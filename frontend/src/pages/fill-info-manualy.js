@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Head from 'next/head'
 
@@ -6,6 +7,7 @@ import Navbar from '../components/navbar'
 import Cards from '../components/cards'
 
 const FillInfoManualy = (props) => {
+  const router = useRouter();
   // Bio part state
   const [bio, setBio] = useState({
     lastName: '',
@@ -168,6 +170,43 @@ const FillInfoManualy = (props) => {
     }
   };
 
+  const sendFormDataToBackend = async (formData) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/resume', { // Replace with your API endpoint
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const responseData = await response.json();
+      console.log('Data successfully sent to the backend', responseData);
+      router.push('/resume-preview');
+    } catch (error) {
+      console.error('Error sending data to backend', error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = {
+      bio,
+      educationHistory,
+      jobHistory,
+      projects,
+      awards,
+      languages,
+      skills
+    };
+    console.log(formData);
+    sendFormDataToBackend(formData);
+  }
+
   return (
     <>
       <div className="w-full flex h-full items-start flex-col justify-start bg-white">
@@ -185,7 +224,7 @@ const FillInfoManualy = (props) => {
             将文件大小控制在6M以内，支持格式pdf/.doc/.docx/.jpg/.png上传成功后，可选择解析简历并填充，便于后续填写、修改。
           </span>
         </div>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="w-full max-w-6xl mx-auto mt-10">
             <h1 className="text-black my-4 ml-2">基本信息：</h1>
             <div className="fill-info-manualy-container01">
@@ -1356,7 +1395,7 @@ const FillInfoManualy = (props) => {
           }
           .fill-info-manualy-container24 {
             width: auto;
-            height: 127px;
+            height: auto;
             display: flex;
             align-items: flex-start;
             justify-content: flex-start;
@@ -1364,15 +1403,15 @@ const FillInfoManualy = (props) => {
           .fill-info-manualy-cards08 {
             gap: var(--dl-space-space-fiveunits);
             width: 600px;
-            height: 158px;
+            height: fit-content;
             display: flex;
             max-width: 1440px;
             align-items: center;
-            padding-top: 13px;
+            padding-top: 10px;
             padding-left: 29px;
             padding-right: var(--dl-space-space-oneandhalfunits);
             flex-direction: row;
-            padding-bottom: var(--dl-space-space-twounits);
+            padding-bottom: 10px;
             justify-content: center;
           }
           .fill-info-manualy-container25 {
