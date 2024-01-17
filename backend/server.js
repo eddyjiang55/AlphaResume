@@ -10,10 +10,20 @@ app.use(express.json());
 // Define port
 const port = 8000;
 
+const { connect } = require('./mongodb/dbconfig');
+const User = require('./mongodb/models/userModel');
+
 // Route for handling POST requests
-app.post('/api/resume', (req, res) => {
-   console.log(req.body); // Log the data to the console
-   res.status(200).json({ message: 'Data received successfully' });
+app.post('/api/resume', async (req, res) => {
+   try {
+      const db = await connect();
+      const user = new User(req.body.bio, req.body.educationHistory, req.body.jobHistory, req.body.projects, req.body.awards, req.body.languages, req.body.skills); // and so on for all fields
+      const collection = db.collection('users');
+      await collection.insertOne(user);
+      res.status(200).json({ message: 'Data stored in MongoDB' });
+   } catch (err) {
+      res.status(500).json({ message: 'Error storing data', error: err });
+   }
 });
 
 // Start the server

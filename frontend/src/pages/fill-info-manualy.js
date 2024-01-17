@@ -170,6 +170,53 @@ const FillInfoManualy = (props) => {
     }
   };
 
+  const reduceOne = (section) => {
+    switch (section) {
+      case 'education':
+        if (educationHistory.length > 1) {
+          const newEducationHistory = [...educationHistory];
+          newEducationHistory.pop();
+          setEducationHistory(newEducationHistory);
+        }
+        break;
+      case 'job':
+        if (jobHistory.length > 1) {
+          const newJobHistory = [...jobHistory];
+          newJobHistory.pop();
+          setJobHistory(newJobHistory);
+        }
+        break;
+      case 'project':
+        if (projects.length > 1) {
+          const newProjects = [...projects];
+          newProjects.pop();
+          setProjects(newProjects);
+        }
+        break;
+      case 'award':
+        if (awards.length > 1) {
+          const newAwards = [...awards];
+          newAwards.pop();
+          setAwards(newAwards);
+        }
+        break;
+      case 'language':
+        if (languages.length > 1) {
+          const newLanguages = [...languages];
+          newLanguages.pop();
+          setLanguages(newLanguages);
+        }
+        break;
+      case 'skill':
+        if (skills.length > 1) {
+          const newSkills = [...skills];
+          newSkills.pop();
+          setSkills(newSkills);
+        }
+        break;
+    }
+  };
+
   const sendFormDataToBackend = async (formData) => {
     try {
       const response = await fetch('http://localhost:8000/api/resume', { // Replace with your API endpoint
@@ -179,11 +226,11 @@ const FillInfoManualy = (props) => {
         },
         body: JSON.stringify(formData)
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const responseData = await response.json();
       console.log('Data successfully sent to the backend', responseData);
       router.push('/resume-preview');
@@ -224,7 +271,7 @@ const FillInfoManualy = (props) => {
             将文件大小控制在6M以内，支持格式pdf/.doc/.docx/.jpg/.png上传成功后，可选择解析简历并填充，便于后续填写、修改。
           </span>
         </div>
-        <form onSubmit={handleSubmit}>
+        <form className="w-full max-w-6xl mx-auto" onSubmit={handleSubmit}>
           <div className="w-full max-w-6xl mx-auto mt-10">
             <h1 className="text-black my-4 ml-2">基本信息：</h1>
             <div className="fill-info-manualy-container01">
@@ -372,12 +419,20 @@ const FillInfoManualy = (props) => {
                 </div>
               </div>
             ))}
-            <button type="button" className="fill-info-manualy-button1 button" onClick={() => addMore('education')}>
-              <span className="fill-info-manualy-text17">
-                添加学历
-                <br />
-              </span>
-            </button>
+            <div className='flex flex-row items-center justify-between'>
+              <button type="button" className="fill-info-manualy-button1 button" onClick={() => addMore('education')}>
+                <span className="fill-info-manualy-text17">
+                  添加学历
+                  <br />
+                </span>
+              </button>
+              <button type="button" className={`${educationHistory.length > 1 ? "fill-info-manualy-button1 button" : "hidden"}`} onClick={() => reduceOne('education')}>
+                <span className="fill-info-manualy-text17">
+                  删除记录
+                  <br />
+                </span>
+              </button>
+            </div>
             <h1 className="fill-info-manualy-text20">工作/实习经历</h1>
             {jobHistory.map((job, index) => (
               <div key={index}>
@@ -424,12 +479,20 @@ const FillInfoManualy = (props) => {
                 ></Cards>
               </div>
             ))}
-            <button type="button" className="fill-info-manualy-button2 button" onClick={() => addMore('job')}>
-              <span className="fill-info-manualy-text27">
-                添加工作/实习经历
-                <br />
-              </span>
-            </button>
+            <div className='flex flex-row items-center justify-between'>
+              <button type="button" className="fill-info-manualy-button2 button" onClick={() => addMore('job')}>
+                <span className="fill-info-manualy-text27">
+                  添加工作/实习经历
+                  <br />
+                </span>
+              </button>
+              <button type="button" className={`${jobHistory.length > 1 ? "fill-info-manualy-button1 button" : "hidden"}`} onClick={() => reduceOne('job')}>
+                <span className="fill-info-manualy-text17">
+                  删除记录
+                  <br />
+                </span>
+              </button>
+            </div>
             <h1 className="fill-info-manualy-text30">项目经历</h1>
             {projects.map((project, index) => (
               <div key={index}>
@@ -488,12 +551,20 @@ const FillInfoManualy = (props) => {
                 ></Cards>
               </div>
             ))}
-            <button type="button" className="fill-info-manualy-button3 button" onClick={() => addMore('project')}>
-              <span className="fill-info-manualy-text27">
-                添加项目经历
-                <br />
-              </span>
-            </button>
+            <div className='flex flex-row items-center justify-between'>
+              <button type="button" className="fill-info-manualy-button3 button" onClick={() => addMore('project')}>
+                <span className="fill-info-manualy-text27">
+                  添加项目经历
+                  <br />
+                </span>
+              </button>
+              <button type="button" className={`${projects.length > 1 ? "fill-info-manualy-button1 button" : "hidden"}`} onClick={() => reduceOne('project')}>
+                <span className="fill-info-manualy-text17">
+                  删除记录
+                  <br />
+                </span>
+              </button>
+            </div>
             <h1 className="fill-info-manualy-text38">获奖信息</h1>
             {awards.map((award, index) => (
               <div key={index}>
@@ -537,12 +608,20 @@ const FillInfoManualy = (props) => {
                 ></Cards>
               </div>
             ))}
-            <button type="button" className="fill-info-manualy-button4 button" onClick={() => addMore('award')}>
-              <span className="fill-info-manualy-text27">
-                添加获奖信息
-                <br />
-              </span>
-            </button>
+            <div className='flex flex-row items-center justify-between'>
+              <button type="button" className="fill-info-manualy-button4 button" onClick={() => addMore('award')}>
+                <span className="fill-info-manualy-text27">
+                  添加获奖信息
+                  <br />
+                </span>
+              </button>
+              <button type="button" className={`${awards.length > 1 ? "fill-info-manualy-button1 button" : "hidden"}`} onClick={() => reduceOne('award')}>
+                <span className="fill-info-manualy-text17">
+                  删除记录
+                  <br />
+                </span>
+              </button>
+            </div>
             <h1 className="fill-info-manualy-text47">语言能力</h1>
             {languages.map((language, index) => (
               <div key={index} className="fill-info-manualy-container31">
@@ -592,12 +671,20 @@ const FillInfoManualy = (props) => {
                 </section>
               </div>
             ))}
-            <button type="button" className="fill-info-manualy-button5 button" onClick={() => addMore('language')}>
-              <span className="fill-info-manualy-text27">
-                添加语言能力
-                <br />
-              </span>
-            </button>
+            <div className='flex flex-row items-center justify-between'>
+              <button type="button" className="fill-info-manualy-button5 button" onClick={() => addMore('language')}>
+                <span className="fill-info-manualy-text27">
+                  添加语言能力
+                  <br />
+                </span>
+              </button>
+              <button type="button" className={`${languages.length > 1 ? "fill-info-manualy-button1 button" : "hidden"}`} onClick={() => reduceOne('language')}>
+                <span className="fill-info-manualy-text17">
+                  删除记录
+                  <br />
+                </span>
+              </button>
+            </div>
             <h1 className="fill-info-manualy-text55">技能</h1>
             {skills.map((skill, index) => (
               <div key={index}>
@@ -640,16 +727,22 @@ const FillInfoManualy = (props) => {
                   <br />
                 </span>
               </button>
-              <button type="submit" className="button fill-info-manualy-link">
-                <span className="p-auto">
-                  下一步
+              <button type="button" className={`${skills.length > 1 ? "fill-info-manualy-button1 button" : "hidden"}`} onClick={() => reduceOne('skill')}>
+                <span className="fill-info-manualy-text17">
+                  删除记录
                   <br />
                 </span>
               </button>
             </div>
           </div>
-        </form>
-      </div>
+          <button type="submit" className="button fill-info-manualy-link">
+            <span className="p-auto">
+              下一步
+              <br />
+            </span>
+          </button>
+        </form >
+      </div >
       <style jsx>
         {`
           .fill-info-manualy-container01 {
@@ -830,7 +923,7 @@ const FillInfoManualy = (props) => {
           .fill-info-manualy-container08 {
             flex: 0 0 auto;
             width: auto;
-            height: 249px;
+            height: auto;
             display: flex;
             align-items: flex-start;
             justify-content: flex-start;
@@ -838,7 +931,7 @@ const FillInfoManualy = (props) => {
           .fill-info-manualy-cards02 {
             gap: var(--dl-space-space-fiveunits);
             width: 600px;
-            height: 284px;
+            height: auto;
             display: flex;
             max-width: 1440px;
             align-items: center;
@@ -936,7 +1029,7 @@ const FillInfoManualy = (props) => {
           .fill-info-manualy-cards03 {
             gap: var(--dl-space-space-fiveunits);
             width: 600px;
-            height: 276px;
+            height: auto;
             display: flex;
             max-width: 1440px;
             align-items: center;
@@ -1594,7 +1687,7 @@ const FillInfoManualy = (props) => {
           .fill-info-manualy-container31 {
             flex: 0 0 auto;
             width: auto;
-            height: 102px;
+            height: auto;
             display: flex;
             align-items: flex-start;
             justify-content: flex-start;
@@ -1602,7 +1695,7 @@ const FillInfoManualy = (props) => {
           .fill-info-manualy-cards11 {
             gap: var(--dl-space-space-fiveunits);
             width: 600px;
-            height: 102px;
+            height: auto;
             display: flex;
             max-width: 1440px;
             align-items: center;
@@ -1665,7 +1758,7 @@ const FillInfoManualy = (props) => {
           .fill-info-manualy-cards12 {
             gap: var(--dl-space-space-fiveunits);
             width: 600px;
-            height: 102px;
+            height: auto;
             display: flex;
             max-width: 1440px;
             align-items: center;
