@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
+import { v4 as uuidv4 } from 'uuid'
 import Link from 'next/link'
 import Head from 'next/head'
+import sampleData from '../lib/personal_info.json'
 
 import Navbar from '../components/navbar'
 import Cards from '../components/cards'
@@ -10,25 +12,27 @@ const FillInfoManualy = (props) => {
   const router = useRouter();
   // Bio part state
   const [bio, setBio] = useState({
-    lastName: '',
-    firstName: '',
-    phoneNumber: '',
-    emailAddress: '',
-    wechatId: ''
+    姓: '',
+    名: '',
+    手机号码: '',
+    邮箱: '',
+    微信号: '',
+    年龄: 22,
+    城市: '北京',
   });
 
   // Education history part state
   const [educationHistory, setEducationHistory] = useState([{
-    degree: '',
-    schoolName: '',
-    city: '',
-    state: '',
-    enrolledTime: '',
-    department: '',
-    major: '',
-    gpa: '',
-    awards: '',
-    courses: ''
+    学历: '',
+    学校名称: '',
+    城市: '',
+    国家: '',
+    起止时间: '',
+    院系: '',
+    专业: '',
+    GPA: '',
+    获奖记录: '',
+    主修课程: ''
   }]);
 
   const handleEducationChange = (index, field, value) => {
@@ -39,11 +43,12 @@ const FillInfoManualy = (props) => {
 
   // Job/Intern history part state
   const [jobHistory, setJobHistory] = useState([{
-    jobType: '',
-    position: '',
-    enrolledTime: '',
-    jobContent: '',
-    achievement: ''
+    公司名字: '',
+    工作类型: '',
+    工作职位: '',
+    就职时间: '',
+    工作内容: '',
+    成就与贡献: ''
   }]);
 
   const handleJobChange = (index, field, value) => {
@@ -54,12 +59,12 @@ const FillInfoManualy = (props) => {
 
   // Project part state
   const [projects, setProjects] = useState([{
-    projectName: '',
-    projectLink: '',
-    startTime: '',
-    endTime: '',
-    projectRole: '',
-    details: ''
+    项目名称: '',
+    项目链接: '',
+    项目起止时间: '',
+    项目职位: '',
+    项目描述: '',
+    项目成就: ''
   }]);
 
   const handleProjectChange = (index, field, value) => {
@@ -70,10 +75,10 @@ const FillInfoManualy = (props) => {
 
   // Award part state
   const [awards, setAwards] = useState([{
-    awardType: '',
-    awardName: '',
-    timeReceived: '',
-    details: ''
+    获奖类型: '',
+    获奖名称: '',
+    获奖时间: '',
+    获奖详情: ''
   }]);
 
   const handleAwardChange = (index, field, value) => {
@@ -84,10 +89,10 @@ const FillInfoManualy = (props) => {
 
   // Language part state
   const [languages, setLanguages] = useState([{
-    languageName: '',
-    proficiency: '',
-    license: '',
-    score: ''
+    语言: '',
+    熟练程度: '',
+    证书类型: '',
+    分数: ''
   }]);
 
   const handleLanguageChange = (index, field, value) => {
@@ -98,8 +103,8 @@ const FillInfoManualy = (props) => {
 
   // Skills part state
   const [skills, setSkills] = useState([{
-    skillName: '',
-    proficiency: ''
+    技能名称: '',
+    熟练程度: ''
   }]);
 
   const handleSkillChange = (index, field, value) => {
@@ -113,56 +118,58 @@ const FillInfoManualy = (props) => {
     switch (section) {
       case 'education':
         setEducationHistory([...educationHistory, {
-          degree: '',
-          schoolName: '',
-          city: '',
-          state: '',
-          enrolledTime: '',
-          department: '',
-          major: '',
-          gpa: '',
-          awards: '',
-          courses: ''
+          学历: '',
+          学校名称: '',
+          城市: '',
+          国家: '',
+          起止时间: '',
+          院系: '',
+          专业: '',
+          GPA: '',
+          获奖记录: '',
+          主修课程: ''
         }]);
         break;
       case 'job':
         setJobHistory([...jobHistory, {
-          jobType: '',
-          position: '',
-          enrolledTime: '',
-          jobContent: '',
-          achievement: ''
+          公司名字: '',
+          工作类型: '',
+          工作职位: '',
+          就职时间: '',
+          工作内容: '',
+          成就与贡献: ''
         }]);
         break;
       case 'project':
         setProjects([...projects, {
-          projectName: '',
-          projectLink: '',
-          timeRange: '',
-          projectRole: '',
-          details: ''
+          项目名称: '',
+          项目链接: '',
+          项目起止时间: '',
+          项目职位: '',
+          项目描述: '',
+          项目成就: ''
         }]);
         break;
       case 'award':
         setAwards([...awards, {
-          awardName: '',
-          awardType: '',
-          timeReceived: '',
-          details: ''
+          获奖类型: '',
+          获奖名称: '',
+          获奖时间: '',
+          获奖详情: ''
         }]);
         break;
       case 'language':
         setLanguages([...languages, {
-          languageName: '',
-          proficiency: '',
-          license: '',
-          score: ''
+          语言: '',
+          熟练程度: '',
+          证书类型: '',
+          分数: ''
         }]);
         break;
       case 'skill':
         setSkills([...skills, {
-          skillName: '',
-          proficiency: ''
+          技能名称: '',
+          熟练程度: ''
         }]);
         break;
       default:
@@ -233,7 +240,8 @@ const FillInfoManualy = (props) => {
 
       const responseData = await response.json();
       console.log('Data successfully sent to the backend', responseData);
-      router.push('/resume-preview');
+      router.push({ pathname: '/resume-preview/', query: { taskId: responseData.id } });
+      // router.reload();
     } catch (error) {
       console.error('Error sending data to backend', error);
     }
@@ -242,16 +250,18 @@ const FillInfoManualy = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = {
-      bio,
-      educationHistory,
-      jobHistory,
-      projects,
-      awards,
-      languages,
-      skills
+      id: uuidv4(),
+      基本信息: bio,
+      教育经历: educationHistory,
+      工作_实习经历: jobHistory,
+      项目经历: projects,
+      获奖信息: awards,
+      语言能力: languages,
+      技能: skills
     };
     console.log(formData);
     sendFormDataToBackend(formData);
+    // sendFormDataToBackend(sampleData);
   }
 
   return (
@@ -287,19 +297,22 @@ const FillInfoManualy = (props) => {
                       type="text"
                       placeholder="请输入你的姓氏"
                       className="fill-info-manualy-textinput input"
-                      onChange={(e) => setBio({ ...bio, lastName: e.target.value })}
+                      value={bio.姓}
+                      onChange={(e) => setBio({ ...bio, 姓: e.target.value })}
                     />
                     <input
                       type="text"
                       placeholder="请输入你的手机号码"
                       className="fill-info-manualy-textinput01 input"
-                      onChange={(e) => setBio({ ...bio, phoneNumber: e.target.value })}
+                      value={bio.手机号码}
+                      onChange={(e) => setBio({ ...bio, 手机号码: e.target.value })}
                     />
                     <input
                       type="text"
                       placeholder="请输入你的微信号"
                       className="fill-info-manualy-textinput02 input"
-                      onChange={(e) => setBio({ ...bio, wechatId: e.target.value })}
+                      value={bio.微信号}
+                      onChange={(e) => setBio({ ...bio, 微信号: e.target.value })}
                     />
                   </div>
                 </section>
@@ -315,13 +328,15 @@ const FillInfoManualy = (props) => {
                       type="text"
                       placeholder="请输入你的名字"
                       className="fill-info-manualy-textinput03 input"
-                      onChange={(e) => setBio({ ...bio, firstName: e.target.value })}
+                      value={bio.名}
+                      onChange={(e) => setBio({ ...bio, 名: e.target.value })}
                     />
                     <input
                       type="text"
                       placeholder="请输入你的邮箱"
                       className="fill-info-manualy-textinput04 input"
-                      onChange={(e) => setBio({ ...bio, emailAddress: e.target.value })}
+                      value={bio.邮箱}
+                      onChange={(e) => setBio({ ...bio, 邮箱: e.target.value })}
                     />
                   </div>
                 </section>
@@ -343,29 +358,29 @@ const FillInfoManualy = (props) => {
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput05 input"
-                        value={education.degree}
-                        onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
+                        value={education.学历}
+                        onChange={(e) => handleEducationChange(index, '学历', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput06 input"
-                        value={education.city}
-                        onChange={(e) => handleEducationChange(index, 'city', e.target.value)}
+                        value={education.城市}
+                        onChange={(e) => handleEducationChange(index, '城市', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput07 input"
-                        value={education.enrolledTime}
-                        onChange={(e) => handleEducationChange(index, 'enrolledTime', e.target.value)}
+                        value={education.起止时间}
+                        onChange={(e) => handleEducationChange(index, '起止时间', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput08 input"
-                        value={education.major}
-                        onChange={(e) => handleEducationChange(index, 'major', e.target.value)}
+                        value={education.专业}
+                        onChange={(e) => handleEducationChange(index, '专业', e.target.value)}
                       />
                     </div>
                   </section>
@@ -381,40 +396,42 @@ const FillInfoManualy = (props) => {
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput09 input"
-                        value={education.schoolName}
-                        onChange={(e) => handleEducationChange(index, 'schoolName', e.target.value)}
+                        value={education.学校名称}
+                        onChange={(e) => handleEducationChange(index, '学校名称', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput10 input"
-                        value={education.state}
-                        onChange={(e) => handleEducationChange(index, 'state', e.target.value)}
+                        value={education.国家}
+                        onChange={(e) => handleEducationChange(index, '国家', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput11 input"
-                        value={education.department}
-                        onChange={(e) => handleEducationChange(index, 'department', e.target.value)}
+                        value={education.院系}
+                        onChange={(e) => handleEducationChange(index, '院系', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput12 input"
-                        value={education.gpa}
-                        onChange={(e) => handleEducationChange(index, 'gpa', e.target.value)}
+                        value={education.GPA}
+                        onChange={(e) => handleEducationChange(index, 'GPA', e.target.value)}
                       />
                     </div>
                   </section>
                 </div>
                 <div className="fill-info-manualy-container13">
                   <Cards
+                    text="获奖记录"
+                    text1="主修课程"
                     rootClassName="cards-root-class-name1"
-                    value={education.awards}
-                    onChange={(e) => handleEducationChange(index, 'awards', e.target.value)}
-                    value1={education.courses}
-                    onChange1={(e) => handleEducationChange(index, 'courses', e.target.value)}
+                    value={education.获奖记录}
+                    value1={education.主修课程}
+                    onChange={(e) => handleEducationChange(index, '获奖记录', e.target.value)}
+                    onChange1={(e) => handleEducationChange(index, '主修课程', e.target.value)}
                   ></Cards>
                 </div>
               </div>
@@ -436,11 +453,10 @@ const FillInfoManualy = (props) => {
             <h1 className="fill-info-manualy-text20">工作/实习经历</h1>
             {jobHistory.map((job, index) => (
               <div key={index}>
-                <div className="fill-info-manualy-container14">
+                <div className="fill-info-manualy-container8 flex">
                   <section className="fill-info-manualy-cards04">
                     <div className="fill-info-manualy-container15">
-                      <span className="fill-info-manualy-text21">类型</span>
-                      <span className="fill-info-manualy-text22">职位</span>
+                      <span className="fill-info-manualy-text21">公司名字</span>
                       <span className="fill-info-manualy-text23">就职时间</span>
                     </div>
                     <div className="fill-info-manualy-container16">
@@ -448,22 +464,37 @@ const FillInfoManualy = (props) => {
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput13 input"
-                        value={job.jobType}
-                        onChange={(e) => handleJobChange(index, 'jobType', e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        placeholder=""
-                        className="fill-info-manualy-textinput14 input"
-                        value={job.position}
-                        onChange={(e) => handleJobChange(index, 'position', e.target.value)}
+                        value={job.公司名字}
+                        onChange={(e) => handleJobChange(index, '公司名字', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput15 input"
-                        value={job.enrolledTime}
-                        onChange={(e) => handleJobChange(index, 'enrolledTime', e.target.value)}
+                        value={job.就职时间}
+                        onChange={(e) => handleJobChange(index, '就职时间', e.target.value)}
+                      />
+                    </div>
+                  </section>
+                  <section className="fill-info-manualy-cards04">
+                    <div className="fill-info-manualy-container15">
+                      <span className="fill-info-manualy-text21">工作类型</span>
+                      <span className="fill-info-manualy-text22">工作职位</span>
+                    </div>
+                    <div className="fill-info-manualy-container16">
+                      <input
+                        type="text"
+                        placeholder=""
+                        className="fill-info-manualy-textinput13 input"
+                        value={job.工作类型}
+                        onChange={(e) => handleJobChange(index, '工作类型', e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        placeholder=""
+                        className="fill-info-manualy-textinput14 input"
+                        value={job.工作职位}
+                        onChange={(e) => handleJobChange(index, '工作职位', e.target.value)}
                       />
                     </div>
                   </section>
@@ -472,10 +503,10 @@ const FillInfoManualy = (props) => {
                   text="工作内容"
                   text1="成就与贡献"
                   rootClassName="cards-root-class-name"
-                  value={job.jobContent}
-                  onChange={(e) => handleJobChange(index, 'jobContent', e.target.value)}
-                  value1={job.achievement}
-                  onChange1={(e) => handleJobChange(index, 'achievement', e.target.value)}
+                  value={job.工作内容}
+                  onChange={(e) => handleJobChange(index, '工作内容', e.target.value)}
+                  value1={job.成就与贡献}
+                  onChange1={(e) => handleJobChange(index, '成就与贡献', e.target.value)}
                 ></Cards>
               </div>
             ))}
@@ -507,15 +538,15 @@ const FillInfoManualy = (props) => {
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput19 input"
-                        value={project.projectName}
-                        onChange={(e) => handleProjectChange(index, 'projectName', e.target.value)}
+                        value={project.项目名称}
+                        onChange={(e) => handleProjectChange(index, '项目名称', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput20 input"
-                        value={project.timeRange}
-                        onChange={(e) => handleProjectChange(index, 'timeRange', e.target.value)}
+                        value={project.项目起止时间}
+                        onChange={(e) => handleProjectChange(index, '项目起止时间', e.target.value)}
                       />
                     </div>
                   </section>
@@ -529,15 +560,15 @@ const FillInfoManualy = (props) => {
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput21 input"
-                        value={project.projectLink}
-                        onChange={(e) => handleProjectChange(index, 'projectLink', e.target.value)}
+                        value={project.项目链接}
+                        onChange={(e) => handleProjectChange(index, '项目链接', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput22 input"
-                        value={project.projectRole}
-                        onChange={(e) => handleProjectChange(index, 'projectRole', e.target.value)}
+                        value={project.项目职位}
+                        onChange={(e) => handleProjectChange(index, '项目职位', e.target.value)}
                       />
                     </div>
                   </section>
@@ -546,8 +577,10 @@ const FillInfoManualy = (props) => {
                   text="项目描述"
                   text1="项目成就"
                   rootClassName="cards-root-class-name1"
-                  value={project.details}
-                  onChange={(e) => handleProjectChange(index, 'details', e.target.value)}
+                  value={project.项目描述}
+                  value1={project.项目成就}
+                  onChange={(e) => handleProjectChange(index, '项目描述', e.target.value)}
+                  onChange1={(e) => handleProjectChange(index, '项目成就', e.target.value)}
                 ></Cards>
               </div>
             ))}
@@ -580,22 +613,22 @@ const FillInfoManualy = (props) => {
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput23 input"
-                        value={award.awardName}
-                        onChange={(e) => handleAwardChange(index, 'awardName', e.target.value)}
+                        value={award.获奖名称}
+                        onChange={(e) => handleAwardChange(index, '获奖名称', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput23 input"
-                        value={award.awardType}
-                        onChange={(e) => handleAwardChange(index, 'awardType', e.target.value)}
+                        value={award.获奖类型}
+                        onChange={(e) => handleAwardChange(index, '获奖类型', e.target.value)}
                       />
                       <input
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput24 input"
-                        value={award.timeReceived}
-                        onChange={(e) => handleAwardChange(index, 'timeReceived', e.target.value)}
+                        value={award.获奖时间}
+                        onChange={(e) => handleAwardChange(index, '获奖时间', e.target.value)}
                       />
                     </div>
                   </section>
@@ -603,8 +636,8 @@ const FillInfoManualy = (props) => {
                 <Cards
                   text="获奖详情"
                   rootClassName="cards-root-class-name2"
-                  value={award.details}
-                  onChange={(e) => handleAwardChange(index, 'details', e.target.value)}
+                  value={award.获奖详情}
+                  onChange={(e) => handleAwardChange(index, '获奖详情', e.target.value)}
                 ></Cards>
               </div>
             ))}
@@ -635,15 +668,15 @@ const FillInfoManualy = (props) => {
                       type="text"
                       placeholder=""
                       className="fill-info-manualy-textinput27 input"
-                      value={language.languageName}
-                      onChange={(e) => handleLanguageChange(index, 'languageName', e.target.value)}
+                      value={language.语言}
+                      onChange={(e) => handleLanguageChange(index, '语言', e.target.value)}
                     />
                     <input
                       type="text"
                       placeholder=""
                       className="fill-info-manualy-textinput28 input"
-                      value={language.license}
-                      onChange={(e) => handleLanguageChange(index, 'license', e.target.value)}
+                      value={language.证书类型}
+                      onChange={(e) => handleLanguageChange(index, '证书类型', e.target.value)}
                     />
                   </div>
                 </section>
@@ -657,15 +690,15 @@ const FillInfoManualy = (props) => {
                       type="text"
                       placeholder=""
                       className="fill-info-manualy-textinput29 input"
-                      value={language.proficiency}
-                      onChange={(e) => handleLanguageChange(index, 'proficiency', e.target.value)}
+                      value={language.熟练程度}
+                      onChange={(e) => handleLanguageChange(index, '熟练程度', e.target.value)}
                     />
                     <input
                       type="text"
                       placeholder=""
                       className="fill-info-manualy-textinput30 input"
-                      value={language.score}
-                      onChange={(e) => handleLanguageChange(index, 'score', e.target.value)}
+                      value={language.分数}
+                      onChange={(e) => handleLanguageChange(index, '分数', e.target.value)}
                     />
                   </div>
                 </section>
@@ -698,8 +731,8 @@ const FillInfoManualy = (props) => {
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput31 input"
-                        value={skill.skillName}
-                        onChange={(e) => handleSkillChange(index, 'skillName', e.target.value)}
+                        value={skill.技能名称}
+                        onChange={(e) => handleSkillChange(index, '技能名称', e.target.value)}
                       />
                     </div>
                   </section>
@@ -712,8 +745,8 @@ const FillInfoManualy = (props) => {
                         type="text"
                         placeholder=""
                         className="fill-info-manualy-textinput32 input"
-                        value={skill.proficiency}
-                        onChange={(e) => handleSkillChange(index, 'proficiency', e.target.value)}
+                        value={skill.熟练程度}
+                        onChange={(e) => handleSkillChange(index, '熟练程度', e.target.value)}
                       />
                     </div>
                   </section>

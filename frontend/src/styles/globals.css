@@ -181,3 +181,132 @@
     padding-bottom: var(--dl-space-space-oneandhalfunits);
   }
 }
+
+.markdown-body {
+  /* max-width:816px; */
+  /* max-height:1056px; */
+  /* margin: auto;
+  padding:48px;
+  background:white;
+  overflow:auto; */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1;
+  /* padding: 20px; */
+}
+
+/* Headings */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: bold;
+  line-height: 1.25;
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+}
+
+.markdown-body h2 {
+  font-size: 1.5em;
+}
+
+.markdown-body h3 {
+  font-size: 1.25em;
+}
+
+.markdown-body h4 {
+  font-size: 1em;
+}
+
+.markdown-body h5 {
+  font-size: 0.875em;
+}
+
+.markdown-body h6 {
+  font-size: 0.85em;
+  color: #6a737d;
+}
+
+/* Paragraphs */
+.markdown-body p {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+/* Links */
+.markdown-body a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+/* Lists */
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em;
+}
+
+.markdown-body li {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* Blockquotes */
+.markdown-body blockquote {
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.25em solid #dfe2e5;
+  color: #6a737d;
+  padding: 0.5em 0;
+  background-color: #f6f8fa;
+}
+
+/* Code Blocks */
+.markdown-body pre {
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  font-size: 85%;
+  line-height: 1.45;
+  overflow: auto;
+  padding: 16px;
+}
+
+.markdown-body code {
+  background-color: rgba(27,31,35,.05);
+  border-radius: 3px;
+  font-size: 85%;
+  margin: 0;
+  padding: 0.2em 0.4em;
+}
+
+/* Images */
+.markdown-body img {
+  max-width: 100%;
+  box-sizing: content-box;
+  background-color: #fff;
+}
+
+.page {
+  max-height: 1056px; /* Height of a letter page in pixels */
+  overflow: hidden; /* Hide overflow */
+  margin-bottom: 20px; /* Space between "pages" */
+  padding: 20px; /* Page padding */
+  border: 1px solid #ccc; /* Page border */
+}
+
+.page-indicator {
+  /* position: fixed;
+  bottom: 20px;
+  right: 20px; */
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+}

@@ -8,7 +8,7 @@ const Cards = (props) => {
       <section className={`cards-cards ${props.rootClassName} `}>
         <div className="cards-container">
           <span className="cards-text">{props.text}</span>
-          <span className="cards-text1">{props.text1}</span>
+          {props.text1 && <span className="cards-text1">{props.text1}</span>}
         </div>
         <div className="cards-container1">
           <textarea
@@ -17,12 +17,12 @@ const Cards = (props) => {
             value={props.value}
             onChange={props.onChange}
           ></textarea>
-          <textarea
+          {props.text1 && <textarea
             placeholder={props.textarea_placeholder1}
             className="cards-textarea1 textarea"
             value={props.value1}
             onChange={props.onChange1}
-          ></textarea>
+          ></textarea>}
         </div>
       </section>
       <style jsx>
@@ -107,11 +107,9 @@ const Cards = (props) => {
 }
 
 Cards.defaultProps = {
-  text1: '主修课程',
   rootClassName: '',
-  textarea_placeholder1: '',
   textarea_placeholder: '',
-  text: '获奖记录',
+  text: '',
 }
 
 Cards.propTypes = {
