@@ -31,7 +31,7 @@ app.post('/api/resume', async (req, res) => {
    }
 
    const pythonProcess = spawn('python3', ['./pyScripts/ResumeProcess.py', req.body.id]);
-   processResult[req.body.id] = { status: 'running', path: "./outputResume/" + req.body.id + ".md" };
+   processResult[req.body.id] = { status: 'running', md_path: "./outputResume/" + req.body.id + ".md", pdf_path: "./outputResume/" + req.body.id + ".pdf", filename: req.body.基本信息.姓 + req.body.基本信息.名 + "_简历.pdf"};
    console.log('Python process started');
    // console.log(processResult);
 
@@ -63,7 +63,7 @@ app.get('/api/result/:id', (req, res) => {
       return res.status(202).json({ message: 'Result is still running' });
    }
    if (result.status === 'done') {
-      fs.readFile(result.path, 'utf-8', (err, data) => {
+      fs.readFile(result.md_path, 'utf-8', (err, data) => {
          if (err) {
             return res.status(500).json({ message: 'Error reading file', error: err });
          }
@@ -81,12 +81,13 @@ app.get('/api/result/:id', (req, res) => {
 app.get('/api/file/:id', (req, res) => {
    const id = req.params.id;
    const result = processResult[id];
-   fs.access(result.path, fs.F_OK, (err) => {
+   fs.access(result.pdf_path, fs.F_OK, (err) => {
       if (err) {
          return res.status(404).json({ message: 'File not found' });
       }
       res.setHeader('Content-Type', 'application/pdf');
-      const filestream = fs.createReadStream(result.path);
+      res.setHeader('Content-Disposition', 'attachment; filename=' + encodeURIComponent(result.filename));
+      const filestream = fs.createReadStream(result.pdf_path);
       filestream.pipe(res);
    });
 });
