@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm';
 export default function PageComponent({ content, pageIndex, onElementClick }) {
   const customRenderers = {
     p: (paragraphProps) => (
-      <p {...paragraphProps} onClick={() => onElementClick(paragraphProps.children)}>
+      <p {...paragraphProps} onClick={() => onElementClick(paragraphProps.node)}>
         {paragraphProps.children}
       </p>
     ),

@@ -23,15 +23,19 @@ const Navbar = (props) => {
               data-role="Nav"
               className="flex flex-1 text-white flex-row items-center gap-x-16"
             >
-              <button className="text-white text-lg font-medium hover:opacity-50 transition-opacity duration-200">
-                {props.button}
-              </button>
+              <Link href="/resume">
+                <button className="text-white text-lg font-medium hover:opacity-50 transition-opacity duration-200">
+                  {props.button}
+                </button>
+              </Link>
               <button className="text-white text-lg font-medium hover:opacity-50 transition-opacity duration-200">
                 {props.button1}
               </button>
-              <button className="text-white text-lg font-medium hover:opacity-50 transition-opacity duration-200">
-                {props.button2}
-              </button>
+              <Link href="/interview">
+                <button className="text-white text-lg font-medium hover:opacity-50 transition-opacity duration-200">
+                  {props.button2}
+                </button>
+              </Link>
             </nav>
           </div>
           <div data-thq="thq-navbar-btn-group" className="w-52 flex flex-row items-center justify-center">

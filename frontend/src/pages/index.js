@@ -65,7 +65,7 @@ const Home = (props) => {
           </div>
           <div className="flex flex-row-reverse w-full">
             <div className="w-52 flex flex-row items-center justify-center">
-              <Link href="/select-communication-method" id="create_resume">
+              <Link href="/resume">
                 <span className="text-black normal-case font-normal pr-6 pb-3 no-underline bg-[#14a9ff] button">新建简历</span>
               </Link>
             </div>

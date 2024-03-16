@@ -1,9 +1,8 @@
+import React from "react";
+import Link from "next/link";
 
-import React from 'react'
-import Link from 'next/link'
-
-import Navbar from '../components/navbar'
-import Card from '../components/card'
+import Navbar from "@/components/navbar";
+import Card from "@/components/card";
 
 const SelectCommunicationMethod = (props) => {
   return (
@@ -26,7 +25,7 @@ const SelectCommunicationMethod = (props) => {
               image_src1="https://images.unsplash.com/photo-1579705379005-1cdcdc76f793?ixid=M3w5MTMyMXwwfDF8c2VhcmNofDE5fHx0ZXh0fGVufDB8fHx8MTcwMDI4MTAyMXww&amp;ixlib=rb-4.0.3&amp;h=300"
               rootClassName="card-root-class-name7"
             ></Card>
-            <Link href="/fill-info-manualy">
+            <Link href="/resume/manualy">
               <span className="bg-[#14a9ff] text-white button">选择</span>
             </Link>
           </div>
@@ -37,34 +36,12 @@ const SelectCommunicationMethod = (props) => {
               image_src1="https://images.unsplash.com/photo-1655271916005-12152fe420a1?ixid=M3w5MTMyMXwwfDF8c2VhcmNofDE1NHx8ZmFzdHxlbnwwfHx8fDE3MDE0ODY4NzF8MA&amp;ixlib=rb-4.0.3&amp;h=300"
               rootClassName="card-root-class-name6"
             ></Card>
-            <Link href="/multiple-resume-through-one-click">
-              <span className="bg-[#14a9ff] text-black button">选择</span>
-            </Link>
+            <span className="bg-[#14a9ff] text-black button">选择</span>
           </div>
         </section>
       </div>
-      {/* <style jsx>
-        {`
-          @media (max-width: 1200px) {
-            .select-communication-method-link1 {
-              color: var(--dl-color-gray-white);
-            }
-            .select-communication-method-link2 {
-              color: var(--dl-color-gray-white);
-            }
-          }
-          @media (max-width: 767px) {
-            .select-communication-method-cards {
-              padding-top: var(--dl-space-space-threeunits);
-              padding-left: var(--dl-space-space-oneandhalfunits);
-              padding-right: var(--dl-space-space-oneandhalfunits);
-              padding-bottom: var(--dl-space-space-fourunits);
-            }
-          }
-        `}
-      </style> */}
     </>
-  )
-}
+  );
+};
 
-export default SelectCommunicationMethod
+export default SelectCommunicationMethod;
