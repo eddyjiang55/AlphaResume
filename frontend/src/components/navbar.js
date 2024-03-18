@@ -9,7 +9,7 @@ const Navbar = () => {
                     <Image src="/img/Logo-x.jpg" alt="Logo" width={190} height={100} />
                 </div>
                 <div className="navigation">
-                    <Link href="/resume-optimization" className="nav-link">简历优化</Link>
+                    <Link href="/choose-resumeserve-type" className="nav-link">简历优化</Link>
                     <Link href="/mock-interview" className="nav-link">模拟面试</Link>
                     <Link href="/personal-info" className="nav-link">个人信息</Link>
                 </div>
@@ -24,7 +24,6 @@ const Navbar = () => {
                     align-items: center;
                     justify-content: space-between;
                     background-color: white;
-                    padding: 0 20px;
                     position: fixed;
                     width: 100%;
                     z-index: 10;
