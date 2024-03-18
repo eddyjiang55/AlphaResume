@@ -13,6 +13,7 @@ const SplitBackgroundPage = () => {
                 .split-background {
                     display: flex;
                     flex-direction: column;
+                    z-index=1;
                 }
                 .top-half {
                     flex: 1;
