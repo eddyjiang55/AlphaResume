@@ -24,10 +24,7 @@ const Navbar = () => {
                     align-items: center;
                     justify-content: space-between;
                     background-color: white;
-                    position: fixed;
                     width: 100%;
-                    z-index: 10;
-                    top: 0;
                     font-size: 20px;
                 }
                 .logo {
