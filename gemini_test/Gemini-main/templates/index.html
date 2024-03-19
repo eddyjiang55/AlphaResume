@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot Webpage</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex; /* Center elements horizontally */
+      justify-content: center;
+      align-items: center; /* Center elements vertically */
+      min-height: 100vh; /* Set minimum viewport height */
+      margin: 0; /* Remove default body margin */
+    }
+
+    #chat-container,
+    #response-container {
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px; /* Add rounded corners */
+      background-color: white;
+      font-size: 16px;
+    }
+
+    #chat-container {
+      width: 50%;
+      height: 300px;
+      overflow-y: scroll;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none; /* Remove default button border */
+      border-radius: 5px;
+      background-color: #4CAF50; /* Green color */
+      color: white;
+      margin: 5px;
+    }
+
+    button:hover {
+      background-color: #45A049; /* Darker green on hover */
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container"></div>
+  <div id="response-container"></div>
+  <div>
+    <button onclick="startVoiceChat()">开始语音聊天</button>
+    <button onclick="restartVoiceChat()">重新开始语音聊天</button>
+  </div>
+
+    <script>
+        var questions_and_answers = [
+            {"question": "请简要介绍一下你在北京大学计算机科学与技术专业以及哥伦比亚大学信息科学专业学习期间，对你影响最大的课程或项目是什么？为什么？", "answer": ""},
+<!--            {"question": "在百度实习期间，你参与了核心软件项目的开发。请描述一下你负责的模块的主要功能以及你在项目中遇到的最大技术挑战是什么？你是如何解决的？", "answer": ""},-->
+<!--            {"question": "你在华为担任前端工程师时，如何与产品经理和后端开发人员协作确保项目符合用户需求和业务目标？请举一个具体的例子。", "answer": ""},-->
+<!--            {"question": "在智能家居控制系统项目中，你是如何利用数据结构和算法优化设备控制逻辑的？请分享一个具体的优化案例。", "answer": ""},-->
+<!--            {"question": "在在线教育平台项目中，你实现了实时互动课堂功能。请详细描述一下这个功能的技术实现方案，以及你是如何优化性能以实现这一功能的？", "answer": ""},-->
+<!--            {"question": "你对Java和Python都非常精通，但在实际项目中如何选择使用哪种语言？请给出一个你做出选择的实例。", "answer": ""},-->
+<!--            {"question": "你中经常使用Git进行版本控制，请分享一次你通过Git解决代码冲突或协同开发问题的经验。", "answer": ""},-->
+<!--            {"question": "你在软件开发中如何保证代码的质量和可维护性？请列举几个你遵循的最佳实践。", "answer": ""},-->
+<!--            {"question": "你在哥伦比亚大学学习期间获得了研究生奖学金，能否分享一下你在这个过程中是如何进行自我驱动学习和研究的？", "answer": ""},-->
+<!--            {"question": "在未来的工作中，如果你遇到一个你之前没有接触过的技术问题，你会如何解决？请描述一下你的问题解决策略。", "answer": ""}-->
+        ];
+
+    var currentQuestionIndex = 0;
+
+    var response = "";
+
+    function startVoiceChat() {
+        if (currentQuestionIndex < questions_and_answers.length) {
+            var question = questions_and_answers[currentQuestionIndex].question;
+            document.getElementById('chat-container').innerHTML += '<p>Question: ' + question + '</p>';
+
+            // 新增语音播报问题
+            var speech = new SpeechSynthesisUtterance(question);
+            speech.lang = 'zh-CN';
+            window.speechSynthesis.speak(speech);
+
+            var recognition = new webkitSpeechRecognition(); // for Chrome
+            recognition.lang = 'zh-CN';
+
+            recognition.onresult = function(event) {
+                var userResponse = event.results[0][0].transcript;
+                questions_and_answers[currentQuestionIndex].answer = userResponse;
+                document.getElementById('chat-container').innerHTML += '<p>Your Answer: ' + userResponse + '</p>';
+
+                if (currentQuestionIndex < questions_and_answers.length - 1) {
+                    currentQuestionIndex++;
+                    startVoiceChat();
+                } else {
+                    showResults(response);
+                    disableVoiceChat();
+                }
+            };
+
+            recognition.start();
+        }
+    }
+
+    function showResults() {
+        console.log("Response in showResults:", response)
+        showResponse(response);
+        document.getElementById('chat-container').innerHTML += '<p>Results: ' + JSON.stringify(questions_and_answers) + '</p>';
+    }
+
+    function showResponse(response) {
+        document.getElementById('response-container').innerHTML = '<p>Generated Response: ' + response + '</p>';
+    }
+
+    function restartVoiceChat() {
+        currentQuestionIndex = 0;
+        questions_and_answers.forEach(function(qa) { qa.answer = ""; });
+        document.getElementById('chat-container').innerHTML = '';
+        enableVoiceChat();
+        startVoiceChat();
+    }
+
+    function enableVoiceChat() {
+        document.querySelector('button[onclick="startVoiceChat"]').disabled = false;
+    }
+
+    function disableVoiceChat() {
+        document.querySelector('button[onclick="startVoiceChat"]').disabled = true;
+    }
+</script>
+</body>
+</html>
