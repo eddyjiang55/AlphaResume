@@ -26,6 +26,7 @@ const Navbar = () => {
                     background-color: white;
                     width: 100%;
                     font-size: 20px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                 }
                 .logo {
                     flex-shrink: 0;

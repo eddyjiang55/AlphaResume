@@ -74,7 +74,9 @@ const SplitBackgroundPage = () => {
                                     </div>
                                 </div>
                                 <div className="actions">
-                                    <button className="action-button">查看知识文档</button>
+                                    <button className="action-button">
+                                        <a href='/start-resumeserve'>简历生成</a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
