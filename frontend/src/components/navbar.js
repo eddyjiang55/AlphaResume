@@ -6,7 +6,7 @@ const Navbar = () => {
         <>
             <nav className="navbar">
                 <div className="logo">
-                    <Link href='/index'><Image src="/img/Logo-x.jpg" alt="Logo" width={190} height={100} /></Link>
+                    <Link href='/'><Image src="/img/Logo-x.jpg" alt="Logo" width={190} height={100} /></Link>
                 </div>
                 <div className="navigation">
                     <Link href="/choose-resumeserve-type" className="nav-link">简历优化</Link>
