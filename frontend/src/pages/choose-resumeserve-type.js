@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 const SplitBackgroundPage = () => {
     return (
         <>
-        <Navbar />
+        <Navbar></Navbar>
             <div className="split-background">
                 <div className="top-half"></div>
                 <div className="content-container">
