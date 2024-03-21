@@ -14,7 +14,7 @@ const Navbar = () => {
                     <Link href="/personal-info" className="nav-link">个人信息</Link>
                 </div>
                 <div className="actions">
-                    <button className="action-button">登陆</button>
+                    <Link href='/login'><button className="action-button">登陆</button></Link>
                     <button className="action-button">获取</button>
                 </div>
             </nav>
@@ -26,7 +26,7 @@ const Navbar = () => {
                     background-color: white;
                     width: 100%;
                     font-size: 20px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                 }
                 .logo {
                     flex-shrink: 0;
