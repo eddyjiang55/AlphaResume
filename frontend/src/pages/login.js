@@ -4,10 +4,14 @@ import Navbar from '../components/Navbar';
 const LoginPage = () => {
   return (
     <>
-    <Navbar />
     <div>
         <div className="container">
             <div className="login-form">
+            <div className='backward'>
+                    <img src='/img/back.svg'width={40} height={40} ></img>
+                    <a href='/choose-resumeserve-type'>返回</a>
+            </div>
+                <div className="text-title">登陆</div>
                 <input type="text" placeholder="手机号码" />
                 <input type="password" placeholder="验证码" />
                 <button className='action-button'>登录</button>
@@ -15,8 +19,8 @@ const LoginPage = () => {
             </div>
             <div className="info-section">
                 <img src='/img/logo_y.jpg' width={190}></img>
-                <p>从简历到面试，每一步都需精心准备，确保领先在起跑线！简历和面试是求职关键，充足准备才能脱颖而出。别小看每一步，从展现经历到面试应对，都至关重要。</p>
-                <p>放心，我们全程陪伴，助你求职之路更顺畅简单！</p>
+                <p className='para1'>从简历到面试，每一步都需精心准备，确保领先在起跑线！简历和面试是求职关键，充足准备才能脱颖而出。别小看每一步，从展现经历到面试应对，都至关重要。</p>
+                <p className='para2'>放心，我们全程陪伴，助你求职之路更顺畅简单！</p>
                 <img></img>
             </div>
         </div>
@@ -27,6 +31,16 @@ const LoginPage = () => {
           min-height:100vh;
           min-width:100vw;
         }
+        .backward {
+            display: flex;
+            position:fixed;
+            align-items: center;
+            padding-left:30px;
+            padding-top:20px;
+            color:white;
+            left:0;
+            top:0;
+        }
         .login-form {
           display: flex;
           flex-direction: column;
@@ -35,6 +49,12 @@ const LoginPage = () => {
           width: 50%;
           background-color: #1D80A7;
           color:white;
+        }
+        .text-title{
+            font-size: 36px;
+            font-weight:bold;
+            padding: 30px;
+            color:white;
         }
         input {
           margin-bottom: 10px;
