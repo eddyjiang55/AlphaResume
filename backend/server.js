@@ -2,10 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const jobInfoRoutes = require('./routes/jobInfoRoutes');
+const resumeRoutes = require('./routes/resumeRoutes'); 
+const chatHisRoutes = require('./routes/chatHisRoutes'); 
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api', jobInfoRoutes);
+app.use('/api', resumeRoutes);
+app.use('/api', chatHisRoutes);
 
 const { Queue, Worker } = require('bull');
 const WebSocket = require('ws');
