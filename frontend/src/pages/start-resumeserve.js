@@ -29,7 +29,7 @@ const SplitBackgroundPage = () => {
                     </div>
                 </div>
                 <div className='start'>
-                    <button className='begin' href='/resume_firststep'>开始</button>
+                    <button className='begin'><a href='/fill-info-step1'>开始</a></button>
                 </div>
             </div>
             <style jsx>{`
