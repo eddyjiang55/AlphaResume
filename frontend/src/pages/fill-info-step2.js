@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
@@ -25,7 +26,7 @@ const HomePage = () => {
         ))}
       </div>
       <div className='background'>
-      <div className="form-container">
+        <div className="form-container">
         <div className="form-heading">
           <h2>请输入以下内容：</h2>
         </div>
@@ -51,6 +52,18 @@ const HomePage = () => {
             </div>
           </form>
         </div>
+        <div className='tip-info'>
+            <div className="form-heading">
+              <h2>小贴士</h2>
+            </div>
+            <div className='tip-context'>
+              <p>
+              Tips（未完善）
+              If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
+              We've got you covered in our post The New Grad's Map to Resume Writing.
+              </p>
+            </div>
+        </div>
       </div>
       </div>
       <style jsx>{`
@@ -58,12 +71,16 @@ const HomePage = () => {
           background-color: #EDF8FD;
           min-height:100vh;
           display: flex;
-          flex-direction: column; // 设置 flex 方向为垂直
-          align-items: center; // 水平居中对齐子元素
+          justify-content: center;
+          align-items: start; // 从顶部开始对齐
+          flex-wrap: wrap; // 允许容器内的项目换行
+          gap: 20px; // 两个容器之间的间距
           padding:20px;
         }
+        .tip-info, .form-container {
+          width:50%;
+        }
         .form-container {
-          width:100%;
           max-width:500px;
         }
         .form-heading h2,
@@ -176,6 +193,27 @@ const HomePage = () => {
           margin-right: 8px;
           width: 50px; // 调整图标大小
           height: 50px; // 调整图标大小
+        .secondNavbar {
+          display: flex;
+          justify-content: space-around;
+          padding: 20px 0;
+          background-color: #B2DDEE;
+          box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+        }
+        .secondNavbar button {
+          flex-grow: 1;
+          padding: 10px 20px;
+          border-radius: 15px;
+          background: none;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+        .secondNavbar button:hover, .secondNavbar button:focus {
+          background-color: #1D80A7;
+        }
+        .secondNavbar .active {
+          background-color: #1D80A7; /* 激活按钮的背景颜色 */
+          color: white; /* 激活按钮的文本颜色 */
         }
       `}</style>
     </div>
