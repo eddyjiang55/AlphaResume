@@ -67,18 +67,24 @@ const HomePage = () => {
       </div>
       </div>
       <style jsx>{`
-        .background{
+        .background {
           background-color: #EDF8FD;
-          min-height:100vh;
+          min-height: 100vh;
+          min-width:100vw;
           display: flex;
-          justify-content: center;
-          align-items: start; // 从顶部开始对齐
-          flex-wrap: wrap; // 允许容器内的项目换行
-          gap: 20px; // 两个容器之间的间距
-          padding:20px;
+          justify-content: space-between;
         }
         .tip-info, .form-container {
-          width:50%;
+          flex:1;
+        }
+        .tip-info{
+          display: flex;
+          justify-content: center;
+          flex-direction: column; 
+          text-align: center;
+          padding:100px;
+          gap:30px;
+          font-size:24px;
         }
         .form-container {
           max-width:500px;
