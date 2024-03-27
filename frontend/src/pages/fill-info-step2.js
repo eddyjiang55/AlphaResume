@@ -52,7 +52,8 @@ const HomePage = () => {
             </div>
           </form>
         </div>
-        <div className='tip-info'>
+      </div>
+      <div className='tip-info'>
             <div className="form-heading">
               <h2>小贴士</h2>
             </div>
@@ -65,29 +66,33 @@ const HomePage = () => {
             </div>
         </div>
       </div>
-      </div>
       <style jsx>{`
-        .background {
-          background-color: #EDF8FD;
-          min-height: 100vh;
-          min-width:100vw;
-          display: flex;
-          justify-content: space-between;
-        }
-        .tip-info, .form-container {
-          flex:1;
-        }
+      .background {
+        background-color: #EDF8FD;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: row; /* 水平排列子元素 */
+        flex-wrap: wrap; /* 允许子元素在必要时换行 */
+        justify-content: center; /* 在主轴上居中对齐子元素 */
+        align-items: flex-start; /* 在交叉轴上从顶部对齐子元素 */
+      }
+
+      .tip-info, .form-container {
+        flex: 1 1 50%; /* 设置子元素基础大小为50%，允许它们增长和缩小 */
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box; /* 包括padding和border在内的宽度计算方式 */
+      }
         .tip-info{
-          display: flex;
-          justify-content: center;
-          flex-direction: column; 
-          text-align: center;
+        }
+        .tip-context{
           padding:100px;
-          gap:30px;
-          font-size:24px;
         }
         .form-container {
-          max-width:500px;
+          min-width:500px;
         }
         .form-heading h2,
         .form-description p {
@@ -104,6 +109,7 @@ const HomePage = () => {
         .form-body form {
           display: flex;
           flex-direction: column;
+          padding:0 100px;
         }
         .input-group {
           display: flex;
