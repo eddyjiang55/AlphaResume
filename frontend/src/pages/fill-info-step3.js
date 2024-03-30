@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
@@ -26,36 +27,87 @@ const HomePage = () => {
       </div>
       <div className='background'>
       <div className="form-container">
-        <div className="form-heading">
-          <h2>请输入以下内容：</h2>
-        </div>
-        <div className="form-description">
-          <p>在填写信息时，请核对入户表格内容是否准确，错误信息将造成相关影响。</p>
-        </div>
-        <div className="form-body">
-          <form>
-            <input type='self'></input>
+          <div className="form-heading">
+            <h2>教育经历</h2>
+          </div>
+          <div className="form-body">
+            <form>
+              <label>学历</label>
+              <input type="tel" placeholder="请选择学历水平" />
 
-            <div className="form-buttons">
-              <button type="submit">保存</button>
-              <button type="button">下一步</button>
-            </div>
-          </form>
-        </div>
+              <label>学校名称</label>
+              <input type="email" placeholder="请输入学校名称" />
+
+              <label>微信号</label>
+              <input type="email" placeholder="请输入微信号" />
+              <label>院系</label>
+              <input type="email" placeholder="请输入院系" />
+              <label>专业</label>
+              <input type="email" placeholder="请输入专业" />
+              <label>获奖记录</label>
+              <input type="email" placeholder="请输入获奖记录" />
+              <label>主修课程</label>
+              <input type="email" placeholder="请输入主修课程" />
+              <div className="input-group">
+                <div className="input-item">
+                  <label>GPA</label>
+                  <input type="text" placeholder="" />
+                </div>
+                <div className="input-item">
+                  <label>排名</label>
+                  <input type="text" placeholder="" />
+                </div>
+              </div>
+              {/* ... 其他表单元素 ... */}
+
+              <div className="form-buttons">
+                <button className='form-b' type="submit">保存</button>
+                <button className='form-b' type="button"><a href='/fill-info-step2'>下一步</a></button>
+              </div>
+            </form>
+          </div>
       </div>
+      <div className='tip-info'>
+            <div className="form-heading">
+              <h2>小贴士</h2>
+            </div>
+            <div className='tip-context'>
+              <p>
+              Tips（未完善）
+              If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
+              We've got you covered in our post The New Grad's Map to Resume Writing.
+              </p>
+            </div>
+        </div>
       </div>
       <style jsx>{`
-        .background{
-          background-color: #EDF8FD;
-          min-height:100vh;
-          display: flex;
-          flex-direction: column; // 设置 flex 方向为垂直
-          align-items: center; // 水平居中对齐子元素
-          padding:20px;
+      
+      .background {
+        background-color: #EDF8FD;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: row; /* 水平排列子元素 */
+        flex-wrap: wrap; /* 允许子元素在必要时换行 */
+        justify-content: center; /* 在主轴上居中对齐子元素 */
+        align-items: flex-start; /* 在交叉轴上从顶部对齐子元素 */
+      }
+
+      .tip-info, .form-container {
+        flex: 1 1 50%; /* 设置子元素基础大小为50%，允许它们增长和缩小 */
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box; /* 包括padding和border在内的宽度计算方式 */
+      }
+        .tip-info{
+        }
+        .tip-context{
+          padding:100px;
         }
         .form-container {
-          width:100%;
-          max-width:500px;
+          min-width:500px;
         }
         .form-heading h2,
         .form-description p {
@@ -72,11 +124,13 @@ const HomePage = () => {
         .form-body form {
           display: flex;
           flex-direction: column;
+          padding:0 100px;
         }
         .input-group {
           display: flex;
           justify-content: center;
           gap:100px;
+          padding:10px;
         }
         .ps{
           color:grey;
@@ -89,6 +143,7 @@ const HomePage = () => {
         label {
           margin-top: 10px;
           font-weight:bold;
+          text-align: left;
         }
         input[type="title"],
         input[type="text"],
@@ -99,19 +154,13 @@ const HomePage = () => {
           border: 1px solid #ccc;
           border-radius: 10px;
         }
-        input[type="self"] {
-          padding: 100px;
-          margin-top: 500px;
-          border: 1px solid #ccc;
-          border-radius: 10px;
-        }
         .form-buttons {
           display: flex;
           justify-content: space-between;
           margin-top: 20px;
         }
         .form-b {
-          padding: 10px 100px;
+          padding: 10px 50px;
           border: none;
           border-radius: 30px;
           color: white;
@@ -173,6 +222,27 @@ const HomePage = () => {
           margin-right: 8px;
           width: 50px; // 调整图标大小
           height: 50px; // 调整图标大小
+        .secondNavbar {
+          display: flex;
+          justify-content: space-around;
+          padding: 20px 0;
+          background-color: #B2DDEE;
+          box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+        }
+        .secondNavbar button {
+          flex-grow: 1;
+          padding: 10px 20px;
+          border-radius: 15px;
+          background: none;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+        .secondNavbar button:hover, .secondNavbar button:focus {
+          background-color: #1D80A7;
+        }
+        .secondNavbar .active {
+          background-color: #1D80A7; /* 激活按钮的背景颜色 */
+          color: white; /* 激活按钮的文本颜色 */
         }
       `}</style>
     </div>

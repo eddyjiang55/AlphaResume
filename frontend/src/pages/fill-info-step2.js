@@ -26,47 +26,48 @@ const HomePage = () => {
         ))}
       </div>
       <div className='background'>
-        <div className="form-container">
-        <div className="form-heading">
-          <h2>请输入以下内容：</h2>
-        </div>
-        <div className="form-description">
-          <p>在填写信息时，请核对入户表格内容是否准确，错误信息将造成相关影响。</p>
-        </div>
-        <div className="form-body">
-          <form>
-            <label>用户名</label>
-            <input type="text" placeholder="请输入用户名" />
-            
-            <label>手机号码</label>
-            <input type="tel" placeholder="请输入手机号码" />
+      <div className="form-container">
+          <div className="form-heading">
+            <h2>请书写您的个人评价</h2>
+          </div>
+          <div className="form-body">
+            <form>
+            <input type='self'></input>
+              {/* ... 其他表单元素 ... */}
 
-            <label>邮箱</label>
-            <input type="email" placeholder="请输入邮箱地址" />
-
-            {/* ... 其他表单元素 ... */}
-
-            <div className="form-buttons">
-              <button type="submit">保存</button>
-              <button type="button">下一步</button>
-            </div>
-          </form>
-        </div>
+              <div className="form-buttons">
+                <button className='form-b' type="submit">保存</button>
+                <button className='form-b' type="button"><a href='/fill-info-step3'>下一步</a></button>
+              </div>
+            </form>
+          </div>
       </div>
       <div className='tip-info'>
             <div className="form-heading">
               <h2>小贴士</h2>
             </div>
             <div className='tip-context'>
-              <p>
-              Tips（未完善）
-              If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
-              We've got you covered in our post The New Grad's Map to Resume Writing.
-              </p>
+            <p>
+              <strong>为什么个人评价重要？</strong><br></br>定位自我：个人评价是您向招聘者展示自身职业特质、价值观及与目标职位契合度的重要一环，有助于快速建立个人品牌形象。突出优势：它让HR在短时间内了解您的核心竞争力、工作风格和所取得的关键成果。
+            </p>
+
+            <p>
+              <strong>有哪些注意事项？</strong><br></br>精炼明确：避免冗长，保持简洁明了，一般不超过3至5句话。针对岗位：根据应聘职位的具体要求，定制个人评价的内容，强调自己的相关经验和成就。客观公正：不要过度夸大或自谦，应实事求是描述自身优点和特长。量化成果：尽可能使用具体数据或案例来支持你的能力表述。体现价值：阐述自己能为潜在雇主带来的价值，如提升团队效率、创造业绩增长等。
+            </p>
+
+            <p>
+              <strong>需要包括哪些内容要素？</strong><br></br>核心技能：概括您的主要专业技能和证书资质。工作经验亮点：提炼过往工作中最具代表性的成绩和贡献。个人特质：展现与工作相关的性格特点和职业态度。成长潜力：表达持续学习和适应新环境的能力，以及对职业发展的长远规划。
+            </p>
+            <p>
+              <strong>示例：</strong>（字节跳动算法岗）<br></br>作为一名算法工程师，我具备扎实的计算机科学基础和丰富的机器学习实践经验，在数据结构、算法设计与优化方面具有深厚造诣，并已获得ACM ICPC亚洲区域赛优胜证书。在过往实习经历中，针对推荐系统优化项目，我提出并实施了一项个性化排序算法改进方案，使点击率提升15%，有效推动了产品用户活跃度及业务增长。我注重团队协作与沟通，曾在团队项目中担任技术负责人，协调成员高效完成任务，提升了整体研发效率20%。持续关注AI领域前沿动态，具备快速学习新知识和技术的能力，对算法岗的职业发展有着明确而长远的规划，期待能在字节跳动发挥所长，共同驱动技术创新与应用突破。
+            </p>
             </div>
         </div>
       </div>
       <style jsx>{`
+      p {
+        margin: 20px 0; /* 调整段落的上下外边距 */
+      }
       .background {
         background-color: #EDF8FD;
         min-height: 100vh;
@@ -76,7 +77,12 @@ const HomePage = () => {
         justify-content: center; /* 在主轴上居中对齐子元素 */
         align-items: flex-start; /* 在交叉轴上从顶部对齐子元素 */
       }
-
+      input[type="self"] {
+        padding: 300px 0px;
+        margin-top: 50px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+      }
       .tip-info, .form-container {
         flex: 1 1 50%; /* 设置子元素基础大小为50%，允许它们增长和缩小 */
         display: flex;
@@ -89,6 +95,7 @@ const HomePage = () => {
         .tip-info{
         }
         .tip-context{
+          text-align:left;
           padding:100px;
         }
         .form-container {
@@ -115,6 +122,7 @@ const HomePage = () => {
           display: flex;
           justify-content: center;
           gap:100px;
+          padding:10px;
         }
         .ps{
           color:grey;
@@ -127,6 +135,7 @@ const HomePage = () => {
         label {
           margin-top: 10px;
           font-weight:bold;
+          text-align: left;
         }
         input[type="title"],
         input[type="text"],
@@ -143,7 +152,7 @@ const HomePage = () => {
           margin-top: 20px;
         }
         .form-b {
-          padding: 10px 100px;
+          padding: 10px 50px;
           border: none;
           border-radius: 30px;
           color: white;
