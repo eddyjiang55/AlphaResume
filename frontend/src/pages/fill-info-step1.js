@@ -5,6 +5,36 @@ import Navbar from '../components/Navbar';
 
 const HomePage = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
+  const handleDragOver = (e) => {
+    e.preventDefault(); // 防止浏览器默认处理文件的行为
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files.length) {
+      uploadFile(files[0]); // 假设我们只处理第一个文件
+    }
+  };
+
+  const uploadFile = (file) => {
+    const formData = new FormData();
+    formData.append('file', file); // 假设后端期望的字段名是 'file'
+
+    fetch('http://localhost:8000/api/resume-info', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Upload successful:', data);
+        // 这里可以更新状态或UI以反馈用户上传成功
+      })
+      .catch(error => {
+        console.error('Upload error:', error);
+        // 这里可以处理上传失败的情况
+      });
+  };
   const buttons = [
     { name: "基础信息", path: "/fill-info-step1" },
     { name: "个人评价", path: "/fill-info-step2" },
@@ -27,9 +57,9 @@ const HomePage = () => {
       <div className='background'>
       <div className="info-container">
           <span className="info-text">若已有简历，上传简历我们帮您解析：</span>
-          <button className="info-button">
-            <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
-            拖曳文件到此处上传
+          <button className="info-button" onDragOver={handleDragOver} onDrop={handleDrop}>
+              <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
+              拖曳文件到此处上传
           </button>
         </div>
         <div className="form-container">
