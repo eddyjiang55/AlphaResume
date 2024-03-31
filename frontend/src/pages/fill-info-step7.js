@@ -34,35 +34,51 @@ const HomePage = () => {
       <div className='background'>
       <div className="form-container">
           <div className="form-heading">
-            <h2>职业经历</h2>
+            <h2>科研论文与知识产权</h2>
           </div>
           <div className="form-body">
             <form>
-              <label>公司名称</label>
+              <label className='smallTitle'>科研论文</label>
+              <label>论文标题</label>
               <input type="tel"/>
-              <div className="input-group">
-                <div className="input-item">
-                  <label>城市</label>
-                  <input type="text" placeholder="" />
-                </div>
-                <div className="input-item">
-                  <label>国家</label>
-                  <input type="text" placeholder="" />
-                </div>
-              </div>
-              <label>起止时间</label>
+              <label>作者顺序</label>
               <input type="email"/>
-              <label>职位</label>
+              <label>期刊/会议</label>
               <input type="email"/>
-              <label>部门</label>
+              <label>出版时间</label>
               <input type="email"/>
-              <label>职责/业务描述</label>
+              <label>DOI/链接</label>
+              <input type="email"/>
+              <label>研究描述</label>
+              <input type="email"/>
+              <label>个人贡献</label>
               <input type="email"/>
               {/* ... 其他表单元素 ... */}
+              <div className="info-container">
+                <button className="info-button">
+                    <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
+                    添加科研论文
+                </button>
+              </div>
 
+              <label className='smallTitle'>知识产权</label>
+              <label>专利名称</label>
+              <input type="tel"/>
+              <label>专利号</label>
+              <input type="email"/>
+              <label>申请/授权日期</label>
+              <input type="email"/>
+              <label>描述</label>
+              <input type="email"/>
+              <div className="info-container">
+                <button className="info-button">
+                    <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
+                    添加知识产权
+                </button>
+              </div>
               <div className="form-buttons">
                 <button className='form-b' type="submit">保存</button>
-                <button className='form-b' type="button"><a href='/fill-info-step5'>下一步</a></button>
+                <button className='form-b' type="button"><a href='/fill-info-step8'>下一步</a></button>
               </div>
             </form>
           </div>
@@ -81,7 +97,11 @@ const HomePage = () => {
         </div>
       </div>
       <style jsx>{`
-      
+      .smallTitle{
+        color:#1D80A7;
+        font-size:20px;
+        padding-buttom:10px;
+      }
       .background {
         background-color: #EDF8FD;
         min-height: 100vh;
@@ -155,8 +175,8 @@ const HomePage = () => {
           border-radius: 10px;
         }
         input[type="long"] {
-          padding: 10px 200px;
-          margin-top: 5px;
+          padding: 20px 10px;
+          margin-top: 50px;
           border: 1px solid #ccc;
           border-radius: 10px;
         }
@@ -208,7 +228,8 @@ const HomePage = () => {
           align-items: center;
           padding: 10px
           border-radius: 4px;
-          margin: 10px 0;
+          font-weight:bold;
+          margin: 30px 0;
           width:100%;
           max-width:800px;
           color:#1D80A7;
@@ -219,9 +240,9 @@ const HomePage = () => {
         .info-button {
           display: flex;
           align-items: center;
-          padding: 0 50px;
-          border: #1D80A7 1px solid;
-          border-radius: 4px;
+          padding: 0 30px;
+          border: #1D80A7 3px solid;
+          border-radius: 30px;
           cursor: pointer;
         }
         .button-icon {
@@ -249,6 +270,19 @@ const HomePage = () => {
         .secondNavbar .active {
           background-color: #1D80A7; /* 激活按钮的背景颜色 */
           color: white; /* 激活按钮的文本颜色 */
+        }
+        .AddMore{
+          display: flex;
+          align-items: center;
+          padding: 0 50px;
+          border: #1D80A7 1px solid;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .button-icon {
+          margin-right: 8px;
+          width: 50px; // 调整图标大小
+          height: 50px; // 调整图标大小
         }
       `}</style>
     </div>

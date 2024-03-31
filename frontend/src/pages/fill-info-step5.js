@@ -12,6 +12,11 @@ const HomePage = () => {
     { name: "教育经历", path: "/fill-info-step3" },
     { name: "职业经历", path: "/fill-info-step4" },
     { name: "项目经历", path: "/fill-info-step5" },
+    { name: "获奖与证书", path: "/fill-info-step6" },
+    { name: "科研论文与知识产权", path: "/fill-info-step7" },
+    { name: "技能", path: "/fill-info-step8" },
+    { name: "语言", path: "/fill-info-step9" },
+    { name: "结束", path: "/fill-info-step10" }
   ];
 
   return (
@@ -57,7 +62,7 @@ const HomePage = () => {
 
               <div className="form-buttons">
                 <button className='form-b' type="submit">保存</button>
-                <button className='form-b' type="button"><a href='/'>生成简历</a></button>
+                <button className='form-b' type="button"><a href='/fill-info-step6'>下一步</a></button>
               </div>
             </form>
           </div>

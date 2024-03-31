@@ -11,7 +11,16 @@ const HomePage = () => {
     { name: "教育经历", path: "/fill-info-step3" },
     { name: "项目经历", path: "/fill-info-step4" },
   ];
-
+  function ImageGallery() {
+    const [selectedImage, setSelectedImage] = useState('');
+  
+    const images = [
+      '/img/result-1.jpg',
+      '/img/result-2.png',
+      '/img/result-3.png',
+      '/img/result-4.png'
+    ];
+  
   return (
     <div>
       <Navbar />

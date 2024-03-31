@@ -12,6 +12,11 @@ const HomePage = () => {
     { name: "教育经历", path: "/fill-info-step3" },
     { name: "职业经历", path: "/fill-info-step4" },
     { name: "项目经历", path: "/fill-info-step5" },
+    { name: "获奖与证书", path: "/fill-info-step6" },
+    { name: "科研论文与知识产权", path: "/fill-info-step7" },
+    { name: "技能", path: "/fill-info-step8" },
+    { name: "语言", path: "/fill-info-step9" },
+    { name: "结束", path: "/fill-info-step10" }
   ];
 
   return (
@@ -74,15 +79,32 @@ const HomePage = () => {
             </div>
             <div className='tip-context'>
               <p>
-              Tips（未完善）
-              If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
-              We've got you covered in our post The New Grad's Map to Resume Writing.
+              <strong>为什么教育经历重要 ?</strong><br></br>
+              - 证明资格：教育经历是求职者证明自己具备某个领域知识和技能的直接证据。对于刚从学校毕业或者具有相关学科背景的岗位申请者来说尤为重要。
+              <br></br>
+              - 展示潜力：对于经验较少的求职者，良好的教育背景可以突显其学习能力和成长潜力。
+              <br></br>
+              - 符合要求：某些岗位可能要求特定的学历背景，教育经历部分直接影响求职者的符合程度。
+              </p>
+              <p><strong>有哪些注意事项?</strong><br></br>
+              - 简洁明了：即便是丰富的教育背景，也应尽量简洁地展示，避免不必要的细节，以免分散招聘官的注意力。
+              <br></br>- 相关性：突出与求职岗位最相关的教育经历，如果有的话。比如，针对技术岗位强调你的理工科学位。
+              <br></br>- 逆序排列：按时间逆序排列你的教育经历，即最近的学历/学位放在最前面。
+              </p>
+              <p>
+              <strong>需要包括哪些内容要素?</strong><br></br>
+              - 学校名称：清楚地列出学习机构的全名，不要用缩写代替。
+              <br></br>- 学位和专业：明确指出所获得的学位以及专业领域。
+              <br></br>- 成绩和荣誉：如有较高的GPA、奖学金或任何特殊荣誉，可以列出。
+              <br></br>- 相关课程：如果适用，列出与求职岗位密切相关的课程（尤其是对于缺乏工作经验的应届毕业生）。
               </p>
             </div>
         </div>
       </div>
       <style jsx>{`
-      
+            p {
+              margin: 20px 0; /* 调整段落的上下外边距 */
+            }
       .background {
         background-color: #EDF8FD;
         min-height: 100vh;
@@ -105,7 +127,6 @@ const HomePage = () => {
         .tip-info{
         }
         .tip-context{
-          padding:100px;
         }
         .form-container {
           min-width:500px;

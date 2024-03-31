@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react'; // Import useState here
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/Navbar';
@@ -18,7 +17,13 @@ const HomePage = () => {
     { name: "语言", path: "/fill-info-step9" },
     { name: "结束", path: "/fill-info-step10" }
   ];
-
+  const [selectedImage, setSelectedImage] = useState('');
+  const images = [
+    '/img/result-1.jpg',
+    '/img/result-2.png',
+    '/img/result-3.png',
+    '/img/result-4.png'
+  ];
   return (
     <div>
       <Navbar />
@@ -34,54 +39,48 @@ const HomePage = () => {
       <div className='background'>
       <div className="form-container">
           <div className="form-heading">
-            <h2>职业经历</h2>
+            <h2>意向岗位</h2>
           </div>
           <div className="form-body">
             <form>
-              <label>公司名称</label>
-              <input type="tel"/>
-              <div className="input-group">
-                <div className="input-item">
-                  <label>城市</label>
-                  <input type="text" placeholder="" />
-                </div>
-                <div className="input-item">
-                  <label>国家</label>
-                  <input type="text" placeholder="" />
-                </div>
+              <input type="email"/>
+              <div className="form-heading">
+                <h2>选择简历模板</h2>
               </div>
-              <label>起止时间</label>
-              <input type="email"/>
-              <label>职位</label>
-              <input type="email"/>
-              <label>部门</label>
-              <input type="email"/>
-              <label>职责/业务描述</label>
-              <input type="email"/>
-              {/* ... 其他表单元素 ... */}
-
-              <div className="form-buttons">
-                <button className='form-b' type="submit">保存</button>
-                <button className='form-b' type="button"><a href='/fill-info-step5'>下一步</a></button>
+              <div className="template-container">
+                {images.map((image, index) => (
+                  <div key={index} className="image-container">
+                    <img
+                      src={image}
+                      alt={`Result ${index + 1}`}
+                      className={`image ${selectedImage === image ? 'selected' : ''}`}
+                      onClick={() => setSelectedImage(image)}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="form-buttons-new">
+                <button className='form-b' type="button"><a href='/fill-info-step11'>生成简历</a></button>
               </div>
             </form>
           </div>
       </div>
       <div className='tip-info'>
             <div className="form-heading">
-              <h2>小贴士</h2>
+              <h2>预览</h2>
             </div>
-            <div className='tip-context'>
-              <p>
-              Tips（未完善）
-              If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
-              We've got you covered in our post The New Grad's Map to Resume Writing.
-              </p>
+            <div className="tip-context">
+              {selectedImage && <img src={selectedImage} alt="Preview" />}
             </div>
         </div>
       </div>
       <style jsx>{`
       
+      .smallTitle{
+        color:#1D80A7;
+        font-size:20px;
+        padding-buttom:10px;
+      }
       .background {
         background-color: #EDF8FD;
         min-height: 100vh;
@@ -155,8 +154,8 @@ const HomePage = () => {
           border-radius: 10px;
         }
         input[type="long"] {
-          padding: 10px 200px;
-          margin-top: 5px;
+          padding: 20px 10px;
+          margin-top: 50px;
           border: 1px solid #ccc;
           border-radius: 10px;
         }
@@ -208,7 +207,8 @@ const HomePage = () => {
           align-items: center;
           padding: 10px
           border-radius: 4px;
-          margin: 10px 0;
+          font-weight:bold;
+          margin: 30px 0;
           width:100%;
           max-width:800px;
           color:#1D80A7;
@@ -219,9 +219,9 @@ const HomePage = () => {
         .info-button {
           display: flex;
           align-items: center;
-          padding: 0 50px;
-          border: #1D80A7 1px solid;
-          border-radius: 4px;
+          padding: 0 30px;
+          border: #1D80A7 3px solid;
+          border-radius: 30px;
           cursor: pointer;
         }
         .button-icon {
@@ -250,6 +250,48 @@ const HomePage = () => {
           background-color: #1D80A7; /* 激活按钮的背景颜色 */
           color: white; /* 激活按钮的文本颜色 */
         }
+        .AddMore{
+          display: flex;
+          align-items: center;
+          padding: 0 50px;
+          border: #1D80A7 1px solid;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .button-icon {
+          margin-right: 8px;
+          width: 50px; // 调整图标大小
+          height: 50px; // 调整图标大小
+        }
+        .template-container {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr); /* 创建两列 */
+          gap: 10px; /* 设置图片之间的间隙 */
+        }
+        
+        .image-container {
+          margin:10000px;
+          gap: 10px;
+          box-sizing: border-box;
+        }
+        
+        .image {
+          width: 10%; /* 确保图片填满它的容器 */
+          cursor: pointer;
+          transition: transform 0.2s; /* 添加点触效果 */
+        }
+        
+        .image:hover {
+          transform: scale(1.05); /* 鼠标悬浮时图片放大 */
+        }
+        
+        .image.selected {
+          border: 2px solid #007bff; /* 选中图片的边框样式 */
+        }
+        
+        /* 其他样式 */
+        
+        
       `}</style>
     </div>
   );
