@@ -1,11 +1,17 @@
 const multer = require('multer');
+const path = require('path');
+
+// 设置存储配置
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/')
     },
     filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now())
+        // 使用原始文件名和添加.pdf扩展名
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
     }
 });
+
 const upload = multer({ storage: storage });
+
 module.exports = upload;
