@@ -1,8 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const path = require('path');
+const jobInfoRoutes = require('./routes/jobInfoRoutes');
+const resumeRoutes = require('./routes/resumeRoutes'); 
+const chatHisRoutes = require('./routes/chatHisRoutes'); 
+const impUserRoutes = require('./routes/impUserRoutes');
+
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api', jobInfoRoutes);
+app.use('/api', resumeRoutes);
+app.use('/api', chatHisRoutes);
+app.use('/api', impUserRoutes);
 
 const { Queue, Worker } = require('bull');
 const WebSocket = require('ws');
@@ -14,7 +25,7 @@ const fs = require('fs');
 const port = 8000;
 
 const { connect } = require('./mongodb/dbconfig');
-const User = require('./mongodb/models/userModel');
+const User = require('./mongodb/models/User');
 
 let processResult = {};
 

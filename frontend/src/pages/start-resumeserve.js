@@ -8,7 +8,7 @@ const SplitBackgroundPage = () => {
             <div className="background">
                 <div className='backward'>
                     <img src='/img/back.svg'width={40} height={40} ></img>
-                    <a href='/choose-resumeserve-type'>返回</a>
+                    <a href='/'>返回</a>
                 </div>
                 <div className='inner-div'>
                     <div className="text-title">欢迎来到Alpha Resume，您的专业简历定制师！</div>
