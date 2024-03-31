@@ -39,7 +39,8 @@ const HomePage = () => {
     { name: "基础信息", path: "/fill-info-step1" },
     { name: "个人评价", path: "/fill-info-step2" },
     { name: "教育经历", path: "/fill-info-step3" },
-    { name: "项目经历", path: "/fill-info-step4" },
+    { name: "职业经历", path: "/fill-info-step4" },
+    { name: "项目经历", path: "/fill-info-step5" },
   ];
 
   return (
