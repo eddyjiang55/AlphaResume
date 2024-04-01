@@ -44,10 +44,11 @@ const HomePage = () => {
           <div className="form-body">
             <form>
               <input type="email"/>
-              <div className="form-heading">
+            </form>
+            <div className="form-heading">
                 <h2>选择简历模板</h2>
               </div>
-              <div className="template-container">
+            <div className="template-container">
                 {images.map((image, index) => (
                   <div key={index} className="image-container">
                     <img
@@ -59,10 +60,9 @@ const HomePage = () => {
                   </div>
                 ))}
               </div>
-              <div className="form-buttons-new">
+            <div className="form-buttons-new">
                 <button className='form-b' type="button"><a href='/fill-info-step11'>生成简历</a></button>
               </div>
-            </form>
           </div>
       </div>
       <div className='tip-info'>
@@ -265,31 +265,28 @@ const HomePage = () => {
         }
         .template-container {
           display: grid;
-          grid-template-columns: repeat(2, 1fr); /* 创建两列 */
-          gap: 10px; /* 设置图片之间的间隙 */
+          grid-template-columns: repeat(2, 1fr); /* 创建两列，每列占用可用空间的一半 */
+          gap: 10px; /* 设置网格之间的空隙 */
+          width: 100%; /* 或者指定一个具体的宽度 */
         }
         
         .image-container {
-          margin:10000px;
-          gap: 10px;
-          box-sizing: border-box;
+          overflow: hidden; /* 防止图片溢出容器 */
+          aspect-ratio: 1 / 1; /* 使每个容器的宽高比为1:1，也可以调整为其他比例 */
         }
         
         .image {
-          width: 10%; /* 确保图片填满它的容器 */
-          cursor: pointer;
-          transition: transform 0.2s; /* 添加点触效果 */
+          width: 100%; /* 使图片宽度填满容器 */
+          height: 100%; /* 使图片高度填满容器 */
+          object-fit: cover; /* 裁剪图片以填充容器，不改变其宽高比 */
         }
         
-        .image:hover {
-          transform: scale(1.05); /* 鼠标悬浮时图片放大 */
+        .selected {
+          border: 2px solid blue; /* 选中图片的边框样式 */
         }
         
-        .image.selected {
-          border: 2px solid #007bff; /* 选中图片的边框样式 */
-        }
         
-        /* 其他样式 */
+        
         
         
       `}</style>
