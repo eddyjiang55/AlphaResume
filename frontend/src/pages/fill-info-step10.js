@@ -264,15 +264,16 @@ const HomePage = () => {
           height: 50px; // 调整图标大小
         }
         .template-container {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr); /* 创建两列，每列占用可用空间的一半 */
-          gap: 10px; /* 设置网格之间的空隙 */
-          width: 100%; /* 或者指定一个具体的宽度 */
+          display: flex; /* 使用flex布局 */
+          flex-wrap: wrap; /* 允许子元素换行 */
+          gap: 10px; /* 设置元素间的间隙 */
+          justify-content: center; /* 水平居中子元素 */
         }
         
         .image-container {
+          width: calc(50% - 10px); /* 减去间隙的一半，确保每行两个图片容器 */
+          aspect-ratio: 1 / 1; /* 使每个容器的宽高比为1:1 */
           overflow: hidden; /* 防止图片溢出容器 */
-          aspect-ratio: 1 / 1; /* 使每个容器的宽高比为1:1，也可以调整为其他比例 */
         }
         
         .image {
@@ -284,6 +285,7 @@ const HomePage = () => {
         .selected {
           border: 2px solid blue; /* 选中图片的边框样式 */
         }
+        
         
         
         

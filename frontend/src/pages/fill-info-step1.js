@@ -1,25 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/Navbar';
 
 const HomePage = () => {
-  const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
+  const router = useRouter();
+
+  // 使用 useState 钩子初始化表单状态
+  const [form, setForm] = useState({
+    title: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    wechat: ''
+  });
+
   const handleDragOver = (e) => {
-    e.preventDefault(); // 防止浏览器默认处理文件的行为
+    e.preventDefault();
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     const files = e.dataTransfer.files;
     if (files.length) {
-      uploadFile(files[0]); // 假设我们只处理第一个文件
+      uploadFile(files[0]);
     }
   };
 
   const uploadFile = (file) => {
     const formData = new FormData();
-    formData.append('file', file); // 假设后端期望的字段名是 'file'
+    formData.append('pdfFile', file);
 
     fetch('http://localhost:8000/api/resume-info', {
       method: 'POST',
@@ -28,12 +39,28 @@ const HomePage = () => {
       .then(response => response.json())
       .then(data => {
         console.log('Upload successful:', data);
-        // 这里可以更新状态或UI以反馈用户上传成功
+        // 使用上传成功的数据更新表单状态
+        setForm({
+          ...form, // 保留其他表单项
+          firstName: data.givenName,
+          lastName: data.surname,
+          phone: data.phones[0],
+          email: data.emails[0],
+          wechat: data.wechats[0]
+        });
       })
       .catch(error => {
         console.error('Upload error:', error);
-        // 这里可以处理上传失败的情况
       });
+  };
+
+  // 更新表单字段的处理函数
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: value,
+    });
   };
   const buttons = [
     { name: "基础信息", path: "/fill-info-step1" },
@@ -85,19 +112,19 @@ const HomePage = () => {
               <div className="input-group">
                 <div className="input-item">
                   <label>姓</label>
-                  <input type="text" placeholder="姓" />
+                  <input type="text" name="lastName" placeholder="姓" value={form.lastName} onChange={handleChange} />
                 </div>
                 <div className="input-item">
                   <label>名</label>
-                  <input type="text" placeholder="名" />
+                  <input type="text" name="firstName" placeholder="名" value={form.firstName} onChange={handleChange} />
                 </div>
               </div>
 
               <label>手机号码</label>
-              <input type="tel" placeholder="请输入手机号码" />
+              <input type="tel" name="phone" placeholder="请输入手机号码" value={form.phone} onChange={handleChange} />
 
               <label>邮箱</label>
-              <input type="email" placeholder="请输入邮箱地址" />
+              <input type="email" name="email" placeholder="请输入邮箱地址" value={form.email} onChange={handleChange} />
 
               {/* ... 其他表单元素 ... */}
 
