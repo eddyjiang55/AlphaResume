@@ -22,22 +22,22 @@ const SplitBackgroundPage = () => {
                             <span>输入您的信息</span>
                         </div>
                         <div className='container'>
-                            <img className='img' src='/img/choose_option.svg'></img>
+                            <img className='img' src='/img/resume.svg'></img>
                             <span>我们将助您快速构建简历</span>
                         </div>
                         <div className='container'>
-                            <button className='form-b' type="submit">开始填写</button>
+                            <button className='form-b' type="submit"><a href='/fill-info-step1'>开始填写</a></button>
                         </div>
                     </div>
-                    <div className='title'>方式一：</div>
+                    <div className='title'>方式二：</div>
                     <div className='introduce'>
                         <div className='container'>
-                            <img className='img' src='/img/fill_information.svg'></img>
-                            <span>告诉我们您的信息</span>
+                            <img className='img' src='/img/chat.svg'></img>
+                            <span>与AI机器人对话</span>
                         </div>
                         <div className='container'>
-                            <img className='img' src='/img/choose_option.svg'></img>
-                            <span>选择您要投递的岗位</span>
+                            <img className='img' src='/img/resume.svg'></img>
+                            <span>将根据聊天信息助您快速构建</span>
                         </div>
                         <div className='container'>
                             <button className='form-b' type="submit">进入聊天</button>
@@ -93,10 +93,10 @@ const SplitBackgroundPage = () => {
                     width:80%;
                     border-radius: 10px;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
-                    margin-bottom:20px;
+                    margin-bottom:50px;
                 }
                 .img{
-                    width:100px;
+                    width:80px;
                 }
                 .choose{
                     display: flex;
