@@ -14,25 +14,50 @@ const SplitBackgroundPage = () => {
                     <div className="text-title">欢迎来到Alpha Resume，您的专业简历定制师！</div>
                     <div className='text-describe'>用几分钟时间生成您的专业简历。</div>
                 </div>
-                <div className='introduce'>
-                    <div className='container'>
-                        <img src='/img/fill_information.svg'></img>
-                        <span>告诉我们您的信息</span>
+                <div className='choose'>
+                    <div className='title'>方式一：</div>
+                    <div className='introduce'>
+                        <div className='container'>
+                            <img className='img' src='/img/fill_information.svg'></img>
+                            <span>输入您的信息</span>
+                        </div>
+                        <div className='container'>
+                            <img className='img' src='/img/choose_option.svg'></img>
+                            <span>我们将助您快速构建简历</span>
+                        </div>
+                        <div className='container'>
+                            <button className='form-b' type="submit">开始填写</button>
+                        </div>
                     </div>
-                    <div className='container'>
-                        <img src='/img/choose_option.svg'></img>
-                        <span>选择您要投递的岗位</span>
+                    <div className='title'>方式一：</div>
+                    <div className='introduce'>
+                        <div className='container'>
+                            <img className='img' src='/img/fill_information.svg'></img>
+                            <span>告诉我们您的信息</span>
+                        </div>
+                        <div className='container'>
+                            <img className='img' src='/img/choose_option.svg'></img>
+                            <span>选择您要投递的岗位</span>
+                        </div>
+                        <div className='container'>
+                            <button className='form-b' type="submit">进入聊天</button>
+                        </div>
                     </div>
-                    <div className='container'>
-                        <img src='/img/build_resume.svg'></img>
-                        <span>我们将在几分钟内助您快速构建简历</span>
-                    </div>
-                </div>
-                <div className='start'>
-                    <button className='begin'><a href='/fill-info-step1'>开始</a></button>
                 </div>
             </div>
             <style jsx>{`
+                .form-b {
+                    padding: 10px 50px;
+                    border: none;
+                    border-radius: 30px;
+                    color: white;
+                    background-color: #1D80A7; /* Bootstrap 蓝色按钮颜色 */
+                    cursor: pointer;
+                    }
+                    .form-b:hover {
+                    background-color: #B2DDEE;
+                    color:black;
+                    }
                 .background{
                     background-color: #EDF8FD;
                     min-height:100vh;
@@ -64,6 +89,27 @@ const SplitBackgroundPage = () => {
                     gap: 20px;
                     justify-content: center;
                     padding:50px;
+                    background-color:#FFFFFF;
+                    width:80%;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+                    margin-bottom:20px;
+                }
+                .img{
+                    width:100px;
+                }
+                .choose{
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                .title{
+                    padding:10px 100px;
+                    width:100%;
+                    text-align:left;
+                    color:#1D80A7;
+                    font-weight:bold;
+                    font-size:20px;
                 }
                 .container {
                     display: flex;
