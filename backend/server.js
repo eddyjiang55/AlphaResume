@@ -6,6 +6,7 @@ const jobInfoRoutes = require('./routes/jobInfoRoutes');
 const resumeRoutes = require('./routes/resumeRoutes'); 
 const chatHisRoutes = require('./routes/chatHisRoutes'); 
 const impUserRoutes = require('./routes/impUserRoutes');
+const resumeChatRoutes = require('./routes/resumeChatRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -14,6 +15,7 @@ app.use('/api', jobInfoRoutes);
 app.use('/api', resumeRoutes);
 app.use('/api', chatHisRoutes);
 app.use('/api', impUserRoutes);
+app.use('/api', resumeChatRoutes);
 
 const { Queue, Worker } = require('bull');
 const WebSocket = require('ws');

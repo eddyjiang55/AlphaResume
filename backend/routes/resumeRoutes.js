@@ -12,12 +12,12 @@ const upload = require('../middleware/uploadMiddleware');
 // 上传简历并保存记录
 router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
     try {
-        // 从请求体获取account、createdAt和可选的id
-        const { account, createdAt, id } = req.body;
+        // 从请求体获取account、createdAt、title、position和可选的id
+        const { account, createdAt, title, position, id } = req.body;
         const pdfPath = req.file ? req.file.path : null; // 获取上传的文件路径
 
         // 根据提供的信息创建新的ResumeHistory实例，包括可选的id
-        const newResume = new ResumeHistory(account, createdAt, pdfPath, id);
+        const newResume = new ResumeHistory(account, createdAt, pdfPath, title, position, id);
 
         // 保存到数据库并获取_id
         const insertedId = await newResume.save();
@@ -33,6 +33,7 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
         res.status(500).json({ message: "Failed to upload resume", error: error.toString() });
     }
 });
+
 
 
 router.delete('/resume-history/:_id', async (req, res) => {
@@ -130,6 +131,20 @@ router.post('/resume-info', upload.single('pdfFile'), async (req, res) => {
     }
 });
 
+router.post('/resume-history/account-position', async (req, res) => {
+    const { account, position } = req.body; // 从请求体中获取账号和岗位
+
+    try {
+        const resumes = await ResumeHistory.findByAccountAndPosition(account, position);
+        if (resumes.length === 0) {
+            return res.status(404).json({ message: "No resumes found for the provided account and position." });
+        }
+        res.status(200).json(resumes);
+    } catch (error) {
+        console.error("Error fetching resumes:", error);
+        res.status(500).json({ message: "Failed to fetch resumes", error: error.toString() });
+    }
+});
 
 
 
