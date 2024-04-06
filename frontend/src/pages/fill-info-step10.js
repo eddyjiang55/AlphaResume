@@ -75,12 +75,6 @@ const HomePage = () => {
         </div>
       </div>
       <style jsx>{`
-      
-      .smallTitle{
-        color:#1D80A7;
-        font-size:20px;
-        padding-buttom:10px;
-      }
       .background {
         background-color: #EDF8FD;
         min-height: 100vh;
