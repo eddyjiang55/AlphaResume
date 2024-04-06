@@ -1,107 +1,199 @@
-"use client"
-import React from 'react'
-import Link from 'next/link'
-import Head from 'next/head'
+import React from 'react';
+import Navbar from '../components/Navbar';
 
-import Navbar from '../components/navbar'
-
-const Home = (props) => {
-  // const accordionContainers = window.document.querySelectorAll('[data-role="accordion-container"]'); // All accordion containers
-  // const accordionContents = document.querySelectorAll('[data-role="accordion-content"]'); // All accordion content
-  // const accordionIconsClosed = document.querySelectorAll('[data-role="accordion-icon-closed"]'); // All accordion closed icons
-  // const accordionIconsOpen = document.querySelectorAll('[data-role="accordion-icon-open"]'); // All accordion open icons
-
-  // accordionContents.forEach((accordionContent) => {
-  //     accordionContent.style.display = "none"; //Hides all accordion contents
-  // });
-
-  // accordionIconsClosed.forEach((icon) => {
-  //   icon.style.display = "flex"
-  // })
-
-  // accordionIconsOpen.forEach((icon) => {
-  //   icon.style.display = "none"
-  // })
-
-  // accordionContainers.forEach((accordionContainer, index) => {
-  //     accordionContainer.addEventListener("click", () => {
-  //         if (accordionContents[index].style.display === "flex") {
-  //             // If the accordion is already open, close it
-  //             accordionContents[index].style.display = "none";
-  //             accordionIconsClosed[index].style.display = "flex";
-  //             accordionIconsOpen[index].style.display = "none"
-  //         } else {
-  //             // If the accordion is closed, open it
-  //             accordionContents.forEach((accordionContent) => {
-  //                 accordionContent.style.display = "none"; //Hides all accordion contents
-  //             });
-
-  //             accordionIconsClosed.forEach((accordionIcon) => {
-  //                 accordionIcon.style.display = "flex"; // Resets all icon transforms to 0deg (default)
-  //             });
-
-  //             accordionIconsOpen.forEach((accordionIcon) => {
-  //               accordionIcon.style.display = "none";
-  //             })
-
-  //             accordionContents[index].style.display = "flex"; // Shows accordion content
-  //             accordionIconsClosed[index].style.display = "none"; // Rotates accordion icon 180deg
-  //             accordionIconsOpen[index].style.display = "flex";
-  //         }
-  //     });
-  // });
-
-  return (
-    <>
-      <div className="w-full flex h-full items-start flex-col justify-start bg-white">
-        <Head>
-          <title>AI Resume</title>
-          <meta property="og:title" content="AI Resume" />
-        </Head>
+const SplitBackgroundPage = () => {
+    return (
+        <>
         <Navbar></Navbar>
-        <section className="gap-y-6 w-full h-fit flex flex-col justify-between max-w-[1440px] items-start p-10 mt-20 mx-auto">
-          <div className="flex w-full">
-            <h1 className="text-black h-fit text-3xl max-w-[900px] normal-case text-center font-medium">我的简历</h1>
-          </div>
-          <div className="flex flex-row-reverse w-full">
-            <div className="w-52 flex flex-row items-center justify-center">
-              <Link href="/resume">
-                <span className="text-black normal-case font-normal pr-6 pb-3 no-underline bg-[#14a9ff] button">新建简历</span>
-              </Link>
+            <div className="split-background">
+                <div className="top-half"></div>
+                <div className="content-container">
+                    <div className="text-container">
+                        开始创建你的专业定制简历
+                    </div>
+                    <div className="rectangle-container">
+                        <div className="rectangle">
+                            <div className="inner-div">
+                                <div className="text-title">怎么写一个好简历</div>
+                                <div className='text-describe'>x个来自行业专家的专业简历书写模板及其相关知识点。</div>
+                            </div>
+                            <div className="inner-div">
+                                <div className="small">
+                                    <div className="row">
+                                        <div className="item1">
+                                            <img src="/img/check_mark.svg" width={50} height={50}></img>
+                                            <span>简历优点</span>
+                                        </div>
+                                        <div className="item1">
+                                            <img src="/img/check_mark.svg" width={50} height={50}></img>
+                                            <span>对岗位理解</span>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="item1">
+                                            <img src="/img/check_mark.svg"  width={50} height={50}></img>
+                                            <span>观念靠拢</span>
+                                        </div>
+                                        <div className="item1">
+                                            <img src="/img/check_mark.svg"  width={50} height={50}></img>
+                                            <span>易错点解析</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="actions">
+                                    <button className="action-button">查看知识文档</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="rectangle right">
+                            <div className="inner-div">
+                                <div className="text-title">简历生成器</div>
+                                <div className='text-describe'>来自行业专家的专业简历书写模板及其相关知识点。</div>
+                            </div>
+                            <div className="inner-div">
+                                <div className="small">
+                                    <div className="row">
+                                        <div className="item1">
+                                            <img src="/img/check_mark.svg" width={50} height={50}></img>
+                                            <span><em>AI</em> 赋能</span>
+                                        </div>
+                                        <div className="item1">
+                                            <img src="/img/check_mark.svg" width={50} height={50}></img>
+                                            <span><em>ATS</em> 筛选</span>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="item1">
+                                            <img src="/img/check_mark.svg"  width={50} height={50}></img>
+                                            <span>专家合作</span>
+                                        </div>
+                                        <div className="item1">
+                                            <img src="/img/check_mark.svg"  width={50} height={50}></img>
+                                            <span>快速生成</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="actions">
+                                    <button className="action-button">
+                                        <a href='/start-resumeserve'>简历生成</a>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="text-container-lower">
+                        你的简历将会显示在这里<br/>
+                        开始创建吧！
+                    </div>
+                </div>
+                <div className="bottom-half"></div>
             </div>
-          </div>
-        </section>
-        <section className="w-full h-auto flex flex-row max-w-[1440px] mt-40 items-center pt-18 pl-4 pr-3 pb-2 mx-auto">
-            <div className="flex-row w-full h-auto flex items-start pr-0 justify-around">
-              <img
-                alt="image"
-                src="https://play.teleporthq.io/static/svg/default-img.svg"
-                className="w-[var(--dl-size-size-xxlarge)] h-[280px] object-cover pl-10 pr-10"
-              />
-              <img
-                alt="image"
-                src="https://play.teleporthq.io/static/svg/default-img.svg"
-                className="w-[var(--dl-size-size-xxlarge)] h-[280px] object-cover pl-10 pr-10"
-              />
-              <img
-                alt="image"
-                src="https://play.teleporthq.io/static/svg/default-img.svg"
-                className="w-[var(--dl-size-size-xxlarge)] h-[280px] object-cover pl-10 pr-10"
-              />
-              <img
-                alt="image"
-                src="https://play.teleporthq.io/static/svg/default-img.svg"
-                className="w-[var(--dl-size-size-xxlarge)] h-[280px] object-cover pl-10 pr-10"
-              />
-            </div>
-        </section>
-        <div>
-          <div className="contents">
-          </div>
-        </div>
-      </div>
-    </>
-  )
+            <style jsx>{`
+                .split-background {
+                    position: relative;
+                    height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1;
+                }
+                .top-half, .bottom-half {
+                    position: absolute;
+                    width: 100%;
+                    z-index: -1;
+                }
+                .top-half {
+                    top: 0;
+                    height: 50%;
+                    background-color: #1D80A7;
+                }
+                .bottom-half {
+                    bottom: 0;
+                    height: 50%;
+                    background-color: #EDF8FD;
+                }
+                .content-container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 50px;
+                }
+                .text-container {
+                    font-size: 32px;
+                    color: #EDF8FD;
+                }
+                .text-container-lower {
+                    font-size: 24px;
+                    color: #1D80A7;
+                    text-align: center;
+                }
+                .rectangle-container {
+                    display: flex;
+                    gap: 100px;
+                }
+                .rectangle {
+                    width: 800px;
+                    height: 600px;
+                    background-color: white;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+                }
+                .rectangle:hover{
+                    background-color:#B2DDEE;
+                }
+                .inner-div {
+                    align-items: left;
+                }
+                .text-title{
+                    font-size: 48px;
+                    font-weight: bold;
+                    padding: 50px;
+                }
+                .text-describe{
+                    font-size: 24px;
+                    padding-left: 70px;
+                }
+                .small{
+                    padding-top:30px;
+                    padding-bottom:30px;
+                    padding-left:70px;
+                }
+                .small .row {
+                    display: flex;
+                    justify-content: flex-start;
+                    padding:20px;
+                }
+                .small .item1 {
+                    display: flex;
+                    align-items: center;
+                    margin-right: 100px;
+                }
+                .small .item1 img {
+                    margin-right: 10px;
+                }
+                
+                .small .item1 span {
+                }
+                .actions {
+                    display: flex;
+                    gap: 10px;
+                    margin-left: 70px;
+                }
+                .action-button {
+                    font-size: 24px;
+                    font-weight: bold;
+                    padding: 8px 16px;
+                    background-color: #1D80A7;
+                    color: white;
+                    cursor: pointer;
+                    border-radius: 50px;
+                    padding-left: 30px;
+                    padding-right: 30px;
+                }
+            `}</style>
+        </>
+    );
 }
 
-export default Home
+export default SplitBackgroundPage;
