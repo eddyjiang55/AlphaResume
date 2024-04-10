@@ -29,9 +29,18 @@ export const bioQues = [
   },
   {
     id: "q4",
-    type: "end",
+    type: "ques",
     loop: false,
     text: "了解，接下来，请提供你的年龄、目前所在地和联系方式，包括电话号码和电子邮件地址。",
+    sender: "bot",
+    "next": {
+      "default": "q5",
+    }
+  }, {
+    id: "q5",
+    type: "end",
+    loop: false,
+    text: "明白了，感谢提供这些信息。接下来，让我们来到你的学历信息。",
     sender: "bot",
   }
 ];

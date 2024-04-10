@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import Navbar from "../components/navbar";
 import ChatSegment from "../components/chat";
 import ChatChoice from "../components/chat-choice";
@@ -202,10 +203,17 @@ const AIChat = () => {
   return (
     <div className="bg-[#EDF8FD] w-full h-screen overflow-hidden">
       <Navbar />
-      <div className="w-full max-w-[960px] mx-auto flex flex-col justify-center items-stretch gap-y-4 p-4">
-        <h1 className="font-semibold text-2xl text-[#1D80A7] text-center">
+      <div className="w-full max-w-[960px] mx-auto flex flex-col justify-center items-stretch gap-y-4 p-4 relative">
+        <h1 className="font-semibold text-2xl text-[#1D80A7] text-center py-2">
           简历信息收集
         </h1>
+        {showLeaveBtn ? (
+          <Link href="/start-resumeserve">
+            <button className="absolute top-4 right-4 bg-gray-400 text-white px-4 py-2 rounded-xl">
+              结束会话
+            </button>
+          </Link>
+        ) : null}
         <div
           ref={chatContainerRef}
           className="overflow-y-auto max-h-[calc(100vh-270px)] mt-4 mb-32 pr-4"
