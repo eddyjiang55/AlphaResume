@@ -4,8 +4,8 @@ const SMSClient = require('@alicloud/sms-sdk');
 
 // 初始化SMSClient
 const smsClient = new SMSClient({
-  accessKeyId: 'LTAI5tELxePPrwBRmfMmhdkc',
-  secretAccessKey: '6WXwK5cjZSak1DxQ3F2pFhXZ7BkYbg',
+  accessKeyId: '',
+  secretAccessKey: '',
 });
 
 // 发送短信的函数

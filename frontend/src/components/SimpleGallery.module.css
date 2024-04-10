@@ -1,0 +1,12 @@
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    min-width: 320px; /* 调整这个值以适应您的设计 */
+  }
+  
+  .item img {
+    width: 100%;
+    height: auto;
+  }
+  
