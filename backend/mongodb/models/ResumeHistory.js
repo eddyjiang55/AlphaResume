@@ -2,14 +2,14 @@ const { connect } = require('../dbconfig');
 const { v4: uuidv4 } = require('uuid'); // 引入UUID生成器
 
 class ResumeHistory {
-    constructor(account, createdAt, pdfPath, title, position, id = null) {
-        // 如果前端提供了id，则使用该id，否则生成一个新的UUID
+    constructor(account, createdAt, pdfData, markdownData, title, position, id = null) {
         this._id = id || uuidv4();
         this.account = account;
         this.createdAt = createdAt;
-        this.pdfPath = pdfPath;
-        this.title = title; // 新增属性：标题
-        this.position = position; // 新增属性：岗位
+        this.pdfData = pdfData; // Storing PDF file data
+        this.markdownData = markdownData; // Storing converted Markdown data
+        this.title = title;
+        this.position = position;
     }
 
     async save() {
@@ -18,11 +18,11 @@ class ResumeHistory {
         const result = await collection.insertOne({
             account: this.account,
             createdAt: this.createdAt,
-            pdfPath: this.pdfPath,
-            title: this.title, // 保存标题
-            position: this.position // 保存岗位
+            pdfData: this.pdfData,
+            markdownData: this.markdownData,
+            title: this.title,
+            position: this.position
         });
-        // 只返回insertedId
         return result.insertedId;
     }
   
