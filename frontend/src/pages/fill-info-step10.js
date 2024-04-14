@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // Import useState here
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
-import Navbar from '../components/Navbar';
+import Navbar from '../components/navbar';
 
 const HomePage = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
@@ -26,52 +26,54 @@ const HomePage = () => {
   ];
   return (
     <div>
-      <Navbar />
-      <div className="secondNavbar">
-        {buttons.map((button) => (
-          <Link key={button.name} href={button.path} passHref>
-            <button className={router.pathname === button.path ? 'active' : ''}>
-              {button.name}
-            </button>
-          </Link>
-        ))}
-      </div>
-      <div className='background'>
-      <div className="form-container">
-          <div className="form-heading">
-            <h2>意向岗位</h2>
+      <div className='bg-[#EDF8FD] w-full grid grid-cols-12 items-start justify-items-center'>
+        <div className="col-span-full w-full">
+          <Navbar />
+          <div className="secondNavbar">
+            {buttons.map((button) => (
+              <Link key={button.name} href={button.path} passHref>
+                <button className={router.pathname === button.path ? 'active' : ''}>
+                  {button.name}
+                </button>
+              </Link>
+            ))}
           </div>
-          <div className="form-body">
-            <form>
-              <input type="email"/>
+        </div>
+        <div className="col-span-6 flex flex-col justify-center items-center gap-y-8 px-20 py-8 h-full">
+          <div className="w-fit mx-auto">
+            <h2 className="text-[#1D80A7] text-4xl font-bold text-center">意向岗位</h2>
+          </div>
+          <div className="w-full">
+            <form className='w-full flex justify-center'>
+              <input className='w-[680px] mx-auto' type="text" />
             </form>
-            <div className="form-heading">
-                <h2>选择简历模板</h2>
-              </div>
-            <div className="template-container">
-                {images.map((image, index) => (
-                  <div key={index} className="image-container">
-                    <img
-                      src={image}
-                      alt={`Result ${index + 1}`}
-                      className={`image ${selectedImage === image ? 'selected' : ''}`}
-                      onClick={() => setSelectedImage(image)}
-                    />
-                  </div>
-                ))}
-              </div>
-            <div className="form-buttons-new">
-                <button className='form-b' type="button"><a href='/fill-info-step11'>生成简历</a></button>
-              </div>
           </div>
-      </div>
-      <div className='tip-info'>
-            <div className="form-heading">
-              <h2>预览</h2>
-            </div>
-            <div className="tip-context">
-              {selectedImage && <img src={selectedImage} alt="Preview" />}
-            </div>
+          <div className="w-fit mx-auto">
+            <h2 className="text-[#1D80A7] text-4xl font-bold text-center">选择简历模板</h2>
+          </div>
+          <div className="w-full grid grid-cols-2 gap-4">
+            {images.map((image, index) => (
+              <div key={index} className="col-span-1 rounded-lg border border-[#1D80A7]">
+                <img
+                  src={image}
+                  alt={`Result ${index + 1}`}
+                  className="object-cover w-full h-full rounded-lg cursor-pointer"
+                  onClick={() => setSelectedImage(image)}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="form-buttons-new">
+            <button className='form-b' type="button"><a href='/fill-info-step11'>生成简历</a></button>
+          </div>
+        </div>
+        <div className='col-span-6 flex flex-col justify-center items-center gap-y-8 px-6 py-8'>
+          <div className="w-fit mx-auto">
+            <h2 className="text-[#1D80A7] text-4xl font-bold text-center">预览</h2>
+          </div>
+          <div className="tip-context">
+            {selectedImage && <img src={selectedImage} alt="Preview" />}
+          </div>
         </div>
       </div>
       <style jsx>{`
