@@ -40,7 +40,7 @@ Beyond resume creation, AlphaResume also features an AI-driven mock interview fu
   **Official Documentation**: [MongoDB](https://www.mongodb.com/)
 ### AI:
 - Tongyi Qianwen:
-  **Introduction**: Tongyi Qianwen is LLM developed by Alibaba.
+  **Introduction**: Tongyi Qianwen is an LLM developed by Ali Cloud.
   **Official Documentation**: [Tongyi Qianwen](https://tongyi.aliyun.com/)
 ### Cloud Deployment:
 - 
