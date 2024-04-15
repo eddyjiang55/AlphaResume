@@ -57,4 +57,52 @@ router.delete('/improved-users/:_id', async (req, res) => {
     }
 });
 
+// POST请求，保存数据到相应的集合
+// 更新个人信息数据
+router.post('/save-data', async (req, res) => {
+    const { id, type, data } = req.body;
+
+    try {
+        // 根据type决定更新哪个部分
+        let updatePath = {};
+        switch (type) {
+            case 'personalEvaluation':
+                updatePath['基本信息'] = data;
+                break;
+            case 'educationHistory':
+                updatePath['教育经历'] = data;
+                break;
+            case 'professionalExperience':
+                updatePath['工作_实习经历'] = data;
+                break;
+            case 'projectExperience':
+                updatePath['项目经历'] = data;
+                break;
+            case 'awardsAndCertificates':
+                updatePath['获奖信息'] = data;
+                break;
+            case 'skills':
+                updatePath['技能'] = data;
+                break;
+            case 'languages':
+                updatePath['语言能力'] = data;
+                break;
+            case 'researchPapersAndPatents':
+                updatePath['科研论文与知识产权'] = data; // 确保有此字段在类定义中
+                break;
+            default:
+                return res.status(400).json({ message: "Invalid type specified" });
+        }
+
+        // 更新数据库记录
+        const result = await ImprovedUser.update(id, updatePath);
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ message: "No record found to update." });
+        }
+        res.status(200).json({ message: "Data updated successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update data", error: error.toString() });
+    }
+});
+
 module.exports = router;

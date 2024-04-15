@@ -8,7 +8,6 @@ const chatHisRoutes = require('./routes/chatHisRoutes');
 const impUserRoutes = require('./routes/impUserRoutes');
 const resumeChatRoutes = require('./routes/resumeChatRoutes');
 const authRoutes = require('./routes/authRoutes');
-const personalDataRoutes = require('./routes/PersonalDataRoutes'); 
 
 app.use(cors());
 app.use(express.json());
@@ -19,7 +18,6 @@ app.use('/api', chatHisRoutes);
 app.use('/api', impUserRoutes);
 app.use('/api', resumeChatRoutes);
 app.use('/api', authRoutes);
-app.use('/api', personalDataRoutes);
 
 const { Queue, Worker } = require('bull');
 const WebSocket = require('ws');
