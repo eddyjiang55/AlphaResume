@@ -1,6 +1,7 @@
 const { connect } = require('../dbconfig');
 const { v4: uuidv4 } = require('uuid'); // 引入UUID生成器，用于生成ID
 
+
 class JobInformation {
     constructor(岗位描述, 岗位要求, 岗位关键词, id = null) {
         // 如果提供了id，则使用该id，否则生成一个新的UUID作为id
