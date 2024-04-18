@@ -44,16 +44,20 @@ const HomePage = () => {
               <label>学校名称</label>
               <input type="email" placeholder="请输入学校名称" />
 
-              <label>微信号</label>
-              <input type="email" placeholder="请输入微信号" />
+              <div className="input-group">
+                <div className="input-item">
+                  <label>城市</label>
+                  <input type="text" placeholder="" />
+                </div>
+                <div className="input-item">
+                  <label>国家</label>
+                  <input type="text" placeholder="" />
+                </div>
+              </div>
               <label>院系</label>
               <input type="email" placeholder="请输入院系" />
               <label>专业</label>
               <input type="email" placeholder="请输入专业" />
-              <label>获奖记录</label>
-              <input type="email" placeholder="请输入获奖记录" />
-              <label>主修课程</label>
-              <input type="email" placeholder="请输入主修课程" />
               <div className="input-group">
                 <div className="input-item">
                   <label>GPA</label>
@@ -64,6 +68,10 @@ const HomePage = () => {
                   <input type="text" placeholder="" />
                 </div>
               </div>
+              <label>获奖记录</label>
+              <input type="email" placeholder="请输入获奖记录" />
+              <label>主修课程</label>
+              <input type="email" placeholder="请输入主修课程" />
               {/* ... 其他表单元素 ... */}
 
               <div className="form-buttons">
@@ -100,6 +108,7 @@ const HomePage = () => {
               </p>
             </div>
         </div>
+        
       </div>
       <style jsx>{`
             p {
@@ -127,6 +136,8 @@ const HomePage = () => {
         .tip-info{
         }
         .tip-context{
+          text-align:left;
+          padding:100px;
         }
         .form-container {
           min-width:500px;

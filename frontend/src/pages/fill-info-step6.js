@@ -57,8 +57,6 @@ const HomePage = () => {
               </div>
               <label>描述</label>
               <input type="email"/>
-              <label>项目成就</label>
-              <input type="email"/>
               {/* ... 其他表单元素 ... */}
               <div className="info-container">
                 <button className="info-button">
@@ -130,6 +128,7 @@ const HomePage = () => {
         .tip-info{
         }
         .tip-context{
+          text-align:left;
           padding:100px;
         }
         .form-container {
