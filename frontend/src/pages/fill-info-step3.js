@@ -108,6 +108,7 @@ const HomePage = () => {
               </p>
             </div>
         </div>
+        
       </div>
       <style jsx>{`
             p {
@@ -135,6 +136,8 @@ const HomePage = () => {
         .tip-info{
         }
         .tip-context{
+          text-align:left;
+          padding:100px;
         }
         .form-container {
           min-width:500px;

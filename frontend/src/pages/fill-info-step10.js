@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // Import useState here
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
-import Navbar from '../components/navbar';
+import Navbar from '../components/Navbar';
 
 const HomePage = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
@@ -99,6 +99,7 @@ const HomePage = () => {
         .tip-info{
         }
         .tip-context{
+          text-align:left;
           padding:100px;
         }
         .form-container {
