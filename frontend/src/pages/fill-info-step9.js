@@ -61,7 +61,7 @@ const HomePage = () => {
               </div>
               <div className="form-buttons">
                 <button className='form-b' type="submit">保存</button>
-                <button className='form-b' type="button"><a href='/fill-info-step'>下一步</a></button>
+                <button className='form-b' type="button"><a href='/fill-info-step10'>下一步</a></button>
               </div>
             </form>
           </div>
@@ -107,6 +107,7 @@ const HomePage = () => {
         .tip-info{
         }
         .tip-context{
+          text-align:left;
           padding:100px;
         }
         .form-container {
