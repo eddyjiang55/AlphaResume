@@ -1,6 +1,7 @@
 const { connect } = require('../dbconfig'); // 确保路径正确
 const { v4: uuidv4 } = require('uuid'); // 引入UUID库
 
+
 class ImprovedUser {
     constructor(基本信息, 教育经历, 工作_实习经历, 项目经历, 获奖信息, 语言能力, 技能, id = null) {
         this._id = id || uuidv4(); // 如果提供了id，则使用该id；否则，生成一个新的UUID
