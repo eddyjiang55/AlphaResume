@@ -126,6 +126,9 @@ const HomePage = () => {
               <label>邮箱</label>
               <input type="email" name="email" placeholder="请输入邮箱地址" value={form.email} onChange={handleChange} />
 
+              {/* ... 新增 ... */}
+              <label>微信号</label>
+              <input type="email" name="email" placeholder="请输入微信号" value={form.email} onChange={handleChange} />
               {/* ... 其他表单元素 ... */}
 
               <div className="form-buttons">
