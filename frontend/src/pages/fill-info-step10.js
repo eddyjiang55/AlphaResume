@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
 
+
 const HomePage = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
   const buttons = [
