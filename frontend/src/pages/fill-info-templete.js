@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
-import Navbar from '../components/Navbar';
+import Navbar from '../components/navbar';
 
 const HomePage = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
@@ -11,15 +11,16 @@ const HomePage = () => {
     { name: "教育经历", path: "/fill-info-step3" },
     { name: "项目经历", path: "/fill-info-step4" },
   ];
-  function ImageGallery() {
-    const [selectedImage, setSelectedImage] = useState('');
+  // function ImageGallery() {
+  //   const [selectedImage, setSelectedImage] = useState('');
   
-    const images = [
-      '/img/result-1.jpg',
-      '/img/result-2.png',
-      '/img/result-3.png',
-      '/img/result-4.png'
-    ];
+  //   const images = [
+  //     '/img/result-1.jpg',
+  //     '/img/result-2.png',
+  //     '/img/result-3.png',
+  //     '/img/result-4.png'
+  //   ];
+    
   
   return (
     <div>
