@@ -5,7 +5,16 @@ const ImprovedUser = require('../mongodb/models/ImprovedUser'); // 确保路径�
 // 创建新的用户
 router.post('/improved-users', async (req, res) => {
     try {
-        const newUser = new ImprovedUser(req.body.基本信息, req.body.教育经历, req.body.工作_实习经历, req.body.项目经历, req.body.获奖信息, req.body.语言能力, req.body.技能);
+        const newUser = new ImprovedUser(
+            req.body.基本信息,
+            req.body.教育经历,
+            req.body.职业经历,
+            req.body.项目经历,
+            req.body.获奖与证书,
+            req.body.语言,
+            req.body.技能,
+            req.body.科研论文与知识产权
+        );
         const _id = await newUser.save();
         res.status(201).json({ message: 'Improved user created successfully', _id: _id });
     } catch (error) {
@@ -73,19 +82,19 @@ router.post('/save-data', async (req, res) => {
                 updatePath['教育经历'] = data;
                 break;
             case 'professionalExperience':
-                updatePath['工作_实习经历'] = data;
+                updatePath['职业经历'] = data;
                 break;
             case 'projectExperience':
                 updatePath['项目经历'] = data;
                 break;
             case 'awardsAndCertificates':
-                updatePath['获奖信息'] = data;
+                updatePath['获奖与证书'] = data;
                 break;
             case 'skills':
                 updatePath['技能'] = data;
                 break;
             case 'languages':
-                updatePath['语言能力'] = data;
+                updatePath['语言'] = data;
                 break;
             case 'researchPapersAndPatents':
                 updatePath['科研论文与知识产权'] = data; // 确保有此字段在类定义中
