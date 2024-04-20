@@ -16,7 +16,7 @@ class ImprovedUser {
 
     async save() {
         const db = await connect();
-        const collection = db.collection('improvedUser'); // 修改集合名称为'improvedUser'
+        const collection = db.collection('improvedUsers'); // 修改集合名称为'improvedUsers'
         const result = await collection.insertOne({
             _id: this._id,
             基本信息: this.基本信息,
@@ -32,21 +32,21 @@ class ImprovedUser {
 
     static async findById(_id) {
         const db = await connect();
-        const collection = db.collection('improvedUser'); // 使用新的集合名称'improvedUser'
+        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUser'
         const user = await collection.findOne({ _id: _id });
         return user;
     }
 
     static async update(_id, updateData) {
         const db = await connect();
-        const collection = db.collection('improvedUser'); // 使用新的集合名称'improvedUser'
+        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUser'
         const result = await collection.updateOne({ _id: _id }, { $set: updateData });
         return result;
     }
 
     static async deleteById(_id) {
         const db = await connect();
-        const collection = db.collection('improvedUser'); // 使用新的集合名称'improvedUser'
+        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUser'
         const result = await collection.deleteOne({ _id: _id });
         return result;
     }

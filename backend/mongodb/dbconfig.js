@@ -1,7 +1,7 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const uri = "mongodb+srv://leoyuruiqing:<password>@airesume.niop3nd.mongodb.net/?retryWrites=true&w=majority&appName=AIResume";
-// const dbName = 'airesumedb'; // Database Name
+const uri = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mongodb.net/?retryWrites=true&w=majority&appName=AIResume";
+const dbName = 'airesumedb'; // Database Name
 
 const client = new MongoClient(uri, {
   serverApi: {
