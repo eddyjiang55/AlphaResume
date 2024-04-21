@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "../components/navbar";
 import ResumeNavbar from "../components/resume-navbar";
+import { step3Tips } from '../lib/tips';
 
 const Step3Page = () => {
   const [formData, setFormData] = useState([]);
@@ -319,35 +320,27 @@ const Step3Page = () => {
             </Link>
           </div>
         </div>
-        <div className=' w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20'>
+        <div className=' w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20 overflow-y-auto'>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
-          <p className='text-black text-base font-normal'>
-            <strong>为什么教育经历重要 ?</strong>
-            <br></br>-
-            证明资格：教育经历是求职者证明自己具备某个领域知识和技能的直接证据。对于刚从学校毕业或者具有相关学科背景的岗位申请者来说尤为重要。
-            <br></br>-
-            展示潜力：对于经验较少的求职者，良好的教育背景可以突显其学习能力和成长潜力。
-            <br></br>-
-            符合要求：某些岗位可能要求特定的学历背景，教育经历部分直接影响求职者的符合程度。
-          </p>
-          <p className='text-black text-base font-normal'>
-            <strong>有哪些注意事项?</strong>
-            <br></br>-
-            简洁明了：即便是丰富的教育背景，也应尽量简洁地展示，避免不必要的细节，以免分散招聘官的注意力。
-            <br></br>-
-            相关性：突出与求职岗位最相关的教育经历，如果有的话。比如，针对技术岗位强调你的理工科学位。
-            <br></br>-
-            逆序排列：按时间逆序排列你的教育经历，即最近的学历/学位放在最前面。
-          </p>
-          <p className='text-black text-base font-normal'>
-            <strong>需要包括哪些内容要素?</strong>
-            <br></br>- 学校名称：清楚地列出学习机构的全名，不要用缩写代替。
-            <br></br>- 学位和专业：明确指出所获得的学位以及专业领域。
-            <br></br>-
-            成绩和荣誉：如有较高的GPA、奖学金或任何特殊荣誉，可以列出。
-            <br></br>-
-            相关课程：如果适用，列出与求职岗位密切相关的课程（尤其是对于缺乏工作经验的应届毕业生）。
-          </p>
+          <div className='flex flex-col gap-y-4'>
+            {step3Tips.map((topic, index) => (
+              <div className='text-black ' key={index}>
+                <h2 className="font-bold text-xl">{topic.title}</h2>
+                {topic.subtopics.map((subtopic, subIndex) => (
+                  <ol className='list-decimal list-inside' key={subIndex}>
+                    {subtopic.title && <li className='font-bold text-lg'>{subtopic.title}</li>}
+                    <ul className='list-disc list-inside'>
+                      {subtopic.bulletPoints.map((point, pointIndex) => (
+                        <li key={pointIndex}>
+                          <span className='text-base'><b className='font-bold text-base'>{point.topic}:</b> {point.content}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </ol>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <style jsx>{`

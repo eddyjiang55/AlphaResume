@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
+import { step6Tips } from '../lib/tips';
 
 const Step6Page = () => {
   const [awardFormData, setAwardFormData] = useState([]);
@@ -360,13 +361,27 @@ const Step6Page = () => {
             </Link>
           </div>
         </div>
-        <div className='w-1/2 bg-[#EDF8FD] h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch '>
+        <div className='w-1/2 bg-[#EDF8FD] h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch overflow-y-auto'>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
-          <p className='text-black text-base font-normal'>
-            Tips（未完善）
-            If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
-            We've got you covered in our post The New Grad's Map to Resume Writing.
-          </p>
+          <div className='flex flex-col gap-y-4'>
+            {step6Tips.map((topic, index) => (
+              <div className='text-black ' key={index}>
+                <h2 className="font-bold text-xl">{topic.title}</h2>
+                {topic.subtopics.map((subtopic, subIndex) => (
+                  <ol className='list-decimal list-inside' key={subIndex}>
+                    {subtopic.title && <li className='font-bold text-lg'>{subtopic.title}</li>}
+                    <ul className='list-disc list-inside'>
+                      {subtopic.bulletPoints.map((point, pointIndex) => (
+                        <li key={pointIndex}>
+                          <span className='text-base'><b className='font-bold text-base'>{point.topic}:</b> {point.content}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </ol>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <style jsx>{`
