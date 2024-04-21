@@ -1,72 +1,164 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
+import ResumeNavbar from "../components/resume-navbar";
 
 const HomePage = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
-  const buttons = [
-    { name: "基础信息", path: "/fill-info-step1" },
-    { name: "个人评价", path: "/fill-info-step2" },
-    { name: "教育经历", path: "/fill-info-step3" },
-    { name: "职业经历", path: "/fill-info-step4" },
-    { name: "项目经历", path: "/fill-info-step5" },
-    { name: "获奖与证书", path: "/fill-info-step6" },
-    { name: "科研论文与知识产权", path: "/fill-info-step7" },
-    { name: "技能", path: "/fill-info-step8" },
-    { name: "语言", path: "/fill-info-step9" },
-    { name: "结束", path: "/fill-info-step10" }
-  ];
+
+  const [skillFormData, setSkillFormData] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  const AddSkill = () => {
+    if (skillFormData.length >= 10) {
+      alert("最多添加10个技能");
+      return;
+    };
+    setSkillFormData([...skillFormData, { skill: "", proficiency: "" }]);
+    setActiveIndex((prev) => prev + 1);
+  }
+
+  const RemoveSkill = (index) => {
+    if (skillFormData.length <= 1) {
+      setSkillFormData([]);
+      setActiveIndex(-1);
+      return;
+    };
+    setSkillFormData(skillFormData.filter((_, i) => i !== index));
+    setActiveIndex((prevIndex) => Math.min(prevIndex, skillFormData.length - 2));
+  }
 
   return (
-    <div>
+    <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <div className="secondNavbar">
-        {buttons.map((button) => (
-          <Link key={button.name} href={button.path} passHref>
-            <button className={router.pathname === button.path ? 'active' : ''}>
-              {button.name}
+      <ResumeNavbar />
+      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+        <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
+          <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
+            <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">技能</h2>
+            {skillFormData.length > 0 &&
+              <>
+                <div className="flex flex-row justify-start items-center text-alpha-blue mx-auto">
+                  {skillFormData.map((data, index) => (
+                    <>
+                      <button
+                        key={index}
+                        className={`${activeIndex === index
+                          ? "underline underline-offset-2"
+                          : ""
+                          }`}
+                        onClick={() => setActiveIndex(index)}
+                      >
+                        技能 {index + 1}
+                      </button>
+                      {index !== skillFormData.length - 1 && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="icon icon-tabler icon-tabler-chevron-right w-4 h-4"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M9 6l6 6l-6 6" />
+                        </svg>
+                      )}{" "}
+                    </>
+                  ))}
+                </div>
+                <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
+                  <label>技能名称</label>
+                  <input type="text"
+                    placeholder='请输入技能名称'
+                    value={skillFormData[activeIndex].skill}
+                    onChange={(e) => {
+                      const newSkillFormData = [...skillFormData];
+                      newSkillFormData[activeIndex].skill = e.target.value;
+                      setSkillFormData(newSkillFormData);
+                    }}
+                  />
+                  <label>熟练度</label>
+                  <input type="text"
+                    placeholder='请输入熟练度'
+                    value={skillFormData[activeIndex].proficiency}
+                    onChange={(e) => {
+                      const newSkillFormData = [...skillFormData];
+                      newSkillFormData[activeIndex].proficiency = e.target.value;
+                      setSkillFormData(newSkillFormData);
+                    }}
+                  />
+                  <div className="w-full flex flex-row justify-end items-center mt-1">
+                    <button
+                      className="text-gray-500 hover:text-red-500"
+                      title="删除这段经历"
+                      type="button"
+                      onClick={() => RemoveSkill(activeIndex)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-trash w-8 h-8"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M4 7l16 0" />
+                        <path d="M10 11l0 6" />
+                        <path d="M14 11l0 6" />
+                        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+              </>
+            }
+            <button
+              className="rounded-full border-4 border-alpha-blue px-4 py-2 flex flex-row justify-center items-center gap-y-2 w-40 mx-auto text-alpha-blue font-bold transition-colors duration-100 hover:bg-alpha-blue hover:text-white"
+              type='button'
+              onClick={AddSkill}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="icon icon-tabler icon-tabler-plus w-6 h-6"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 5l0 14" />
+                <path d="M5 12l14 0" />
+              </svg>
+              增加技能
             </button>
-          </Link>
-        ))}
-      </div>
-      <div className='background'>
-      <div className="form-container">
-          <div className="form-heading">
-            <h2>技能</h2>
           </div>
-          <div className="form-body">
-            <form>
-
-              <label>技能名称</label>
-              <input type="email"/>
-              <label>熟练度</label>
-              <input type="email"/>
-              <div className="info-container">
-                <button className="info-button">
-                    <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
-                    添加技能
-                </button>
-              </div>
-              <div className="form-buttons">
-                <button className='form-b' type="submit">保存</button>
-                <button className='form-b' type="button"><a href='/fill-info-step9'>下一步</a></button>
-              </div>
-            </form>
+          <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
+            <button className="form-b">保存</button>
+            <Link href="/fill-info-step9">
+              <button className="form-b" type="button">
+                下一步
+              </button>{" "}
+            </Link>
           </div>
-      </div>
-      <div className='tip-info'>
-            <div className="form-heading">
-              <h2>小贴士</h2>
-            </div>
-            <div className='tip-context'>
-              <p>
-              Tips（未完善）
-              If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
-              We've got you covered in our post The New Grad's Map to Resume Writing.
-              </p>
-            </div>
+        </div>
+        <div className='w-1/2 bg-[#EDF8FD] h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch '>
+          <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
+          <p className='text-black text-base font-normal'>
+            Tips（未完善）
+            If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
+            We've got you covered in our post The New Grad's Map to Resume Writing.
+          </p>
         </div>
       </div>
       <style jsx>{`
