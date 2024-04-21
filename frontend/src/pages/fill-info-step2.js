@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
+import { step2Tips } from '../lib/tips';
 
 const Step2Page = () => {
 
@@ -23,22 +24,27 @@ const Step2Page = () => {
             <Link href='/fill-info-step3'><button className='form-b' type="button">下一步</button> </Link>
           </div>
         </div>
-        <div className=' w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20'>
+        <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20 overflow-y-auto'>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
-          <p className='text-black text-base font-normal'>
-            <strong>为什么个人评价重要？</strong><br></br>定位自我：个人评价是您向招聘者展示自身职业特质、价值观及与目标职位契合度的重要一环，有助于快速建立个人品牌形象。突出优势：它让HR在短时间内了解您的核心竞争力、工作风格和所取得的关键成果。
-          </p>
-
-          <p className='text-black text-base font-normal'>
-            <strong>有哪些注意事项？</strong><br></br>精炼明确：避免冗长，保持简洁明了，一般不超过3至5句话。针对岗位：根据应聘职位的具体要求，定制个人评价的内容，强调自己的相关经验和成就。客观公正：不要过度夸大或自谦，应实事求是描述自身优点和特长。量化成果：尽可能使用具体数据或案例来支持你的能力表述。体现价值：阐述自己能为潜在雇主带来的价值，如提升团队效率、创造业绩增长等。
-          </p>
-
-          <p className='text-black text-base font-normal'>
-            <strong>需要包括哪些内容要素？</strong><br></br>核心技能：概括您的主要专业技能和证书资质。工作经验亮点：提炼过往工作中最具代表性的成绩和贡献。个人特质：展现与工作相关的性格特点和职业态度。成长潜力：表达持续学习和适应新环境的能力，以及对职业发展的长远规划。
-          </p>
-          <p className='text-black text-base font-normal'>
-            <strong>示例：</strong>（字节跳动算法岗）<br></br>作为一名算法工程师，我具备扎实的计算机科学基础和丰富的机器学习实践经验，在数据结构、算法设计与优化方面具有深厚造诣，并已获得ACM ICPC亚洲区域赛优胜证书。在过往实习经历中，针对推荐系统优化项目，我提出并实施了一项个性化排序算法改进方案，使点击率提升15%，有效推动了产品用户活跃度及业务增长。我注重团队协作与沟通，曾在团队项目中担任技术负责人，协调成员高效完成任务，提升了整体研发效率20%。持续关注AI领域前沿动态，具备快速学习新知识和技术的能力，对算法岗的职业发展有着明确而长远的规划，期待能在字节跳动发挥所长，共同驱动技术创新与应用突破。
-          </p>
+          <div className='flex flex-col gap-y-4'>
+            {step2Tips.map((topic, index) => (
+              <div className='text-black ' key={index}>
+                <h2 className="font-bold text-xl">{topic.title}</h2>
+                {topic.subtopics.map((subtopic, subIndex) => (
+                  <ol className='list-decimal list-inside' key={subIndex}>
+                    {subtopic.title && <li className='font-bold text-lg'>{subtopic.title}</li>}
+                    <ul className='list-disc list-inside'>
+                      {subtopic.bulletPoints.map((point, pointIndex) => (
+                        <li key={pointIndex}>
+                          <span className='text-base'><b className='font-bold text-base'>{point.topic}:</b> {point.content}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </ol>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <style jsx>{`
