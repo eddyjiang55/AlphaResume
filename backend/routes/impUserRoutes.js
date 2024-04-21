@@ -7,6 +7,7 @@ router.post('/improved-users', async (req, res) => {
     try {
         const newUser = new ImprovedUser(
             req.body.基本信息,
+            req.body.个人评价, // 添加个人评价的处理
             req.body.教育经历,
             req.body.职业经历,
             req.body.项目经历,
@@ -75,8 +76,11 @@ router.post('/save-data', async (req, res) => {
         // 根据type决定更新哪个部分
         let updatePath = {};
         switch (type) {
-            case 'personalEvaluation':
+            case 'basicInformation':  // 新增的基本信息处理
                 updatePath['基本信息'] = data;
+                break;
+            case 'personalEvaluation':
+                updatePath['个人评价'] = data;
                 break;
             case 'educationHistory':
                 updatePath['教育经历'] = data;
@@ -97,7 +101,7 @@ router.post('/save-data', async (req, res) => {
                 updatePath['语言'] = data;
                 break;
             case 'researchPapersAndPatents':
-                updatePath['科研论文与知识产权'] = data; // 确保有此字段在类定义中
+                updatePath['科研论文与知识产权'] = data;
                 break;
             default:
                 return res.status(400).json({ message: "Invalid type specified" });
