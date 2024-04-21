@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import Link from "next/link";
+import { useRouter } from 'next/router';
 import Navbar from "../components/navbar";
 import ResumeNavbar from "../components/resume-navbar";
 import { step3Tips } from '../lib/tips';
 
 const Step3Page = () => {
+  const router = useRouter();
+  const [error, setError] = useState(false);
   const [formData, setFormData] = useState([]);
 
   const [activeIndex, setActiveIndex] = useState(-1); // 当前显示的教育经历索引
@@ -51,8 +53,58 @@ const Step3Page = () => {
     }
   };
 
+  const handleSave = () => {
+    if (formData.length === 0) {
+      return;
+    }
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify(formData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+  }
+
+  const handleSubmit = () => {
+
+    if (formData.length === 0) {
+      router.push('/fill-info-step4');
+    }
+    //检查是否有任何一个字段为空
+    for (let i = 0; i < formData.length; i++) {
+      if (!formData[i].degree || !formData[i].school || !formData[i].startDate || !formData[i].endDate || !formData[i].department || !formData[i].major) {
+        setError(true);
+        return;
+      }
+    }
+
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify(formData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+        router.push('/fill-info-step4');
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+  }
+
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden">
+    <div className="w-full h-screen flex flex-col overflow-hidden relative">
       <Navbar />
       <ResumeNavbar />
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
@@ -93,7 +145,7 @@ const Step3Page = () => {
               ))}
             </div>
               <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
-                <label>学历</label>
+                <label>*学历</label>
                 <input
                   type="text"
                   placeholder="请输入学历水平"
@@ -105,7 +157,7 @@ const Step3Page = () => {
                   }}
                 />
 
-                <label>学校名称</label>
+                <label>*学校名称</label>
                 <input
                   type="text"
                   placeholder="请输入学校名称"
@@ -145,7 +197,7 @@ const Step3Page = () => {
                     />
                   </div>
                 </div>
-                <label>起止时间</label>
+                <label>*起止时间</label>
                 <div className="w-full p-2.5 mt-1.5 rounded-xl border border-[#ccc] flex flex-row justify-between items-center gap-x-6">
                   <input
                     className="flex-grow"
@@ -183,7 +235,7 @@ const Step3Page = () => {
                     }}
                   />
                 </div>
-                <label>院系</label>
+                <label>*院系</label>
                 <input
                   type="text"
                   placeholder="请输入院系"
@@ -195,7 +247,7 @@ const Step3Page = () => {
                   }}
                 />
 
-                <label>专业</label>
+                <label>*专业</label>
                 <input
                   type="text"
                   placeholder="请输入专业"
@@ -312,12 +364,10 @@ const Step3Page = () => {
             </button>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
-            <button className="form-b">保存</button>
-            <Link href="/fill-info-step4">
-              <button className="form-b" type="button">
-                下一步
-              </button>{" "}
-            </Link>
+            <button className="form-b" onClick={handleSave}>保存</button>
+            <button className="form-b" type="button" onClick={handleSubmit}>
+              下一步
+            </button>
           </div>
         </div>
         <div className=' w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20 overflow-y-auto'>
@@ -343,6 +393,11 @@ const Step3Page = () => {
           </div>
         </div>
       </div>
+      {error && <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2'>
+        <p className='text-base font-bold text-wrap text-center py-4 px-4'>本页存在必填项未填写，请检查并完成所有*标记项后重试。</p>
+        <div className='w-full border border-alpha-blue ' />
+        <button className='py-2 px-4 text-base' onClick={() => setError(false)}>了解</button>
+      </div>}
       <style jsx>{`
             p {
               margin: 20px 0; /* 调整段落的上下外边距 */

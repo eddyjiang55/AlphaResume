@@ -1,11 +1,13 @@
 
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { step6Tips } from '../lib/tips';
 
 const Step6Page = () => {
+  const router = useRouter();
+  const [error, setError] = useState(false);
   const [awardFormData, setAwardFormData] = useState([]);
   const [certificateFormData, setCertificateFormData] = useState([]);
 
@@ -76,6 +78,106 @@ const Step6Page = () => {
     }
   };
 
+  const handleSave = () => {
+    if (awardFormData.length > 0) {
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: '123',
+          type: 'award',
+          data: awardFormData,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    if (certificateFormData.length > 0) {
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: '123',
+          type: 'certificate',
+          data: certificateFormData,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+  }
+
+  const handleSubmit = () => {
+    if (awardFormData.length > 0) {
+      for (let i = 0; i < awardFormData.length; i++) {
+        if (!awardFormData[i].awardName || !awardFormData[i].awardTime || !awardFormData[i].awardOrg) {
+          setError(true);
+          return;
+        }
+      }
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: '123',
+          type: 'award',
+          data: awardFormData,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    if (certificateFormData.length > 0) {
+      for (let i = 0; i < certificateFormData.length; i++) {
+        if (!certificateFormData[i].certificateName || !certificateFormData[i].certificateTime || !certificateFormData[i].certificateOrg) {
+          setError(true);
+          return;
+        }
+      }
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: '123',
+          type: 'certificate',
+          data: certificateFormData,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+          router.push('/fill-info-step7');
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    router.push('/fill-info-step7');
+  }
+
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
@@ -118,7 +220,7 @@ const Step6Page = () => {
                   ))}
                 </div>
                 <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
-                  <label>奖项名称</label>
+                  <label>*奖项名称</label>
                   <input type="text"
                     placeholder='请输入奖项名称'
                     value={awardFormData[activeAwardIndex].awardName}
@@ -128,7 +230,7 @@ const Step6Page = () => {
                       setAwardFormData(newFormData);
                     }}
                   />
-                  <label>获奖时间</label>
+                  <label>*获奖时间</label>
                   <input type="date"
                     value={awardFormData[activeAwardIndex].awardTime}
                     onChange={(e) => {
@@ -137,7 +239,7 @@ const Step6Page = () => {
                       setAwardFormData(newFormData);
                     }}
                   />
-                  <label>颁奖机构</label>
+                  <label>*颁奖机构</label>
                   <input type="text"
                     placeholder='请输入颁奖机构'
                     value={awardFormData[activeAwardIndex].awardOrg}
@@ -263,7 +365,7 @@ const Step6Page = () => {
                   ))}
                 </div>
                 <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
-                  <label>证书名称</label>
+                  <label>*证书名称</label>
                   <input type="text"
                     placeholder='请输入证书名称'
                     value={certificateFormData[activeCertificateIndex].certificateName}
@@ -273,7 +375,7 @@ const Step6Page = () => {
                       setCertificateFormData(newFormData);
                     }}
                   />
-                  <label>取得时间</label>
+                  <label>*取得时间</label>
                   <input type="date"
                     value={certificateFormData[activeCertificateIndex].certificateTime}
                     onChange={(e) => {
@@ -282,7 +384,7 @@ const Step6Page = () => {
                       setCertificateFormData(newFormData);
                     }}
                   />
-                  <label>颁发机构</label>
+                  <label>*颁发机构</label>
                   <input type="text"
                     placeholder='请输入颁发机构'
                     value={certificateFormData[activeCertificateIndex].certificateOrg}
@@ -353,12 +455,10 @@ const Step6Page = () => {
             </button>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
-            <button className="form-b">保存</button>
-            <Link href="/fill-info-step7">
-              <button className="form-b" type="button">
-                下一步
-              </button>{" "}
-            </Link>
+            <button className="form-b" onClick={handleSave}>保存</button>
+            <button className="form-b" type="button" onClick={handleSubmit}>
+              下一步
+            </button>
           </div>
         </div>
         <div className='w-1/2 bg-[#EDF8FD] h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch overflow-y-auto'>
@@ -384,6 +484,11 @@ const Step6Page = () => {
           </div>
         </div>
       </div>
+      {error && <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2'>
+        <p className='text-base font-bold text-wrap text-center py-4 px-4'>本页存在必填项未填写，请检查并完成所有*标记项后重试。</p>
+        <div className='w-full border border-alpha-blue ' />
+        <button className='py-2 px-4 text-base' onClick={() => setError(false)}>了解</button>
+      </div>}
       <style jsx>{`
       .smallTitle{
         color:#1D80A7;

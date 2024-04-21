@@ -1,10 +1,12 @@
 
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 
 const Step7Page = () => {
+  const router = useRouter();
+  const [error, setError] = useState(false);
   const [paperFormData, setPaperFormData] = useState([]);
 
   const [patentFormData, setPatentFormData] = useState([]);
@@ -63,6 +65,91 @@ const Step7Page = () => {
     setActivePatentIndex((prevIndex) => Math.min(prevIndex, patentFormData.length - 2));
   };
 
+  const handleSave = () => {
+    if (paperFormData.length > 0) {
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify(paperFormData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    if (patentFormData.length > 0) {
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify(patentFormData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+  }
+
+  const handleSubmit = () => {
+    if (paperFormData.length > 0) {
+      for (const paper of paperFormData) {
+        if (!paper.title || !paper.authors || !paper.journal || !paper.date) {
+          setError(true);
+          return;
+        }
+      }
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify(paperFormData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+          router.push('/fill-info-step8');
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    if (patentFormData.length > 0) {
+      for (const patent of patentFormData) {
+        if (!patent.title || !patent.number || !patent.date) {
+          setError(true);
+          return;
+        }
+      }
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify(patentFormData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+          router.push('/fill-info-step8');
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    router.push('/fill-info-step8');
+  }
+
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
@@ -105,7 +192,7 @@ const Step7Page = () => {
                   ))}
                 </div>
                 <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
-                  <label>论文标题</label>
+                  <label>*论文标题</label>
                   <input type="text"
                     placeholder='请输入论文标题'
                     value={paperFormData[activePaperIndex].title}
@@ -115,7 +202,7 @@ const Step7Page = () => {
                       setPaperFormData(newPaperFormData);
                     }}
                   />
-                  <label>作者顺序</label>
+                  <label>*作者顺序</label>
                   <input type="text"
                     placeholder='请输入作者顺序'
                     value={paperFormData[activePaperIndex].authors}
@@ -125,7 +212,7 @@ const Step7Page = () => {
                       setPaperFormData(newPaperFormData);
                     }}
                   />
-                  <label>期刊/会议</label>
+                  <label>*期刊/会议</label>
                   <input type="text"
                     placeholder='请输入期刊/会议'
                     value={paperFormData[activePaperIndex].journal}
@@ -135,7 +222,7 @@ const Step7Page = () => {
                       setPaperFormData(newPaperFormData);
                     }}
                   />
-                  <label>出版时间</label>
+                  <label>*出版时间</label>
                   <input type="date"
                     value={paperFormData[activePaperIndex].date}
                     onChange={(e) => {
@@ -260,7 +347,7 @@ const Step7Page = () => {
                   ))}
                 </div>
                 <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
-                  <label>专利名称</label>
+                  <label>*专利名称</label>
                   <input type="text"
                     placeholder='请输入专利名称'
                     value={patentFormData[activePatentIndex].title}
@@ -270,7 +357,7 @@ const Step7Page = () => {
                       setPatentFormData(newPatentFormData);
                     }}
                   />
-                  <label>专利号</label>
+                  <label>*专利号</label>
                   <input type="text"
                     placeholder='请输入专利号'
                     value={patentFormData[activePatentIndex].number}
@@ -280,7 +367,7 @@ const Step7Page = () => {
                       setPatentFormData(newPatentFormData);
                     }}
                   />
-                  <label>申请/授权日期</label>
+                  <label>*申请/授权日期</label>
                   <input type="date"
                     value={patentFormData[activePatentIndex].date}
                     onChange={(e) => {
@@ -351,12 +438,10 @@ const Step7Page = () => {
             </button>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
-            <button className="form-b">保存</button>
-            <Link href="/fill-info-step8">
-              <button className="form-b" type="button">
-                下一步
-              </button>{" "}
-            </Link>
+            <button className="form-b" onClick={handleSave}>保存</button>
+            <button className="form-b" type="button" onClick={handleSubmit}>
+              下一步
+            </button>
           </div>
         </div>
         <div className='w-1/2 bg-[#EDF8FD] h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch '>
@@ -368,6 +453,11 @@ const Step7Page = () => {
           </p>
         </div>
       </div>
+      {error && <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2'>
+        <p className='text-base font-bold text-wrap text-center py-4 px-4'>本页存在必填项未填写，请检查并完成所有*标记项后重试。</p>
+        <div className='w-full border border-alpha-blue ' />
+        <button className='py-2 px-4 text-base' onClick={() => setError(false)}>了解</button>
+      </div>}
       <style jsx>{`
       .smallTitle{
         color:#1D80A7;
