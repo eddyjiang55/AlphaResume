@@ -1,13 +1,12 @@
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 
 const HomePage = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
-
+  const [error, setError] = useState(false);
   const [skillFormData, setSkillFormData] = useState([]);
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -28,6 +27,52 @@ const HomePage = () => {
     };
     setSkillFormData(skillFormData.filter((_, i) => i !== index));
     setActiveIndex((prevIndex) => Math.min(prevIndex, skillFormData.length - 2));
+  }
+
+  const handleSave = () => {
+    if (skillFormData.length > 0) {
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify(skillFormData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+  }
+
+  const handleSubmit = () => {
+    if (skillFormData.length > 0) {
+      for (let i = 0; i < skillFormData.length; i++) {
+        if (skillFormData[i].skill === "" || skillFormData[i].proficiency === "") {
+          setError(true);
+          return;
+        }
+      }
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify(skillFormData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+          router.push('/fill-info-step9');
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    router.push('/fill-info-step9');
   }
 
   return (
@@ -72,7 +117,7 @@ const HomePage = () => {
                   ))}
                 </div>
                 <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
-                  <label>技能名称</label>
+                  <label>*技能名称</label>
                   <input type="text"
                     placeholder='请输入技能名称'
                     value={skillFormData[activeIndex].skill}
@@ -82,7 +127,7 @@ const HomePage = () => {
                       setSkillFormData(newSkillFormData);
                     }}
                   />
-                  <label>熟练度</label>
+                  <label>*熟练度</label>
                   <input type="text"
                     placeholder='请输入熟练度'
                     value={skillFormData[activeIndex].proficiency}
@@ -144,12 +189,10 @@ const HomePage = () => {
             </button>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
-            <button className="form-b">保存</button>
-            <Link href="/fill-info-step9">
-              <button className="form-b" type="button">
-                下一步
-              </button>{" "}
-            </Link>
+            <button className="form-b" onClick={handleSave}>保存</button>
+            <button className="form-b" type="button" onClick={handleSubmit}>
+              下一步
+            </button>
           </div>
         </div>
         <div className='w-1/2 bg-[#EDF8FD] h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch '>
@@ -161,6 +204,11 @@ const HomePage = () => {
           </p>
         </div>
       </div>
+      {error && <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2'>
+        <p className='text-base font-bold text-wrap text-center py-4 px-4'>本页存在必填项未填写，请检查并完成所有*标记项后重试。</p>
+        <div className='w-full border border-alpha-blue ' />
+        <button className='py-2 px-4 text-base' onClick={() => setError(false)}>了解</button>
+      </div>}
       <style jsx>{`
       .smallTitle{
         color:#1D80A7;

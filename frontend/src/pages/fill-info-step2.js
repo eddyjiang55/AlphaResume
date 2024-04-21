@@ -1,11 +1,50 @@
 
-import React from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
 import { step2Tips } from '../lib/tips';
 
 const Step2Page = () => {
+
+  const router = useRouter();
+
+  const [formData, setFormData] = useState('');
+
+  const handleSave = () => {
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify(form),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+  }
+
+  const handleSubmit = () => {
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify(form),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+        router.push('/fill-info-step3');
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+  }
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
@@ -16,12 +55,14 @@ const Step2Page = () => {
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-16 w-full max-w-[75%] mx-auto">
             <h2 className='text-alpha-blue font-bold text-4xl text-center mx-auto'>请书写您的个人评价</h2>
             <form className='w-full max-w-[75%]  flex items-center justify-start mx-auto'>
-              <textarea className='w-full rounded-lg border border-black focus:border-2 p-4' rows={15}></textarea>
+              <textarea className='w-full rounded-lg border border-black focus:border-2 p-4' rows={15} value={formData} onChange={
+                (e) => setFormData(e.target.value)
+              }></textarea>
             </form>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
-            <button className='form-b'>保存</button>
-            <Link href='/fill-info-step3'><button className='form-b' type="button">下一步</button> </Link>
+            <button className='form-b' onClick={handleSave}>保存</button>
+            <button className='form-b' type="button" onClick={handleSubmit}>下一步</button>
           </div>
         </div>
         <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20 overflow-y-auto'>

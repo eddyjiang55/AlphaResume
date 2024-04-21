@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
 
 const Step1Page = () => {
+  const router = useRouter();
 
   // 使用 useState 钩子初始化表单状态
   const [form, setForm] = useState({
@@ -14,6 +15,8 @@ const Step1Page = () => {
     email: '',
     wechat: ''
   });
+
+  const [error, setError] = useState(false);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -62,8 +65,60 @@ const Step1Page = () => {
     });
   };
 
+  const handleSubmit = () => {
+    // 检查是否有必填项未填写
+    if (!form.title || !form.firstName || !form.lastName || !form.phone || !form.email || !form.wechat) {
+      setError(true);
+      return;
+    }
+
+    // 发送表单数据到后端
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: '123', // 假设用户 ID 为 123
+        type: 'personalEvaluation',
+        data: form,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+        // 跳转到下一步页面
+        router.push('/fill-info-step2');
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+  }
+
+  const handleSave = () => {
+    // 发送表单数据到后端
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: '123', // 假设用户 ID 为 123
+        type: 'personalEvaluation',
+        data: form,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+  }
+
   return (
-    <div className='bg-[#EDF8FD] w-full h-screen flex flex-col'>
+    <div className='bg-[#EDF8FD] w-full h-screen flex flex-col relative'>
       <Navbar />
       <ResumeNavbar />
       <div className="flex-grow w-full max-w-[960px] mx-auto flex flex-col justify-between">
@@ -83,40 +138,45 @@ const Step1Page = () => {
               <p className='text-base text-black'>在填写简历时，若您认为某些内容非必要，请自由选择性省略。</p>
             </div>
             <form className='h-full flex-grow flex flex-col justify-between'>
-              <label>简历标题</label>
+              <label>*简历标题</label>
               <input type="title" placeholder="请输入简历标题" />
               <div className='text-black text-base'>
                 此项内容不会出现在简历上，仅用于后续识别您的简历
               </div>
               <div className="w-full flex flex-row justify-between items-center gap-x-16">
                 <div className="w-full flex flex-col justify-start items-stretch">
-                  <label>姓</label>
+                  <label>*姓</label>
                   <input type="text" name="lastName" placeholder="请输入姓氏" value={form.lastName} onChange={handleChange} />
                 </div>
                 <div className="w-full flex flex-col justify-start items-stretch">
-                  <label>名</label>
+                  <label>*名</label>
                   <input type="text" name="firstName" placeholder="请输入名字" value={form.firstName} onChange={handleChange} />
                 </div>
               </div>
 
-              <label>手机号码</label>
+              <label>*手机号码</label>
               <input type="tel" name="phone" placeholder="请输入手机号码" value={form.phone} onChange={handleChange} />
 
-              <label>邮箱</label>
+              <label>*邮箱</label>
               <input type="email" name="email" placeholder="请输入邮箱地址" value={form.email} onChange={handleChange} />
 
               {/* ... 新增 ... */}
-              <label>微信号</label>
-              <input type="text" name="wechatId" placeholder="请输入微信号" value={form.email} onChange={handleChange} />
+              <label>*微信号</label>
+              <input type="text" name="wechatId" placeholder="请输入微信号" value={form.wechat} onChange={handleChange} />
               {/* ... 其他表单元素 ... */}
             </form>
           </div>
         </div>
         <div className="w-full flex flex-row justify-center items-center gap-x-20 p-4 mb-28">
-          <button className='form-b'>保存</button>
-          <Link href='/fill-info-step2'><button className='form-b' type="button">下一步</button> </Link>
+          <button className='form-b' onClick={handleSave}>保存</button>
+          <button className='form-b' type="button" onClick={handleSubmit}>下一步</button>
         </div>
       </div>
+      {error && <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2'>
+        <p className='text-base font-bold text-wrap text-center py-4 px-4'>本页存在必填项未填写，请检查并完成所有*标记项后重试。</p>
+        <div className='w-full border border-alpha-blue ' />
+        <button className='py-2 px-4 text-base' onClick={() => setError(false)}>了解</button>
+      </div>}
       <style jsx>{`
         .background{
           background-color: #EDF8FD;
