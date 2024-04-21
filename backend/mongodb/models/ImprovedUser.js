@@ -2,9 +2,10 @@ const { connect } = require('../dbconfig'); // 确保路径正确
 const { v4: uuidv4 } = require('uuid'); // 引入UUID库
 
 class ImprovedUser {
-    constructor(基本信息, 教育经历, 职业经历, 项目经历, 获奖与证书, 语言, 技能, 科研论文与知识产权, id = null) {
+    constructor(基本信息, 个人评价, 教育经历, 职业经历, 项目经历, 获奖与证书, 语言, 技能, 科研论文与知识产权, id = null) {
         this._id = id || uuidv4(); // 如果提供了id，则使用该id；否则，生成一个新的UUID
         this.基本信息 = 基本信息;
+        this.个人评价 = 个人评价; // 新添加的字段
         this.教育经历 = 教育经历;
         this.职业经历 = 职业经历;
         this.项目经历 = 项目经历;
@@ -20,6 +21,7 @@ class ImprovedUser {
         const result = await collection.insertOne({
             _id: this._id,
             基本信息: this.基本信息,
+            个人评价: this.个人评价, // 确保保存时包括新添加的字段
             教育经历: this.教育经历,
             职业经历: this.职业经历,
             项目经历: this.项目经历,
