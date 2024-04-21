@@ -1,83 +1,260 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
+import ResumeNavbar from "../components/resume-navbar";
 
-const HomePage = () => {
-  const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
-  const buttons = [
-    { name: "基础信息", path: "/fill-info-step1" },
-    { name: "个人评价", path: "/fill-info-step2" },
-    { name: "教育经历", path: "/fill-info-step3" },
-    { name: "职业经历", path: "/fill-info-step4" },
-    { name: "项目经历", path: "/fill-info-step5" },
-    { name: "获奖与证书", path: "/fill-info-step6" },
-    { name: "科研论文与知识产权", path: "/fill-info-step7" },
-    { name: "技能", path: "/fill-info-step8" },
-    { name: "语言", path: "/fill-info-step9" },
-    { name: "结束", path: "/fill-info-step10" }
-  ];
+const step4Page = () => {
+  const [formData, setFormData] = useState([]);
+
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  const AddJob = () => {
+    if (formData.length >= 5) {
+      alert("最多只能添加5个实习经历");
+      return
+    };
+    setFormData([
+      ...formData,
+      {
+        company: "",
+        city: "",
+        country: "",
+        startDate: "",
+        endDate: "",
+        department: "",
+        position: "",
+        description: "",
+      },
+    ]);
+    setActiveIndex((prevIndex) => prevIndex + 1);
+  };
+
+  const RemoveJob = (index) => {
+    if (formData.length <= 1) {
+      setFormData([]);
+      setActiveIndex(-1);
+      return;
+    }
+    const newFormData = formData.filter((_, i) => i !== index);
+    setFormData(newFormData);
+    if (index === activeIndex) {
+      const newActiveIndex = activeIndex === 0 ? 0 : activeIndex - 1;
+      setActiveIndex(newActiveIndex);
+    } else if (activeIndex > index) {
+      setActiveIndex((prevIndex) => prevIndex - 1);
+    }
+  }
 
   return (
-    <div>
+    <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <div className="secondNavbar">
-        {buttons.map((button) => (
-          <Link key={button.name} href={button.path} passHref>
-            <button className={router.pathname === button.path ? 'active' : ''}>
-              {button.name}
+      <ResumeNavbar />
+      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+        <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
+          <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
+            <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">职业经历</h2>
+            {formData.length > 0 && <>
+              <div className="flex flex-row justify-start items-center text-alpha-blue mx-auto">
+                {formData.map((data, index) => (
+                  <>
+                    <button
+                      key={index}
+                      className={`${activeIndex === index
+                        ? "underline underline-offset-2"
+                        : ""
+                        }`}
+                      onClick={() => setActiveIndex(index)}
+                    >
+                      实习经历 {index + 1}
+                    </button>
+                    {index !== formData.length - 1 && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-chevron-right w-4 h-4"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M9 6l6 6l-6 6" />
+                      </svg>
+                    )}{" "}
+                  </>
+                ))}
+              </div>
+              <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
+                <label>公司名称</label>
+                <input type="text"
+                  placeholder="请输入公司名称"
+                  value={formData[activeIndex].company}
+                  onChange={(e) => {
+                    const newFormData = [...formData];
+                    newFormData[activeIndex].company = e.target.value;
+                    setFormData(newFormData);
+                  }}
+                />
+                <div className="w-full flex flex-row justify-between items-center gap-x-16">
+                  <div className="w-full flex flex-col justify-start items-stretch">
+                    <label>城市</label>
+                    <input type="text" placeholder="请输入城市"
+                      value={formData[activeIndex].city}
+                      onChange={(e) => {
+                        const newFormData = [...formData];
+                        newFormData[activeIndex].city = e.target.value;
+                        setFormData(newFormData);
+                      }}
+                    />
+                  </div>
+                  <div className="w-full flex flex-col justify-start items-stretch">
+                    <label>国家</label>
+                    <input type="text" placeholder="请输入国家"
+                      value={formData[activeIndex].country}
+                      onChange={(e) => {
+                        const newFormData = [...formData];
+                        newFormData[activeIndex].country = e.target.value;
+                        setFormData(newFormData);
+                      }}
+                    />
+                  </div>
+                </div>
+                <label>起止时间</label>
+                <div className="w-full p-2.5 mt-1.5 rounded-xl border border-[#ccc] flex flex-row justify-between items-center gap-x-6">
+                  <input
+                    className="flex-grow"
+                    type="month"
+                    value={formData[activeIndex].startDate}
+                    onChange={(e) => {
+                      const newFormData = [...formData];
+                      newFormData[activeIndex].startDate = e.target.value;
+                      setFormData(newFormData);
+                    }}
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="icon icon-tabler icon-tabler-arrow-narrow-right w-6 h-6"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="#000000"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M5 12l14 0" />
+                    <path d="M15 16l4 -4" />
+                    <path d="M15 8l4 4" />
+                  </svg>
+                  <input
+                    className="flex-grow"
+                    type="month"
+                    value={formData[activeIndex].endDate}
+                    onChange={(e) => {
+                      const newFormData = [...formData];
+                      newFormData[activeIndex].endDate = e.target.value;
+                      setFormData(newFormData);
+                    }}
+                  />
+                </div>
+                <label>职位</label>
+                <input type="text" placeholder="请输入实习职位"
+                  value={formData[activeIndex].position}
+                  onChange={(e) => {
+                    const newFormData = [...formData];
+                    newFormData[activeIndex].position = e.target.value;
+                    setFormData(newFormData);
+                  }}
+                />
+                <label>部门</label>
+                <input type="text" placeholder="请输入实习部门"
+                  value={formData[activeIndex].department}
+                  onChange={(e) => {
+                    const newFormData = [...formData];
+                    newFormData[activeIndex].department = e.target.value;
+                    setFormData(newFormData);
+                  }}
+                />
+                <label>职责/业务描述</label>
+                <textarea
+                  type="text"
+                  placeholder="请输入实习经历描述"
+                  rows={3}
+                  value={formData[activeIndex].description}
+                  onChange={(e) => {
+                    const newFormData = [...formData];
+                    newFormData[activeIndex].description = e.target.value;
+                    setFormData(newFormData);
+                  }}
+                />
+                {/* ... 其他表单元素 ... */}
+                <div className="w-full flex flex-row justify-end items-center mt-1">
+                  <button
+                    className="text-gray-500 hover:text-red-500"
+                    title="删除这段经历"
+                    type="button"
+                    onClick={() => RemoveJob(activeIndex)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="icon icon-tabler icon-tabler-trash w-8 h-8"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M4 7l16 0" />
+                      <path d="M10 11l0 6" />
+                      <path d="M14 11l0 6" />
+                      <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                      <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+            </>}
+            <button
+              className="rounded-full border-4 border-alpha-blue px-4 py-2 flex flex-row justify-center items-center gap-y-2 w-40 mx-auto text-alpha-blue font-bold transition-colors duration-100 hover:bg-alpha-blue hover:text-white"
+              onClick={AddJob}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="icon icon-tabler icon-tabler-plus w-6 h-6"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 5l0 14" />
+                <path d="M5 12l14 0" />
+              </svg>
+              增加实习经历
             </button>
-          </Link>
-        ))}
-      </div>
-      <div className='background'>
-      <div className="form-container">
-          <div className="form-heading">
-            <h2>职业经历</h2>
           </div>
-          <div className="form-body">
-            <form>
-              <label>公司名称</label>
-              <input type="tel"/>
-              <div className="input-group">
-                <div className="input-item">
-                  <label>城市</label>
-                  <input type="text" placeholder="" />
-                </div>
-                <div className="input-item">
-                  <label>国家</label>
-                  <input type="text" placeholder="" />
-                </div>
-              </div>
-              <label>起止时间</label>
-              <input type="email"/>
-              <label>职位</label>
-              <input type="email"/>
-              <label>部门</label>
-              <input type="email"/>
-              <label>职责/业务描述</label>
-              <input type="email"/>
-              {/* ... 其他表单元素 ... */}
-
-              <div className="form-buttons">
-                <button className='form-b' type="submit">保存</button>
-                <button className='form-b' type="button"><a href='/fill-info-step5'>下一步</a></button>
-              </div>
-            </form>
+          <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
+            <button className="form-b">保存</button>
+            <Link href="/fill-info-step5">
+              <button className="form-b" type="button">
+                下一步
+              </button>{" "}
+            </Link>
           </div>
-      </div>
-      <div className='tip-info'>
-            <div className="form-heading">
-              <h2>小贴士</h2>
-            </div>
-            <div className='tip-context'>
-              <p>
-              Tips（未完善）
-              If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
-              We've got you covered in our post The New Grad's Map to Resume Writing.
-              </p>
-            </div>
+        </div>
+        <div className=' w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20'>
+          <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
+          <p className='text-black text-base font-normal'>
+            Tips（未完善）
+            If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
+            We've got you covered in our post The New Grad's Map to Resume Writing.
+          </p>
         </div>
       </div>
       <style jsx>{`
@@ -148,6 +325,7 @@ const HomePage = () => {
         }
         input[type="title"],
         input[type="text"],
+        textarea[type="text"],
         input[type="tel"],
         input[type="email"] {
           padding: 10px;
@@ -256,7 +434,7 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default step4Page;
 
 
 

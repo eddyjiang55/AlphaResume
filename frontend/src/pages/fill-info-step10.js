@@ -2,22 +2,12 @@ import React, { useState } from 'react'; // Import useState here
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
+import ResumeNavbar from "../components/resume-navbar";
 
 
 const HomePage = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
-  const buttons = [
-    { name: "基础信息", path: "/fill-info-step1" },
-    { name: "个人评价", path: "/fill-info-step2" },
-    { name: "教育经历", path: "/fill-info-step3" },
-    { name: "职业经历", path: "/fill-info-step4" },
-    { name: "项目经历", path: "/fill-info-step5" },
-    { name: "获奖与证书", path: "/fill-info-step6" },
-    { name: "科研论文与知识产权", path: "/fill-info-step7" },
-    { name: "技能", path: "/fill-info-step8" },
-    { name: "语言", path: "/fill-info-step9" },
-    { name: "结束", path: "/fill-info-step10" }
-  ];
+
   const [selectedImage, setSelectedImage] = useState('');
   const images = [
     '/img/result-1.jpg',
@@ -26,33 +16,17 @@ const HomePage = () => {
     '/img/result-4.png'
   ];
   return (
-    <div>
-      <div className='bg-[#EDF8FD] w-full grid grid-cols-12 items-start justify-items-center'>
-        <div className="col-span-full w-full">
-          <Navbar />
-          <div className="secondNavbar">
-            {buttons.map((button) => (
-              <Link key={button.name} href={button.path} passHref>
-                <button className={router.pathname === button.path ? 'active' : ''}>
-                  {button.name}
-                </button>
-              </Link>
-            ))}
-          </div>
-        </div>
-        <div className="col-span-6 flex flex-col justify-center items-center gap-y-8 px-20 py-8 h-full">
-          <div className="w-fit mx-auto">
-            <h2 className="text-[#1D80A7] text-4xl font-bold text-center">意向岗位</h2>
-          </div>
-          <div className="w-full">
-            <form className='w-full flex justify-center'>
-              <input className='w-[680px] mx-auto' type="text" />
-            </form>
-          </div>
-          <div className="w-fit mx-auto">
-            <h2 className="text-[#1D80A7] text-4xl font-bold text-center">选择简历模板</h2>
-          </div>
-          <div className="w-full grid grid-cols-2 gap-4">
+    <div className="w-full h-screen flex flex-col overflow-hidden">
+      <Navbar />
+      <ResumeNavbar />
+      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+        <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
+          <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">意向岗位</h2>
+          <form className='w-full flex justify-center'>
+            <input className='w-[680px] mx-auto' type="text" />
+          </form>
+          <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">选择简历模板</h2>
+          <div className="w-full max-w-[90%] grid grid-cols-2 gap-4 mx-auto">
             {images.map((image, index) => (
               <div key={index} className="col-span-1 rounded-lg border border-[#1D80A7]">
                 <img
@@ -64,17 +38,13 @@ const HomePage = () => {
               </div>
             ))}
           </div>
-          <div className="form-buttons-new">
+          <div className="mx-auto w-fit">
             <button className='form-b' type="button"><a href='/fill-info-step11'>生成简历</a></button>
           </div>
         </div>
-        <div className='col-span-6 flex flex-col justify-center items-center gap-y-8 px-6 py-8'>
-          <div className="w-fit mx-auto">
-            <h2 className="text-[#1D80A7] text-4xl font-bold text-center">预览</h2>
-          </div>
-          <div className="tip-context">
-            {selectedImage && <img src={selectedImage} alt="Preview" />}
-          </div>
+        <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch gap-y-8 px-6 py-8 overflow-y-auto'>
+          <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">预览</h2>
+          {selectedImage && <img className='w-fit h-full mx-auto my-16' src={selectedImage} alt="Preview" />}
         </div>
       </div>
       <style jsx>{`
@@ -99,7 +69,7 @@ const HomePage = () => {
       }
         .tip-info{
         }
-        .tip-context{
+        .{
           text-align:left;
           padding:100px;
         }
@@ -290,7 +260,7 @@ const HomePage = () => {
         
         
       `}</style>
-    </div>
+    </div >
   );
 };
 

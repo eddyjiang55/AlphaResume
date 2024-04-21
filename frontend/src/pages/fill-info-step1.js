@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
+import ResumeNavbar from '../components/resume-navbar';
 
-const HomePage = () => {
-  const router = useRouter();
+const Step1Page = () => {
 
   // 使用 useState 钩子初始化表单状态
   const [form, setForm] = useState({
@@ -62,61 +61,41 @@ const HomePage = () => {
       [name]: value,
     });
   };
-  const buttons = [
-    { name: "基础信息", path: "/fill-info-step1" },
-    { name: "个人评价", path: "/fill-info-step2" },
-    { name: "教育经历", path: "/fill-info-step3" },
-    { name: "职业经历", path: "/fill-info-step4" },
-    { name: "项目经历", path: "/fill-info-step5" },
-    { name: "获奖与证书", path: "/fill-info-step6" },
-    { name: "科研论文与知识产权", path: "/fill-info-step7" },
-    { name: "技能", path: "/fill-info-step8" },
-    { name: "语言", path: "/fill-info-step9" },
-    { name: "结束", path: "/fill-info-step10" }
-  ];
 
   return (
-    <div>
+    <div className='bg-[#EDF8FD] w-full h-screen flex flex-col'>
       <Navbar />
-      <div className="secondNavbar">
-        {buttons.map((button) => (
-          <Link key={button.name} href={button.path} passHref>
-            <button className={router.pathname === button.path ? 'active' : ''}>
-              {button.name}
-            </button>
-          </Link>
-        ))}
-      </div>
-      <div className='background'>
-      <div className="info-container">
-          <span className="info-text">若已有简历，上传简历我们帮您解析：</span>
-          <button className="info-button" onDragOver={handleDragOver} onDrop={handleDrop}>
-              <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
-              拖曳文件到此处上传
-          </button>
-        </div>
-        <div className="form-container">
-          <div className="form-heading">
-            <h2>请输入以下空格</h2>
+      <ResumeNavbar />
+      <div className="flex-grow w-full max-w-[960px] mx-auto flex flex-col justify-between">
+        <div>
+          <div className="w-full mt-8">
+            <div className='w-auto mx-auto flex flex-row justify-center items-center gap-x-10'>
+              <span className="info-text">若已有简历，上传简历我们帮您解析：</span>
+              <button className="info-button" onDragOver={handleDragOver} onDrop={handleDrop}>
+                <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
+                拖曳文件到此处上传
+              </button>
+            </div>
           </div>
-          <div className="form-description">
-            <p>在填写简历时，若您认为某些内容非必要，请自由选择性省略。</p>
-          </div>
-          <div className="form-body">
-            <form>
+          <div className="flex flex-col justify-center items-center gap-y-6">
+            <div className='flex flex-col justify-center items-center gap-y-6 my-4'>
+              <h2 className='text-alpha-blue font-bold text-4xl'>请输入以下空格</h2>
+              <p className='text-base text-black'>在填写简历时，若您认为某些内容非必要，请自由选择性省略。</p>
+            </div>
+            <form className='h-full flex-grow flex flex-col justify-between'>
               <label>简历标题</label>
               <input type="title" placeholder="请输入简历标题" />
-              <div className='ps'>
-              此项内容不会出现在简历上，仅用于后续识别您的简历
+              <div className='text-black text-base'>
+                此项内容不会出现在简历上，仅用于后续识别您的简历
               </div>
-              <div className="input-group">
-                <div className="input-item">
+              <div className="w-full flex flex-row justify-between items-center gap-x-16">
+                <div className="w-full flex flex-col justify-start items-stretch">
                   <label>姓</label>
-                  <input type="text" name="lastName" placeholder="姓" value={form.lastName} onChange={handleChange} />
+                  <input type="text" name="lastName" placeholder="请输入姓氏" value={form.lastName} onChange={handleChange} />
                 </div>
-                <div className="input-item">
+                <div className="w-full flex flex-col justify-start items-stretch">
                   <label>名</label>
-                  <input type="text" name="firstName" placeholder="名" value={form.firstName} onChange={handleChange} />
+                  <input type="text" name="firstName" placeholder="请输入名字" value={form.firstName} onChange={handleChange} />
                 </div>
               </div>
 
@@ -128,15 +107,14 @@ const HomePage = () => {
 
               {/* ... 新增 ... */}
               <label>微信号</label>
-              <input type="email" name="email" placeholder="请输入微信号" value={form.email} onChange={handleChange} />
+              <input type="text" name="wechatId" placeholder="请输入微信号" value={form.email} onChange={handleChange} />
               {/* ... 其他表单元素 ... */}
-
-              <div className="form-buttons">
-                <button className='form-b' type="submit">保存</button>
-                <button className='form-b' type="button"><a href='/fill-info-step2'>下一步</a></button>
-              </div>
             </form>
           </div>
+        </div>
+        <div className="w-full flex flex-row justify-center items-center gap-x-20 p-4 mb-28">
+          <button className='form-b'>保存</button>
+          <Link href='/fill-info-step2'><button className='form-b' type="button">下一步</button> </Link>
         </div>
       </div>
       <style jsx>{`
@@ -268,7 +246,7 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default Step1Page;
 
 
 
