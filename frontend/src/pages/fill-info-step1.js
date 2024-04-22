@@ -7,17 +7,8 @@ export async function getServerSideProps(context) {
   let data = {};
   if (context.query.id) {
     // Fetch data from external API
-    // const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}`)
-    // const data = await res.json()
-    // const data = {
-    //   "基本信息": {
-    //     "title": "简历标题",
-    //     "名": "名字",
-    //     "姓": "姓氏",
-    //     "电话号码": "1234567890",
-    //     "邮箱地址": "",
-    //     "微信号": "wechat"
-    //   }
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/basicInformation`)
+    data = await res.json()
   } else {
     const res = await fetch('http://localhost:8000/api/improved-users', {
       method: 'POST',
@@ -27,6 +18,7 @@ export async function getServerSideProps(context) {
       body: JSON.stringify({}),
     })
     data = await res.json()
+    return { redirect: { destination: `/fill-info-step1?id=${data._id}`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { data } }
