@@ -4,11 +4,37 @@ import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 
-const HomePage = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    // Fetch dbFormData from external API
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/languages`)
+    const dbData = await res.json();
+    if (dbData.data) {
+      const displayData = dbData.data.map(data => {
+        return {
+          language: data.语言,
+          proficiency: data.熟练度,
+          certificate: data["证书/资格认证"],
+          score: data.成绩,
+        };
+      });
+      dbFormData = { _id: dbData._id, data: displayData };
+    } else {
+      dbFormData = { _id: dbData._id, data: null };
+    }
+  } else {
+    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+  }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
+
+export default function Step10Page({ dbFormData }) {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
   const [error, setError] = useState(false);
-  const [languageFormData, setLanguageFormData] = useState([]);
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const [languageFormData, setLanguageFormData] = useState(dbFormData.data || []);
+  const [activeIndex, setActiveIndex] = useState(dbFormData.data && dbFormData.data.length > 0 ? 0 : -1);
 
   const AddLanguage = () => {
     if (languageFormData.length >= 5) {
@@ -32,9 +58,21 @@ const HomePage = () => {
 
   const handleSave = () => {
     if (languageFormData.length > 0) {
+      const translatedLanguageFormData = languageFormData.map(data => {
+        return {
+          语言: data.language,
+          熟练度: data.proficiency,
+          "证书/资格认证": data.certificate,
+          成绩: data.score,
+        };
+      });
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
-        body: JSON.stringify(languageFormData),
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'languages',
+          data: translatedLanguageFormData,
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -57,9 +95,21 @@ const HomePage = () => {
           return;
         }
       }
+      const translatedLanguageFormData = languageFormData.map(data => {
+        return {
+          语言: data.language,
+          熟练度: data.proficiency,
+          "证书/资格认证": data.certificate,
+          成绩: data.score,
+        };
+      });
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
-        body: JSON.stringify(languageFormData),
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'languages',
+          data: translatedLanguageFormData,
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -67,13 +117,12 @@ const HomePage = () => {
         .then(response => response.json())
         .then(data => {
           console.log('Save successful:', data);
-          router.push('/fill-info-step10');
         })
         .catch(error => {
           console.error('Save error:', error);
         });
     }
-    router.push('/fill-info-step10');
+    router.push(`/fill-info-step10?id=${dbFormData._id}`);
   }
 
   return (
@@ -426,9 +475,6 @@ const HomePage = () => {
       `}</style>
     </div>
   );
-};
-
-export default HomePage;
-
+}
 
 

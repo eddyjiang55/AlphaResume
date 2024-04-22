@@ -5,11 +5,43 @@ import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { step5Tips } from '../lib/tips';
 
-const Step5Page = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    // Fetch dbFormData from external API
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/projectExperience`)
+    const dbData = await res.json();
+    if (dbData.data) {
+      const displayData = dbData.data.map((data) => {
+        return {
+          name: data['项目名称'],
+          city: data['城市'],
+          country: data['国家'],
+          startDate: data['起止时间'].split(' 至 ')[0],
+          endDate: data['起止时间'].split(' 至 ')[1],
+          role: data['项目角色'],
+          link: data['项目链接'],
+          achievement: data['项目成就'],
+          description: data['项目描述'],
+          responsibility: data['项目职责']
+        }
+      });
+      dbFormData = { _id: context.query.id, data: displayData };
+    } else {
+      dbFormData = { _id: context.query.id, data: null };
+    }
+  } else {
+    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+  }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
+
+export default function Step5Page({ dbFormData }) {
   const router = useRouter();
   const [error, setError] = useState(false);
-  const [formData, setFormData] = useState([]);
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const [formData, setFormData] = useState(dbFormData.data || []);
+  const [activeIndex, setActiveIndex] = useState(dbFormData.data && dbFormData.data.length > 0 ? 0 : -1);
 
   const AddProject = () => {
     if (formData.length >= 5) {
@@ -18,7 +50,18 @@ const Step5Page = () => {
     };
     setFormData([
       ...formData,
-      { name: '', city: '', country: '', startDate: '', endDate: '', role: '', link: '', achievement: '', description: '', responsibility: '' }
+      {
+        name: '',
+        city: '',
+        country: '',
+        startDate: '',
+        endDate: '',
+        role: '',
+        link: '',
+        achievement: '',
+        description: '',
+        responsibility: ''
+      }
     ]);
     setActiveIndex((prevIndex) => prevIndex + 1);
   }
@@ -39,52 +82,82 @@ const Step5Page = () => {
   }
 
   const handleSave = () => {
-    if (formData.length === 0) {
-      return;
-    }
-    fetch('http://localhost:8000/api/save-data', {
-      method: 'POST',
-      body: JSON.stringify({ type: 'projectExperience', data: formData }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Save successful:', data);
-      })
-      .catch(error => {
-        console.error('Save error:', error);
+    if (formData.length > 0) {
+      const translatedData = formData.map((data) => {
+        return {
+          项目名称: data.name,
+          城市: data.city,
+          国家: data.country,
+          起止时间: `${data.startDate} 至 ${data.endDate}`,
+          项目角色: data.role,
+          项目链接: data.link,
+          项目成就: data.achievement,
+          项目描述: data.description,
+          项目职责: data.responsibility
+        }
       });
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'projectExperience',
+          data: translatedData
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
   }
 
   const handleSubmit = () => {
-    if (formData.length === 0) {
-      router.push('/fill-info-step6');
-    }
-
-    for (let i = 0; i < formData.length; i++) {
-      if (!formData[i].name || !formData[i].city || !formData[i].startDate || !formData[i].endDate || !formData[i].role || !formData[i].achievement || !formData[i].description || !formData[i].responsibility) {
-        setError(true);
-        return;
+    if (formData.length > 0) {
+      for (let i = 0; i < formData.length; i++) {
+        if (!formData[i].name || !formData[i].city || !formData[i].startDate || !formData[i].endDate || !formData[i].role || !formData[i].achievement || !formData[i].description || !formData[i].responsibility) {
+          setError(true);
+          return;
+        }
       }
-    }
-
-    fetch('http://localhost:8000/api/save-data', {
-      method: 'POST',
-      body: JSON.stringify({ type: 'projectExperience', data: formData }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Save successful:', data);
-        router.push('/fill-info-step6');
-      })
-      .catch(error => {
-        console.error('Save error:', error);
+      const translatedData = formData.map((data) => {
+        return {
+          项目名称: data.name,
+          城市: data.city,
+          国家: data.country,
+          起止时间: `${data.startDate} 至 ${data.endDate}`,
+          项目角色: data.role,
+          项目链接: data.link,
+          项目成就: data.achievement,
+          项目描述: data.description,
+          项目职责: data.responsibility
+        }
       });
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'projectExperience',
+          data: translatedData
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    router.push(`/fill-info-step6?id=${dbFormData._id}`);
   }
 
   return (
@@ -516,9 +589,7 @@ const Step5Page = () => {
       `}</style>
     </div>
   );
-};
-
-export default Step5Page;
+}
 
 
 

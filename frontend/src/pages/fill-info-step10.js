@@ -5,7 +5,7 @@ import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 
 
-const HomePage = () => {
+const Step10Page = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
 
   const [selectedImage, setSelectedImage] = useState('');
@@ -264,7 +264,7 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default Step10Page;
 
 
 

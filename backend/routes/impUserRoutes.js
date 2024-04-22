@@ -75,7 +75,7 @@ router.get('/improved-users/:_id/:type', async (req, res) => {
         const user = await ImprovedUser.findById(_id);
         if (user) {
             const responseData = user[chineseType] || null; // 如果指定类型不存在，返回 null
-            res.status(200).json({ data: responseData });
+            res.status(200).json({ data: responseData, _id: _id });
         } else {
             res.status(404).json({ message: 'User not found' });
         }

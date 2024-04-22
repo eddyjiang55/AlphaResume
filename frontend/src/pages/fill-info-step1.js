@@ -4,11 +4,11 @@ import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
 
 export async function getServerSideProps(context) {
-  let data = {};
+  let dbFormData = {};
   if (context.query.id) {
-    // Fetch data from external API
+    // Fetch dbFormData from external API
     const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/basicInformation`)
-    data = await res.json()
+    dbFormData = await res.json();
   } else {
     const res = await fetch('http://localhost:8000/api/improved-users', {
       method: 'POST',
@@ -17,19 +17,18 @@ export async function getServerSideProps(context) {
       },
       body: JSON.stringify({}),
     })
-    data = await res.json()
+    dbFormData = await res.json()
     return { redirect: { destination: `/fill-info-step1?id=${data._id}`, permanent: false } }
   }
   // Pass data to the page via props
-  return { props: { data } }
+  return { props: { dbFormData } }
 }
 
-export default function Step1Page({ data }) {
-  console.log(data);
+export default function Step1Page({ dbFormData }) {
   const router = useRouter();
 
   // 使用 useState 钩子初始化表单状态
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(dbFormData.data || {
     title: '',
     名: '',
     姓: '',
@@ -90,7 +89,6 @@ export default function Step1Page({ data }) {
   const handleSubmit = () => {
     // 检查是否有必填项未填写
     if (!form.title || !form.名 || !form.姓 || !form.电话号码 || !form.邮箱地址 || !form.微信号) {
-      console.log(form);
       setError(true);
       return;
     }
@@ -102,7 +100,7 @@ export default function Step1Page({ data }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: '6621e0f77b5f95efede7b4fc',
+        id: dbFormData._id,
         type: 'basicInformation',
         data: form,
       }),
@@ -110,7 +108,7 @@ export default function Step1Page({ data }) {
       .then(response => response.json())
       .then(data => {
         console.log('Save successful:', data);
-        router.push('/fill-info-step2');
+        router.push(`/fill-info-step2?id=${dbFormData._id}`);
       })
       .catch(error => {
         console.error('Save error:', error);

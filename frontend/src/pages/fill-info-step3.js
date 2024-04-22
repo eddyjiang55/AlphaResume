@@ -4,12 +4,46 @@ import Navbar from "../components/navbar";
 import ResumeNavbar from "../components/resume-navbar";
 import { step3Tips } from '../lib/tips';
 
-const Step3Page = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    // Fetch dbFormData from external API
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/educationHistory`)
+    const dbData = await res.json();
+    if (!dbData.data) {
+      dbFormData = { data: null, _id: dbData._id };
+    } else {
+      const displayData = dbData.data.map((data) => {
+        return {
+          degree: data.学历,
+          school: data.学校名称,
+          city: data.城市,
+          country: data.国家,
+          startDate: data.起止时间.split(" 至 ")[0],
+          endDate: data.起止时间.split(" 至 ")[1],
+          department: data.院系,
+          major: data.专业,
+          gpa: data.GPA,
+          rank: data.排名,
+          awards: data.获奖记录,
+          courses: data.主修课程,
+        };
+      });
+      dbFormData = { data: displayData, _id: dbData._id };
+    }
+  } else {
+    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+  }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
+
+export default function Step3Page({ dbFormData }) {
   const router = useRouter();
   const [error, setError] = useState(false);
-  const [formData, setFormData] = useState([]);
+  const [formData, setFormData] = useState(dbFormData.data || []);
 
-  const [activeIndex, setActiveIndex] = useState(-1); // 当前显示的教育经历索引
+  const [activeIndex, setActiveIndex] = useState(dbFormData.data && dbFormData.data.length > 0 ? 0 : -1); // 当前显示的教育经历索引
 
   const AddEducation = () => {
     if (formData.length >= 5) {
@@ -54,53 +88,88 @@ const Step3Page = () => {
   };
 
   const handleSave = () => {
-    if (formData.length === 0) {
-      return;
-    }
-    fetch('http://localhost:8000/api/save-data', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Save successful:', data);
-      })
-      .catch(error => {
-        console.error('Save error:', error);
+    if (formData.length > 0) {
+      const translatedData = formData.map((data) => {
+        return {
+          学历: data.degree,
+          学校名称: data.school,
+          城市: data.city,
+          国家: data.country,
+          起止时间: data.startDate + " 至 " + data.endDate,
+          院系: data.department,
+          专业: data.major,
+          GPA: data.gpa,
+          排名: data.rank,
+          获奖记录: data.awards,
+          主修课程: data.courses,
+        };
       });
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'educationHistory',
+          data: translatedData,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
   }
 
   const handleSubmit = () => {
 
-    if (formData.length === 0) {
-      router.push('/fill-info-step4');
-    }
-    //检查是否有任何一个字段为空
-    for (let i = 0; i < formData.length; i++) {
-      if (!formData[i].degree || !formData[i].school || !formData[i].startDate || !formData[i].endDate || !formData[i].department || !formData[i].major) {
-        setError(true);
-        return;
+    if (formData.length > 0) {
+      //检查是否有任何一个字段为空
+      for (let i = 0; i < formData.length; i++) {
+        if (!formData[i].degree || !formData[i].school || !formData[i].startDate || !formData[i].endDate || !formData[i].department || !formData[i].major) {
+          setError(true);
+          return;
+        }
       }
-    }
-
-    fetch('http://localhost:8000/api/save-data', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Save successful:', data);
-        router.push('/fill-info-step4');
-      })
-      .catch(error => {
-        console.error('Save error:', error);
+      const translatedData = formData.map((data) => {
+        return {
+          学历: data.degree,
+          学校名称: data.school,
+          城市: data.city,
+          国家: data.country,
+          起止时间: data.startDate + " 至 " + data.endDate,
+          院系: data.department,
+          专业: data.major,
+          GPA: data.gpa,
+          排名: data.rank,
+          获奖记录: data.awards,
+          主修课程: data.courses,
+        };
       });
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'educationHistory',
+          data: translatedData,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    router.push(`/fill-info-step4?id=${dbFormData._id}`);
   }
 
   return (
@@ -569,6 +638,4 @@ const Step3Page = () => {
       `}</style>
     </div>
   );
-};
-
-export default Step3Page;
+}
