@@ -3,17 +3,38 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
 
-const Step1Page = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    // Fetch dbFormData from external API
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/basicInformation`)
+    dbFormData = await res.json();
+  } else {
+    const res = await fetch('http://localhost:8000/api/improved-users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    })
+    dbFormData = await res.json()
+    return { redirect: { destination: `/fill-info-step1?id=${data._id}`, permanent: false } }
+  }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
+
+export default function Step1Page({ dbFormData }) {
   const router = useRouter();
 
   // 使用 useState 钩子初始化表单状态
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(dbFormData.data || {
     title: '',
-    firstName: '',
-    lastName: '',
-    phone: '',
-    email: '',
-    wechat: ''
+    名: '',
+    姓: '',
+    电话号码: '',
+    邮箱地址: '',
+    微信号: ''
   });
 
   const [error, setError] = useState(false);
@@ -44,11 +65,11 @@ const Step1Page = () => {
         // 使用上传成功的数据更新表单状态
         setForm({
           ...form, // 保留其他表单项
-          firstName: data.givenName,
-          lastName: data.surname,
-          phone: data.phones[0],
-          email: data.emails[0],
-          wechat: data.wechats[0]
+          名: data.givenName,
+          姓: data.surname,
+          电话号码: data.phones[0],
+          邮箱地址: data.emails[0],
+          微信号: data.wechats[0]
         });
       })
       .catch(error => {
@@ -67,7 +88,7 @@ const Step1Page = () => {
 
   const handleSubmit = () => {
     // 检查是否有必填项未填写
-    if (!form.title || !form.firstName || !form.lastName || !form.phone || !form.email || !form.wechat) {
+    if (!form.title || !form.名 || !form.姓 || !form.电话号码 || !form.邮箱地址 || !form.微信号) {
       setError(true);
       return;
     }
@@ -79,16 +100,15 @@ const Step1Page = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: '123', // 假设用户 ID 为 123
-        type: 'personalEvaluation',
+        id: dbFormData._id,
+        type: 'basicInformation',
         data: form,
       }),
     })
       .then(response => response.json())
       .then(data => {
         console.log('Save successful:', data);
-        // 跳转到下一步页面
-        router.push('/fill-info-step2');
+        router.push(`/fill-info-step2?id=${dbFormData._id}`);
       })
       .catch(error => {
         console.error('Save error:', error);
@@ -103,8 +123,8 @@ const Step1Page = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: '123', // 假设用户 ID 为 123
-        type: 'personalEvaluation',
+        id: '6621e0f77b5f95efede7b4fc',
+        type: 'basicInformation',
         data: form,
       }),
     })
@@ -139,30 +159,30 @@ const Step1Page = () => {
             </div>
             <form className='h-full flex-grow flex flex-col justify-between'>
               <label>*简历标题</label>
-              <input type="title" placeholder="请输入简历标题" />
+              <input type="title" name="title" placeholder="请输入简历标题" value={form.title} onChange={handleChange} />
               <div className='text-black text-base'>
                 此项内容不会出现在简历上，仅用于后续识别您的简历
               </div>
               <div className="w-full flex flex-row justify-between items-center gap-x-16">
                 <div className="w-full flex flex-col justify-start items-stretch">
                   <label>*姓</label>
-                  <input type="text" name="lastName" placeholder="请输入姓氏" value={form.lastName} onChange={handleChange} />
+                  <input type="text" name="姓" placeholder="请输入姓氏" value={form.姓} onChange={handleChange} />
                 </div>
                 <div className="w-full flex flex-col justify-start items-stretch">
                   <label>*名</label>
-                  <input type="text" name="firstName" placeholder="请输入名字" value={form.firstName} onChange={handleChange} />
+                  <input type="text" name="名" placeholder="请输入名字" value={form.名} onChange={handleChange} />
                 </div>
               </div>
 
               <label>*手机号码</label>
-              <input type="tel" name="phone" placeholder="请输入手机号码" value={form.phone} onChange={handleChange} />
+              <input type="tel" name="电话号码" placeholder="请输入手机号码" value={form.电话号码} onChange={handleChange} />
 
               <label>*邮箱</label>
-              <input type="email" name="email" placeholder="请输入邮箱地址" value={form.email} onChange={handleChange} />
+              <input type="email" name="邮箱地址" placeholder="请输入邮箱地址" value={form.邮箱地址} onChange={handleChange} />
 
               {/* ... 新增 ... */}
               <label>*微信号</label>
-              <input type="text" name="wechatId" placeholder="请输入微信号" value={form.wechat} onChange={handleChange} />
+              <input type="text" name="微信号" placeholder="请输入微信号" value={form.微信号} onChange={handleChange} />
               {/* ... 其他表单元素 ... */}
             </form>
           </div>
@@ -304,9 +324,6 @@ const Step1Page = () => {
       `}</style>
     </div>
   );
-};
-
-export default Step1Page;
-
+}
 
 

@@ -5,16 +5,33 @@ import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
 import { step2Tips } from '../lib/tips';
 
-const Step2Page = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    // Fetch dbFormData from external API
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/personalEvaluation`)
+    dbFormData = await res.json()
+  } else {
+    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+  }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
+
+export default function Step2Page({ dbFormData }) {
 
   const router = useRouter();
 
-  const [formData, setFormData] = useState('');
+  const [formData, setFormData] = useState(dbFormData.data || '');
 
   const handleSave = () => {
     fetch('http://localhost:8000/api/save-data', {
       method: 'POST',
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'personalEvaluation',
+        data: formData,
+      }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -31,7 +48,11 @@ const Step2Page = () => {
   const handleSubmit = () => {
     fetch('http://localhost:8000/api/save-data', {
       method: 'POST',
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'personalEvaluation',
+        data: formData,
+      }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -39,7 +60,7 @@ const Step2Page = () => {
       .then(response => response.json())
       .then(data => {
         console.log('Save successful:', data);
-        router.push('/fill-info-step3');
+        router.push(`/fill-info-step3?id=${dbFormData._id}`);
       })
       .catch(error => {
         console.error('Save error:', error);
@@ -259,9 +280,7 @@ const Step2Page = () => {
       `}</style>
     </div>
   );
-};
-
-export default Step2Page;
+}
 
 
 

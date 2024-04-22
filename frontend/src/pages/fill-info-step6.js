@@ -5,14 +5,50 @@ import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { step6Tips } from '../lib/tips';
 
-const Step6Page = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    // Fetch dbFormData from external API
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/awardsAndCertificates`)
+    const dbData = await res.json();
+    if (dbData.data) {
+      const displayAwardData = dbData.data.获奖.map((data) => {
+        return {
+          awardName: data.奖项名称,
+          awardTime: data.获奖时间,
+          awardOrg: data.颁奖机构,
+          awardLevel: data.获奖级别,
+          awardRank: data.获奖名次,
+          awardDescription: data.描述,
+        };
+      });
+      const displayCertificateData = dbData.data.证书.map((data) => {
+        return {
+          certificateName: data.证书名称,
+          certificateTime: data.取得时间,
+          certificateOrg: data.颁发机构,
+          certificateDescription: data.证书详情,
+        };
+      });
+      dbFormData = { _id: context.query.id, data: { awards: displayAwardData, certificates: displayCertificateData } };
+    } else {
+      dbFormData = { _id: context.query.id, data: { awards: null, certificates: null } };
+    }
+  } else {
+    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+  }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
+
+export default function Step6Page({ dbFormData }) {
   const router = useRouter();
   const [error, setError] = useState(false);
-  const [awardFormData, setAwardFormData] = useState([]);
-  const [certificateFormData, setCertificateFormData] = useState([]);
+  const [awardFormData, setAwardFormData] = useState(dbFormData.data.awards || []);
+  const [certificateFormData, setCertificateFormData] = useState(dbFormData.data.certificates || []);
 
-  const [activeAwardIndex, setActiveAwardIndex] = useState(-1);
-  const [activeCertificateIndex, setActiveCertificateIndex] = useState(-1);
+  const [activeAwardIndex, setActiveAwardIndex] = useState(dbFormData.data.awards && dbFormData.data.awards.length > 0 ? 0 : -1);
+  const [activeCertificateIndex, setActiveCertificateIndex] = useState(dbFormData.data.certificates && dbFormData.data.certificates.length ? 0 : -1);
 
   const AddAward = () => {
     if (awardFormData.length >= 5) {
@@ -80,15 +116,25 @@ const Step6Page = () => {
 
   const handleSave = () => {
     if (awardFormData.length > 0) {
+      const translatedAwardFormData = awardFormData.map((data) => {
+        return {
+          奖项名称: data.awardName,
+          获奖时间: data.awardTime,
+          颁奖机构: data.awardOrg,
+          获奖级别: data.awardLevel,
+          获奖名次: data.awardRank,
+          描述: data.awardDescription,
+        };
+      });
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: '123',
-          type: 'award',
-          data: awardFormData,
+          id: dbFormData._id,
+          type: 'awardsAndCertificates',
+          data: { 获奖: translatedAwardFormData },
         }),
       })
         .then(response => response.json())
@@ -100,15 +146,23 @@ const Step6Page = () => {
         });
     }
     if (certificateFormData.length > 0) {
+      const translatedCertificateFormData = certificateFormData.map((data) => {
+        return {
+          证书名称: data.certificateName,
+          取得时间: data.certificateTime,
+          颁发机构: data.certificateOrg,
+          证书详情: data.certificateDescription,
+        };
+      });
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: '123',
-          type: 'certificate',
-          data: certificateFormData,
+          id: dbFormData._id,
+          type: 'awardsAndCertificates',
+          data: { 证书: translatedCertificateFormData },
         }),
       })
         .then(response => response.json())
@@ -129,15 +183,25 @@ const Step6Page = () => {
           return;
         }
       }
+      const translatedAwardFormData = awardFormData.map((data) => {
+        return {
+          奖项名称: data.awardName,
+          获奖时间: data.awardTime,
+          颁奖机构: data.awardOrg,
+          获奖级别: data.awardLevel,
+          获奖名次: data.awardRank,
+          描述: data.awardDescription,
+        };
+      });
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: '123',
-          type: 'award',
-          data: awardFormData,
+          id: dbFormData._id,
+          type: 'awardsAndCertificates',
+          data: { 获奖: translatedAwardFormData },
         }),
       })
         .then(response => response.json())
@@ -155,27 +219,34 @@ const Step6Page = () => {
           return;
         }
       }
+      const translatedCertificateFormData = certificateFormData.map((data) => {
+        return {
+          证书名称: data.certificateName,
+          取得时间: data.certificateTime,
+          颁发机构: data.certificateOrg,
+          证书详情: data.certificateDescription,
+        };
+      });
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: '123',
-          type: 'certificate',
-          data: certificateFormData,
+          id: dbFormData._id,
+          type: 'awardsAndCertificates',
+          data: { 证书: translatedCertificateFormData },
         }),
       })
         .then(response => response.json())
         .then(data => {
           console.log('Save successful:', data);
-          router.push('/fill-info-step7');
         })
         .catch(error => {
           console.error('Save error:', error);
         });
     }
-    router.push('/fill-info-step7');
+    router.push(`/fill-info-step7?id=${dbFormData._id}`);
   }
 
   return (
@@ -683,9 +754,7 @@ const Step6Page = () => {
       `}</style>
     </div >
   );
-};
-
-export default Step6Page;
+}
 
 
 

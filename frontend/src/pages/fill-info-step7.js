@@ -4,15 +4,48 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 
-const Step7Page = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    // Fetch dbFormData from external API
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/researchPapersAndPatents`)
+    const dbData = await res.json()
+    if (dbData.data) {
+      const displayPaperData = dbData.data.科研论文.map((data) => ({
+        title: data.论文标题,
+        authors: data.作者顺序,
+        journal: data["期刊/会议"],
+        date: data.出版时间,
+        doi: data["DOI/链接"],
+        description: data.研究描述,
+        contribution: data.个人贡献,
+      }));
+      const displayPatentData = dbData.data.知识产权.map((data) => ({
+        title: data.专利名称,
+        number: data.专利号,
+        date: data["申请/授权日期"],
+        description: data.描述,
+      }));
+      dbFormData = { _id: context.query.id, data: { papers: displayPaperData, patents: displayPatentData } };
+    } else {
+      dbFormData = { _id: context.query.id, data: { papers: null, patents: null } };
+    }
+  } else {
+    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+  }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
+
+export default function Step7Page({ dbFormData }) {
   const router = useRouter();
   const [error, setError] = useState(false);
-  const [paperFormData, setPaperFormData] = useState([]);
+  const [paperFormData, setPaperFormData] = useState(dbFormData.data.papers || []);
 
-  const [patentFormData, setPatentFormData] = useState([]);
+  const [patentFormData, setPatentFormData] = useState(dbFormData.data.patents || []);
 
-  const [activePaperIndex, setActivePaperIndex] = useState(-1);
-  const [activePatentIndex, setActivePatentIndex] = useState(-1);
+  const [activePaperIndex, setActivePaperIndex] = useState(dbFormData.data.papers && dbFormData.data.papers.length > 0 ? 0 : -1);
+  const [activePatentIndex, setActivePatentIndex] = useState(dbFormData.data.patents && dbFormData.data.patents.length > 0 ? 0 : -1);
 
   const AddPaper = () => {
     if (paperFormData.length >= 5) {
@@ -67,9 +100,22 @@ const Step7Page = () => {
 
   const handleSave = () => {
     if (paperFormData.length > 0) {
+      const translatedPaperFormData = paperFormData.map((data) => ({
+        论文标题: data.title,
+        作者顺序: data.authors,
+        "期刊/会议": data.journal,
+        出版时间: data.date,
+        "DOI/链接": data.doi,
+        研究描述: data.description,
+        个人贡献: data.contribution,
+      }));
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
-        body: JSON.stringify(paperFormData),
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'researchPapersAndPatents',
+          data: { "科研论文": translatedPaperFormData },
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -83,9 +129,19 @@ const Step7Page = () => {
         });
     }
     if (patentFormData.length > 0) {
+      const translatedPatentFormData = patentFormData.map((data) => ({
+        专利名称: data.title,
+        专利号: data.number,
+        "申请/授权日期": data.date,
+        描述: data.description,
+      }));
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
-        body: JSON.stringify(patentFormData),
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'researchPapersAndPatents',
+          data: { "知识产权": translatedPatentFormData },
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -108,9 +164,22 @@ const Step7Page = () => {
           return;
         }
       }
+      const translatedPaperFormData = paperFormData.map((data) => ({
+        论文标题: data.title,
+        作者顺序: data.authors,
+        "期刊/会议": data.journal,
+        出版时间: data.date,
+        "DOI/链接": data.doi,
+        研究描述: data.description,
+        个人贡献: data.contribution,
+      }));
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
-        body: JSON.stringify(paperFormData),
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'researchPapersAndPatents',
+          data: { "科研论文": translatedPaperFormData },
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -131,9 +200,19 @@ const Step7Page = () => {
           return;
         }
       }
+      const translatedPatentFormData = patentFormData.map((data) => ({
+        专利名称: data.title,
+        专利号: data.number,
+        "申请/授权日期": data.date,
+        描述: data.description,
+      }));
       fetch('http://localhost:8000/api/save-data', {
         method: 'POST',
-        body: JSON.stringify(patentFormData),
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'researchPapersAndPatents',
+          data: { "知识产权": translatedPatentFormData },
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -141,13 +220,12 @@ const Step7Page = () => {
         .then(response => response.json())
         .then(data => {
           console.log('Save successful:', data);
-          router.push('/fill-info-step8');
         })
         .catch(error => {
           console.error('Save error:', error);
         });
     }
-    router.push('/fill-info-step8');
+    router.push(`/fill-info-step8?id=${dbFormData._id}`);
   }
 
   return (
@@ -652,9 +730,7 @@ const Step7Page = () => {
       `}</style>
     </div>
   );
-};
-
-export default Step7Page;
+}
 
 
 

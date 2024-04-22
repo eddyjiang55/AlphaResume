@@ -5,12 +5,42 @@ import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { step4Tips } from '../lib/tips';
 
-const step4Page = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    // Fetch dbFormData from external API
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/professionalExperience`)
+    const dbData = await res.json();
+    if (dbData.data) {
+      const displayData = dbData.data.map((data) => {
+        return {
+          company: data.公司名称,
+          city: data.城市,
+          country: data.国家,
+          startDate: data.起始时间.split(" 至 ")[0],
+          endDate: data.起始时间.split(" 至 ")[1],
+          department: data.部门,
+          position: data.职位,
+          description: data["职责/业务描述"],
+        };
+      });
+      dbFormData = { _id: dbData._id, data: displayData };
+    } else {
+      dbFormData = { _id: dbData._id, data: null };
+    }
+  } else {
+    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+  }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
+
+export default function step4Page({ dbFormData }) {
   const router = useRouter();
   const [error, setError] = useState(false);
-  const [formData, setFormData] = useState([]);
+  const [formData, setFormData] = useState(dbFormData.data || []);
 
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const [activeIndex, setActiveIndex] = useState(dbFormData.data && dbFormData.data.length > 0 ? 0 : -1);
 
   const AddJob = () => {
     if (formData.length >= 5) {
@@ -50,50 +80,79 @@ const step4Page = () => {
   }
 
   const handleSubmit = () => {
-    if (formData.length === 0) {
-      router.push('/fill-info-step5');
-    }
-    for (let i = 0; i < formData.length; i++) {
-      if (formData[i].company === "" || formData[i].city === "" || formData[i].startDate === "" || formData[i].endDate === "" || formData[i].position === "" || formData[i].description === "") {
-        setError(true);
-        return;
+    if (formData.length > 0) {
+      for (let i = 0; i < formData.length; i++) {
+        if (formData[i].company === "" || formData[i].city === "" || formData[i].startDate === "" || formData[i].endDate === "" || formData[i].position === "" || formData[i].description === "") {
+          setError(true);
+          return;
+        }
       }
-    }
-    fetch('http://localhost:8000/api/save-data', {
-      method: 'POST',
-      body: JSON.stringify({ type: 'professionalExperience', data: formData }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Save successful:', data);
-        router.push('/fill-info-step5');
-      })
-      .catch(error => {
-        console.error('Save error:', error);
+      const translatedData = formData.map((data) => {
+        return {
+          公司名称: data.company,
+          城市: data.city,
+          国家: data.country,
+          起始时间: data.startDate + " 至 " + data.endDate,
+          部门: data.department,
+          职位: data.position,
+          "职责/业务描述": data.description,
+        };
       });
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'professionalExperience',
+          data: translatedData
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+          router.push('/fill-info-step5');
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
+    router.push(`/fill-info-step5?id=${dbFormData._id}`);
   }
 
   const handleSave = () => {
-    if (formData.length === 0) {
-      return;
-    }
-    fetch('http://localhost:8000/api/save-data', {
-      method: 'POST',
-      body: JSON.stringify({ type: 'professionalExperience', data: formData }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Save successful:', data);
-      })
-      .catch(error => {
-        console.error('Save error:', error);
+    if (formData.length > 0) {
+      const translatedData = formData.map((data) => {
+        return {
+          公司名称: data.company,
+          城市: data.city,
+          国家: data.country,
+          起始时间: data.startDate + " 至 " + data.endDate,
+          部门: data.department,
+          职位: data.position,
+          "职责/业务描述": data.description,
+        };
       });
+      fetch('http://localhost:8000/api/save-data', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: dbFormData._id,
+          type: 'professionalExperience',
+          data: translatedData
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Save successful:', data);
+        })
+        .catch(error => {
+          console.error('Save error:', error);
+        });
+    }
   }
 
   return (
@@ -499,9 +558,7 @@ const step4Page = () => {
       `}</style>
     </div>
   );
-};
-
-export default step4Page;
+}
 
 
 
