@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ImprovedUser = require('../mongodb/models/ImprovedUser'); // 确保路径与你的项目结构相匹配
+const ImprovedUser = require('../mongodb/models/ImprovedUser.js'); // 确保路径与你的项目结构相匹配
 
 // 创建新的用户
 router.post('/improved-users', async (req, res) => {
@@ -38,6 +38,27 @@ router.get('/improved-users/:_id', async (req, res) => {
         res.status(500).json({ message: 'Failed to retrieve user', error: error.toString() });
     }
 });
+
+// 根据ID和类型查询用户的特定信息
+router.get('/improved-users/:_id/:type', async (req, res) => {
+    try {
+        const { _id, type } = req.params;
+        const user = await ImprovedUser.findById(_id);
+        if (user) {
+            if (user[type]) {  // 确保类型存在于用户数据中
+                res.status(200).json(user[type]);
+            } else {
+                res.status(404).json({ message: 'Requested information type not found' });
+            }
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to retrieve user', error: error.toString() });
+    }
+});
+
 
 // 更新用户信息
 router.patch('/improved-users/:_id', async (req, res) => {
