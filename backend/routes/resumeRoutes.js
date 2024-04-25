@@ -16,49 +16,43 @@ const upload = multer({ storage: storage });
 // 上传简历并保存记录
 router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
     try {
-        // 确认接收到的前端数据
-        console.log("Received data from client:", req.body);
+        // 直接从 req.body 访问数据
+        const account = req.body.account;
+        const createdAt = req.body.createdAt;
+        const title = req.body.title;
+        const position = req.body.position;
 
-        // 检查文件上传状态
+        console.log('Received data:', req.body);  // 打印接收到的全部数据，以便调试
+
         if (!req.file) {
-            console.log("Error: No file uploaded");
             return res.status(400).json({ message: "No PDF file uploaded" });
         }
-        console.log("File uploaded successfully:", req.file.filename); // 显示上传的文件名
 
-        // 解构请求体中的数据
-        const { account, createdAt, title, position } = req.body;
-        const pdfData = req.file.buffer; // 从内存中获取PDF文件数据
+        const pdfData = req.file.buffer; // 获取PDF文件数据
+        const markdownData = await convertToMarkdown(pdfData); // 假设这个函数同步执行并返回Markdown数据
 
-        // PDF转Markdown转换前的日志
-        console.log("Starting conversion from PDF to Markdown for file:", req.file.filename);
-        const markdownData = await convertToMarkdown(pdfData);
-
-        // 创建简历记录实例并保存
-        console.log("Creating new resume record in database...");
-        const newResume = new ResumeHistory({
+        const newResume = new ResumeHistory(
             account,
             createdAt,
             title,
             position,
             pdfData,
             markdownData
-        });
+        );
 
-        // 保存简历记录到数据库
         const insertedId = await newResume.save();
-        console.log("Resume record saved successfully with ID:", insertedId);
-
-        // 发送成功响应
         res.status(200).json({
             message: "Resume uploaded and processed successfully",
             _id: insertedId
         });
     } catch (error) {
-        console.error("Error during resume upload and processing:", error);
+        console.error("Error uploading and processing resume:", error);
         res.status(500).json({ message: "Failed to upload and process resume", error: error.toString() });
     }
 });
+
+
+
 
 
 

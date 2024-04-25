@@ -2,7 +2,7 @@ const { connect } = require('../dbconfig');
 const { v4: uuidv4 } = require('uuid'); // 引入UUID生成器
 
 class ResumeHistory {
-    constructor(account, createdAt, pdfData, markdownData, title, position, id = null) {
+    constructor(account, createdAt, title, position, pdfData, markdownData,id = null) {
         this._id = id || uuidv4();
         this.account = account;
         this.createdAt = createdAt;
@@ -15,14 +15,7 @@ class ResumeHistory {
     async save() {
         const db = await connect();
         const collection = db.collection('resumeHistories');
-        const result = await collection.insertOne({
-            account: this.account,
-            createdAt: this.createdAt,
-            pdfData: this.pdfData,
-            markdownData: this.markdownData,
-            title: this.title,
-            position: this.position
-        });
+        const result = await collection.insertOne(this);
         return result.insertedId;
     }
   
