@@ -54,74 +54,70 @@ export default function Step8Page({ dbFormData }) {
   }
 
   const handleSave = () => {
-    if (skillFormData.length > 0) {
-      const translatedSkillFormData = skillFormData.map((data) => {
-        return {
-          技能名称: data.skill,
-          熟练度: data.proficiency,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'skills',
-          data: translatedSkillFormData,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    const translatedSkillFormData = skillFormData.map((data) => {
+      return {
+        技能名称: data.skill,
+        熟练度: data.proficiency,
+      };
+    });
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'skills',
+        data: translatedSkillFormData,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
-    }
+      .catch(error => {
+        console.error('Save error:', error);
+      });
   }
 
   const handleSubmit = () => {
-    if (skillFormData.length > 0) {
-      for (let i = 0; i < skillFormData.length; i++) {
-        if (skillFormData[i].skill === "" || skillFormData[i].proficiency === "") {
-          setError(true);
-          return;
-        }
+    for (let i = 0; i < skillFormData.length; i++) {
+      if (skillFormData[i].skill === "" || skillFormData[i].proficiency === "") {
+        setError(true);
+        return;
       }
-      const translatedSkillFormData = skillFormData.map((data) => {
-        return {
-          技能名称: data.skill,
-          熟练度: data.proficiency,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'skills',
-          data: translatedSkillFormData,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
     }
+    const translatedSkillFormData = skillFormData.map((data) => {
+      return {
+        技能名称: data.skill,
+        熟练度: data.proficiency,
+      };
+    });
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'skills',
+        data: translatedSkillFormData,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
     router.push(`/fill-info-step9?id=${dbFormData._id}`);
   }
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">

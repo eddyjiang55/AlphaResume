@@ -82,88 +82,84 @@ export default function Step5Page({ dbFormData }) {
   }
 
   const handleSave = () => {
-    if (formData.length > 0) {
-      const translatedData = formData.map((data) => {
-        return {
-          项目名称: data.name,
-          城市: data.city,
-          国家: data.country,
-          起止时间: `${data.startDate} 至 ${data.endDate}`,
-          项目角色: data.role,
-          项目链接: data.link,
-          项目成就: data.achievement,
-          项目描述: data.description,
-          项目职责: data.responsibility
-        }
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'projectExperience',
-          data: translatedData
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    const translatedData = formData.map((data) => {
+      return {
+        项目名称: data.name,
+        城市: data.city,
+        国家: data.country,
+        起止时间: `${data.startDate} 至 ${data.endDate}`,
+        项目角色: data.role,
+        项目链接: data.link,
+        项目成就: data.achievement,
+        项目描述: data.description,
+        项目职责: data.responsibility
+      }
+    });
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'projectExperience',
+        data: translatedData
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
-    }
+      .catch(error => {
+        console.error('Save error:', error);
+      });
   }
 
   const handleSubmit = () => {
-    if (formData.length > 0) {
-      for (let i = 0; i < formData.length; i++) {
-        if (!formData[i].name || !formData[i].city || !formData[i].startDate || !formData[i].endDate || !formData[i].role || !formData[i].achievement || !formData[i].description || !formData[i].responsibility) {
-          setError(true);
-          return;
-        }
+    for (let i = 0; i < formData.length; i++) {
+      if (!formData[i].name || !formData[i].city || !formData[i].startDate || !formData[i].endDate || !formData[i].role || !formData[i].achievement || !formData[i].description || !formData[i].responsibility) {
+        setError(true);
+        return;
       }
-      const translatedData = formData.map((data) => {
-        return {
-          项目名称: data.name,
-          城市: data.city,
-          国家: data.country,
-          起止时间: `${data.startDate} 至 ${data.endDate}`,
-          项目角色: data.role,
-          项目链接: data.link,
-          项目成就: data.achievement,
-          项目描述: data.description,
-          项目职责: data.responsibility
-        }
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'projectExperience',
-          data: translatedData
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
     }
+    const translatedData = formData.map((data) => {
+      return {
+        项目名称: data.name,
+        城市: data.city,
+        国家: data.country,
+        起止时间: `${data.startDate} 至 ${data.endDate}`,
+        项目角色: data.role,
+        项目链接: data.link,
+        项目成就: data.achievement,
+        项目描述: data.description,
+        项目职责: data.responsibility
+      }
+    });
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'projectExperience',
+        data: translatedData
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
     router.push(`/fill-info-step6?id=${dbFormData._id}`);
   }
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden relative">
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">

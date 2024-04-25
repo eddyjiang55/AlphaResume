@@ -18,7 +18,7 @@ export async function getServerSideProps(context) {
       body: JSON.stringify({}),
     })
     dbFormData = await res.json()
-    return { redirect: { destination: `/fill-info-step1?id=${data._id}`, permanent: false } }
+    return { redirect: { destination: `/fill-info-step1?id=${dbFormData._id}`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
@@ -140,7 +140,7 @@ export default function Step1Page({ dbFormData }) {
   return (
     <div className='bg-[#EDF8FD] w-full h-screen flex flex-col relative'>
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex-grow w-full max-w-[960px] mx-auto flex flex-col justify-between">
         <div>
           <div className="w-full mt-8">
