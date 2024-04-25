@@ -99,139 +99,131 @@ export default function Step7Page({ dbFormData }) {
   };
 
   const handleSave = () => {
-    if (paperFormData.length > 0) {
-      const translatedPaperFormData = paperFormData.map((data) => ({
-        论文标题: data.title,
-        作者顺序: data.authors,
-        "期刊/会议": data.journal,
-        出版时间: data.date,
-        "DOI/链接": data.doi,
-        研究描述: data.description,
-        个人贡献: data.contribution,
-      }));
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'researchPapersAndPatents',
-          data: { "科研论文": translatedPaperFormData },
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    const translatedPaperFormData = paperFormData.map((data) => ({
+      论文标题: data.title,
+      作者顺序: data.authors,
+      "期刊/会议": data.journal,
+      出版时间: data.date,
+      "DOI/链接": data.doi,
+      研究描述: data.description,
+      个人贡献: data.contribution,
+    }));
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'researchPapersAndPatents',
+        data: { "科研论文": translatedPaperFormData },
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
-    }
-    if (patentFormData.length > 0) {
-      const translatedPatentFormData = patentFormData.map((data) => ({
-        专利名称: data.title,
-        专利号: data.number,
-        "申请/授权日期": data.date,
-        描述: data.description,
-      }));
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'researchPapersAndPatents',
-          data: { "知识产权": translatedPatentFormData },
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+    const translatedPatentFormData = patentFormData.map((data) => ({
+      专利名称: data.title,
+      专利号: data.number,
+      "申请/授权日期": data.date,
+      描述: data.description,
+    }));
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'researchPapersAndPatents',
+        data: { "知识产权": translatedPatentFormData },
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
-    }
+      .catch(error => {
+        console.error('Save error:', error);
+      });
   }
 
   const handleSubmit = () => {
-    if (paperFormData.length > 0) {
-      for (const paper of paperFormData) {
-        if (!paper.title || !paper.authors || !paper.journal || !paper.date) {
-          setError(true);
-          return;
-        }
+    for (const paper of paperFormData) {
+      if (!paper.title || !paper.authors || !paper.journal || !paper.date) {
+        setError(true);
+        return;
       }
-      const translatedPaperFormData = paperFormData.map((data) => ({
-        论文标题: data.title,
-        作者顺序: data.authors,
-        "期刊/会议": data.journal,
-        出版时间: data.date,
-        "DOI/链接": data.doi,
-        研究描述: data.description,
-        个人贡献: data.contribution,
-      }));
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'researchPapersAndPatents',
-          data: { "科研论文": translatedPaperFormData },
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-          router.push('/fill-info-step8');
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
     }
-    if (patentFormData.length > 0) {
-      for (const patent of patentFormData) {
-        if (!patent.title || !patent.number || !patent.date) {
-          setError(true);
-          return;
-        }
+    const translatedPaperFormData = paperFormData.map((data) => ({
+      论文标题: data.title,
+      作者顺序: data.authors,
+      "期刊/会议": data.journal,
+      出版时间: data.date,
+      "DOI/链接": data.doi,
+      研究描述: data.description,
+      个人贡献: data.contribution,
+    }));
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'researchPapersAndPatents',
+        data: { "科研论文": translatedPaperFormData },
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+        router.push('/fill-info-step8');
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+    for (const patent of patentFormData) {
+      if (!patent.title || !patent.number || !patent.date) {
+        setError(true);
+        return;
       }
-      const translatedPatentFormData = patentFormData.map((data) => ({
-        专利名称: data.title,
-        专利号: data.number,
-        "申请/授权日期": data.date,
-        描述: data.description,
-      }));
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'researchPapersAndPatents',
-          data: { "知识产权": translatedPatentFormData },
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
     }
+    const translatedPatentFormData = patentFormData.map((data) => ({
+      专利名称: data.title,
+      专利号: data.number,
+      "申请/授权日期": data.date,
+      描述: data.description,
+    }));
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'researchPapersAndPatents',
+        data: { "知识产权": translatedPatentFormData },
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
     router.push(`/fill-info-step8?id=${dbFormData._id}`);
   }
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">

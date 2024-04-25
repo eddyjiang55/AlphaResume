@@ -126,56 +126,52 @@ export default function Step3Page({ dbFormData }) {
   }
 
   const handleSubmit = () => {
-
-    if (formData.length > 0) {
-      //检查是否有任何一个字段为空
-      for (let i = 0; i < formData.length; i++) {
-        if (!formData[i].degree || !formData[i].school || !formData[i].startDate || !formData[i].endDate || !formData[i].department || !formData[i].major) {
-          setError(true);
-          return;
-        }
+    for (let i = 0; i < formData.length; i++) {
+      if (!formData[i].degree || !formData[i].school || !formData[i].startDate || !formData[i].endDate || !formData[i].department || !formData[i].major) {
+        setError(true);
+        return;
       }
-      const translatedData = formData.map((data) => {
-        return {
-          学历: data.degree,
-          学校名称: data.school,
-          城市: data.city,
-          国家: data.country,
-          起止时间: data.startDate + " 至 " + data.endDate,
-          院系: data.department,
-          专业: data.major,
-          GPA: data.gpa,
-          排名: data.rank,
-          获奖记录: data.awards,
-          主修课程: data.courses,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'educationHistory',
-          data: translatedData,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
     }
+    const translatedData = formData.map((data) => {
+      return {
+        学历: data.degree,
+        学校名称: data.school,
+        城市: data.city,
+        国家: data.country,
+        起止时间: data.startDate + " 至 " + data.endDate,
+        院系: data.department,
+        专业: data.major,
+        GPA: data.gpa,
+        排名: data.rank,
+        获奖记录: data.awards,
+        主修课程: data.courses,
+      };
+    });
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'educationHistory',
+        data: translatedData,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
     router.push(`/fill-info-step4?id=${dbFormData._id}`);
   }
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden relative">
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
