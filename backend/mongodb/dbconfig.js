@@ -1,7 +1,8 @@
+require('dotenv').config()
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const uri = "mongodb+srv://leoyuruiqing:<password>@airesume.niop3nd.mongodb.net/?retryWrites=true&w=majority&appName=AIResume";
-// const dbName = 'airesumedb'; // Database Name
+const uri = process.env.MONGODB_URL;
+const dbName = 'airesumedb'; // Database Name
 
 const client = new MongoClient(uri, {
   serverApi: {

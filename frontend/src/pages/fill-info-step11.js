@@ -1,57 +1,34 @@
 
-import React from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
+import ResumeNavbar from "../components/resume-navbar";
 
-const HomePage = () => {
+const Step11Page = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
-  const buttons = [
-    { name: "基础信息", path: "/fill-info-step1" },
-    { name: "个人评价", path: "/fill-info-step2" },
-    { name: "教育经历", path: "/fill-info-step3" },
-    { name: "职业经历", path: "/fill-info-step4" },
-    { name: "项目经历", path: "/fill-info-step5" },
-    { name: "获奖与证书", path: "/fill-info-step6" },
-    { name: "科研论文与知识产权", path: "/fill-info-step7" },
-    { name: "技能", path: "/fill-info-step8" },
-    { name: "语言", path: "/fill-info-step9" },
-    { name: "结束", path: "/fill-info-step10" }
-  ];
+  const [formData, setFormData] = useState('');
 
   return (
-    <div>
+    <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <div className="secondNavbar">
-        {buttons.map((button) => (
-          <Link key={button.name} href={button.path} passHref>
-            <button className={router.pathname === button.path ? 'active' : ''}>
-              {button.name}
-            </button>
-          </Link>
-        ))}
-      </div>
-      <div className='background'>
-      <div className="form-container">
-          <div className="form-heading">
-            <h2>分区修改</h2>
+      <ResumeNavbar />
+      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+        <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
+          <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">分区修改</h2>
+          <form className='w-full max-w-[75%]  flex items-center justify-start mx-auto'>
+            <textarea className='w-full rounded-lg border border-black focus:border-2 p-4' rows={15} value={formData} onChange={
+              (e) => setFormData(e.target.value)
+            }></textarea>
+          </form>
+          <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
+            <button className='form-b' type="submit">保存</button>
+            <button className='form-b' type="submit">导出</button>
           </div>
-          <div className="form-body">
-            <form>
-            <input type='self'></input>
-              {/* ... 其他表单元素 ... */}
-              <button className='form-b' type="submit">保存</button>
-              <button className='form-b' type="submit">导出</button>
-            </form>
-          </div>
-      </div>
-      <div className='tip-info'>
-            <div className="form-heading">
-              <h2>导出效果</h2>
-            </div>
-            <div className="tip-context">
-              <img src='/img/result.png'></img>
-            </div>
+        </div>
+
+        <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch gap-y-8 px-6 py-8 overflow-y-auto'>
+          <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">导出效果</h2>
+          <img className='w-fit h-full mx-auto my-16' src='/img/result.png' />
         </div>
       </div>
       <style jsx>{`
@@ -232,7 +209,7 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default Step11Page;
 
 
 

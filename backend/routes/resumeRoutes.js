@@ -2,37 +2,66 @@ const express = require('express');
 const { uploadPDFToGridFS } = require('../services/pdfUploadService'); // 假设你已经设置好了这个服务
 const ResumeHistory = require('../mongodb/models/ResumeHistory'); // 假设你已经定义好了这个模型
 const router = express.Router();
+const multer = require('multer');
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
+const { convertToMarkdown } = require('../utils/pdfToMarkdown'); 
 
 // 假设有一个用于处理文件上传的中间件
-const upload = require('../middleware/uploadMiddleware');
+const storage = multer.memoryStorage(); // 使用内存存储来处理文件
+const upload = multer({ storage: storage });
+// const upload = require('../middleware/uploadMiddleware');
 
 
 // 上传简历并保存记录
 router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
     try {
-        // 从请求体获取account、createdAt和可选的id
-        const { account, createdAt, id } = req.body;
-        const pdfPath = req.file ? req.file.path : null; // 获取上传的文件路径
+        // 确认接收到的前端数据
+        console.log("Received data from client:", req.body);
 
-        // 根据提供的信息创建新的ResumeHistory实例，包括可选的id
-        const newResume = new ResumeHistory(account, createdAt, pdfPath, id);
+        // 检查文件上传状态
+        if (!req.file) {
+            console.log("Error: No file uploaded");
+            return res.status(400).json({ message: "No PDF file uploaded" });
+        }
+        console.log("File uploaded successfully:", req.file.filename); // 显示上传的文件名
 
-        // 保存到数据库并获取_id
+        // 解构请求体中的数据
+        const { account, createdAt, title, position } = req.body;
+        const pdfData = req.file.buffer; // 从内存中获取PDF文件数据
+
+        // PDF转Markdown转换前的日志
+        console.log("Starting conversion from PDF to Markdown for file:", req.file.filename);
+        const markdownData = await convertToMarkdown(pdfData);
+
+        // 创建简历记录实例并保存
+        console.log("Creating new resume record in database...");
+        const newResume = new ResumeHistory({
+            account,
+            createdAt,
+            title,
+            position,
+            pdfData,
+            markdownData
+        });
+
+        // 保存简历记录到数据库
         const insertedId = await newResume.save();
+        console.log("Resume record saved successfully with ID:", insertedId);
 
-        // 发送成功响应并包含_id和文件路径
-        res.status(200).json({ 
-            message: "Resume uploaded successfully",
-            _id: insertedId, // 返回新创建记录的_id
-            filePath: pdfPath // 返回文件存储的路径
+        // 发送成功响应
+        res.status(200).json({
+            message: "Resume uploaded and processed successfully",
+            _id: insertedId
         });
     } catch (error) {
-        // 处理并返回错误信息
-        res.status(500).json({ message: "Failed to upload resume", error: error.toString() });
+        console.error("Error during resume upload and processing:", error);
+        res.status(500).json({ message: "Failed to upload and process resume", error: error.toString() });
     }
 });
+
+
+
 
 
 router.delete('/resume-history/:_id', async (req, res) => {

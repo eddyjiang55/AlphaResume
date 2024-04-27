@@ -204,7 +204,7 @@ const AIChat = () => {
     <div className="bg-[#EDF8FD] w-full h-screen overflow-hidden">
       <Navbar />
       <div className="w-full max-w-[960px] mx-auto flex flex-col justify-center items-stretch gap-y-4 p-4 relative">
-        <h1 className="font-semibold text-2xl text-[#1D80A7] text-center py-2">
+        <h1 className="font-semibold text-2xl text-alpha-blue text-center py-2">
           简历信息收集
         </h1>
         {showLeaveBtn ? (
@@ -236,7 +236,7 @@ const AIChat = () => {
           </ul>
         </div>
       </div>
-      <div className="fixed inset-x-0 bottom-0 p-2 flex justify-center items-center flex-row gap-x-4 w-full max-w-[864px] mx-auto mb-6 border border-solid border-[#1D80A7] rounded-lg bg-white shadow-lg">
+      <div className="fixed inset-x-0 bottom-0 p-2 flex justify-center items-center flex-row gap-x-4 w-full max-w-[864px] mx-auto mb-6 border border-solid border-alpha-blue rounded-lg bg-white shadow-lg">
         <input
           type="text"
           className="w-full p-1 focus:outline-none"

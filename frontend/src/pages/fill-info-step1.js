@@ -1,20 +1,43 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router'; // 导入 useRouter 钩子
+import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
+import ResumeNavbar from '../components/resume-navbar';
 
-const HomePage = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    // Fetch dbFormData from external API
+    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/basicInformation`)
+    dbFormData = await res.json();
+  } else {
+    const res = await fetch('http://localhost:8000/api/improved-users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    })
+    dbFormData = await res.json()
+    return { redirect: { destination: `/fill-info-step1?id=${dbFormData._id}`, permanent: false } }
+  }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
+
+export default function Step1Page({ dbFormData }) {
   const router = useRouter();
 
   // 使用 useState 钩子初始化表单状态
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(dbFormData.data || {
     title: '',
-    firstName: '',
-    lastName: '',
-    phone: '',
-    email: '',
-    wechat: ''
+    名: '',
+    姓: '',
+    电话号码: '',
+    邮箱地址: '',
+    微信号: ''
   });
+
+  const [error, setError] = useState(false);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -42,11 +65,11 @@ const HomePage = () => {
         // 使用上传成功的数据更新表单状态
         setForm({
           ...form, // 保留其他表单项
-          firstName: data.givenName,
-          lastName: data.surname,
-          phone: data.phones[0],
-          email: data.emails[0],
-          wechat: data.wechats[0]
+          名: data.givenName,
+          姓: data.surname,
+          电话号码: data.phones[0],
+          邮箱地址: data.emails[0],
+          微信号: data.wechats[0]
         });
       })
       .catch(error => {
@@ -62,83 +85,118 @@ const HomePage = () => {
       [name]: value,
     });
   };
-  const buttons = [
-    { name: "基础信息", path: "/fill-info-step1" },
-    { name: "个人评价", path: "/fill-info-step2" },
-    { name: "教育经历", path: "/fill-info-step3" },
-    { name: "职业经历", path: "/fill-info-step4" },
-    { name: "项目经历", path: "/fill-info-step5" },
-    { name: "获奖与证书", path: "/fill-info-step6" },
-    { name: "科研论文与知识产权", path: "/fill-info-step7" },
-    { name: "技能", path: "/fill-info-step8" },
-    { name: "语言", path: "/fill-info-step9" },
-    { name: "结束", path: "/fill-info-step10" }
-  ];
+
+  const handleSubmit = () => {
+    // 检查是否有必填项未填写
+    if (!form.title || !form.名 || !form.姓 || !form.电话号码 || !form.邮箱地址 || !form.微信号) {
+      setError(true);
+      return;
+    }
+
+    // 发送表单数据到后端
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'basicInformation',
+        data: form,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+        router.push(`/fill-info-step2?id=${dbFormData._id}`);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+  }
+
+  const handleSave = () => {
+    // 发送表单数据到后端
+    fetch('http://localhost:8000/api/save-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: '6621e0f77b5f95efede7b4fc',
+        type: 'basicInformation',
+        data: form,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+  }
 
   return (
-    <div>
+    <div className='bg-[#EDF8FD] w-full h-screen flex flex-col relative'>
       <Navbar />
-      <div className="secondNavbar">
-        {buttons.map((button) => (
-          <Link key={button.name} href={button.path} passHref>
-            <button className={router.pathname === button.path ? 'active' : ''}>
-              {button.name}
-            </button>
-          </Link>
-        ))}
-      </div>
-      <div className='background'>
-      <div className="info-container">
-          <span className="info-text">若已有简历，上传简历我们帮您解析：</span>
-          <button className="info-button" onDragOver={handleDragOver} onDrop={handleDrop}>
-              <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
-              拖曳文件到此处上传
-          </button>
-        </div>
-        <div className="form-container">
-          <div className="form-heading">
-            <h2>请输入以下空格</h2>
+      <ResumeNavbar currentIndex={dbFormData._id} />
+      <div className="flex-grow w-full max-w-[960px] mx-auto flex flex-col justify-between">
+        <div>
+          <div className="w-full mt-8">
+            <div className='w-auto mx-auto flex flex-row justify-center items-center gap-x-10'>
+              <span className="info-text">若已有简历，上传简历我们帮您解析：</span>
+              <button className="info-button" onDragOver={handleDragOver} onDrop={handleDrop}>
+                <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
+                拖曳文件到此处上传
+              </button>
+            </div>
           </div>
-          <div className="form-description">
-            <p>在填写简历时，若您认为某些内容非必要，请自由选择性省略。</p>
-          </div>
-          <div className="form-body">
-            <form>
-              <label>简历标题</label>
-              <input type="title" placeholder="请输入简历标题" />
-              <div className='ps'>
-              此项内容不会出现在简历上，仅用于后续识别您的简历
+          <div className="flex flex-col justify-center items-center gap-y-6">
+            <div className='flex flex-col justify-center items-center gap-y-6 my-4'>
+              <h2 className='text-alpha-blue font-bold text-4xl'>请输入以下空格</h2>
+              <p className='text-base text-black'>在填写简历时，若您认为某些内容非必要，请自由选择性省略。</p>
+            </div>
+            <form className='h-full flex-grow flex flex-col justify-between'>
+              <label>*简历标题</label>
+              <input type="title" name="title" placeholder="请输入简历标题" value={form.title} onChange={handleChange} />
+              <div className='text-black text-base'>
+                此项内容不会出现在简历上，仅用于后续识别您的简历
               </div>
-              <div className="input-group">
-                <div className="input-item">
-                  <label>姓</label>
-                  <input type="text" name="lastName" placeholder="姓" value={form.lastName} onChange={handleChange} />
+              <div className="w-full flex flex-row justify-between items-center gap-x-16">
+                <div className="w-full flex flex-col justify-start items-stretch">
+                  <label>*姓</label>
+                  <input type="text" name="姓" placeholder="请输入姓氏" value={form.姓} onChange={handleChange} />
                 </div>
-                <div className="input-item">
-                  <label>名</label>
-                  <input type="text" name="firstName" placeholder="名" value={form.firstName} onChange={handleChange} />
+                <div className="w-full flex flex-col justify-start items-stretch">
+                  <label>*名</label>
+                  <input type="text" name="名" placeholder="请输入名字" value={form.名} onChange={handleChange} />
                 </div>
               </div>
 
-              <label>手机号码</label>
-              <input type="tel" name="phone" placeholder="请输入手机号码" value={form.phone} onChange={handleChange} />
+              <label>*手机号码</label>
+              <input type="tel" name="电话号码" placeholder="请输入手机号码" value={form.电话号码} onChange={handleChange} />
 
-              <label>邮箱</label>
-              <input type="email" name="email" placeholder="请输入邮箱地址" value={form.email} onChange={handleChange} />
+              <label>*邮箱</label>
+              <input type="email" name="邮箱地址" placeholder="请输入邮箱地址" value={form.邮箱地址} onChange={handleChange} />
 
               {/* ... 新增 ... */}
-              <label>微信号</label>
-              <input type="email" name="email" placeholder="请输入微信号" value={form.email} onChange={handleChange} />
+              <label>*微信号</label>
+              <input type="text" name="微信号" placeholder="请输入微信号" value={form.微信号} onChange={handleChange} />
               {/* ... 其他表单元素 ... */}
-
-              <div className="form-buttons">
-                <button className='form-b' type="submit">保存</button>
-                <button className='form-b' type="button"><a href='/fill-info-step2'>下一步</a></button>
-              </div>
             </form>
           </div>
         </div>
+        <div className="w-full flex flex-row justify-center items-center gap-x-20 p-4 mb-28">
+          <button className='form-b' onClick={handleSave}>保存</button>
+          <button className='form-b' type="button" onClick={handleSubmit}>下一步</button>
+        </div>
       </div>
+      {error && <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2'>
+        <p className='text-base font-bold text-wrap text-center py-4 px-4'>本页存在必填项未填写，请检查并完成所有*标记项后重试。</p>
+        <div className='w-full border border-alpha-blue ' />
+        <button className='py-2 px-4 text-base' onClick={() => setError(false)}>了解</button>
+      </div>}
       <style jsx>{`
         .background{
           background-color: #EDF8FD;
@@ -266,9 +324,6 @@ const HomePage = () => {
       `}</style>
     </div>
   );
-};
-
-export default HomePage;
-
+}
 
 
