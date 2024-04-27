@@ -106,6 +106,7 @@ const Navbar = () => {
                 }
                 .item-text:hover{
                     background-color: #B2DDEE;
+                    border-radius: 10px;
                 }
                 .item-title {
                     font-weight: bold;
