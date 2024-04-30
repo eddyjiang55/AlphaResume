@@ -8,7 +8,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/languages`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/languages`)
     const dbData = await res.json();
     if (dbData.data) {
       const displayData = dbData.data.map(data => {
@@ -65,7 +65,7 @@ export default function Step10Page({ dbFormData }) {
         成绩: data.score,
       };
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -100,7 +100,7 @@ export default function Step10Page({ dbFormData }) {
         成绩: data.score,
       };
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,

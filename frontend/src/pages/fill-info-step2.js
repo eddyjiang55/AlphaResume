@@ -9,7 +9,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/personalEvaluation`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/personalEvaluation`)
     dbFormData = await res.json()
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }
@@ -25,7 +25,7 @@ export default function Step2Page({ dbFormData }) {
   const [formData, setFormData] = useState(dbFormData.data || '');
 
   const handleSave = () => {
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -46,7 +46,7 @@ export default function Step2Page({ dbFormData }) {
   }
 
   const handleSubmit = () => {
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,

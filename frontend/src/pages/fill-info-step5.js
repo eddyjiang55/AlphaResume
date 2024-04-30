@@ -9,7 +9,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/projectExperience`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/projectExperience`)
     const dbData = await res.json();
     if (dbData.data) {
       const displayData = dbData.data.map((data) => {
@@ -95,7 +95,7 @@ export default function Step5Page({ dbFormData }) {
         项目职责: data.responsibility
       }
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -135,7 +135,7 @@ export default function Step5Page({ dbFormData }) {
         项目职责: data.responsibility
       }
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
