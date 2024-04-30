@@ -9,7 +9,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/professionalExperience`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/professionalExperience`)
     const dbData = await res.json();
     if (dbData.data) {
       const displayData = dbData.data.map((data) => {
@@ -97,7 +97,7 @@ export default function step4Page({ dbFormData }) {
         "职责/业务描述": data.description,
       };
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -131,7 +131,7 @@ export default function step4Page({ dbFormData }) {
         "职责/业务描述": data.description,
       };
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,

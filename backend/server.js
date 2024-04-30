@@ -3,8 +3,8 @@ const cors = require('cors');
 const app = express();
 const path = require('path');
 const jobInfoRoutes = require('./routes/jobInfoRoutes');
-const resumeRoutes = require('./routes/resumeRoutes'); 
-const chatHisRoutes = require('./routes/chatHisRoutes'); 
+const resumeRoutes = require('./routes/resumeRoutes');
+const chatHisRoutes = require('./routes/chatHisRoutes');
 const impUserRoutes = require('./routes/impUserRoutes');
 const resumeChatRoutes = require('./routes/resumeChatRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -32,6 +32,10 @@ const { connect } = require('./mongodb/dbconfig');
 const User = require('./mongodb/models/User');
 
 let processResult = {};
+
+app.get('/healthcheck', async (req, res) => {
+   res.status(200).json("hello world");
+});
 
 // Route for handling POST requests
 app.post('/api/resume', async (req, res) => {
@@ -82,7 +86,7 @@ app.get('/api/result/:id', (req, res) => {
          if (err) {
             return res.status(500).json({ message: 'Error reading file', error: err });
          }
-         return res.type('text/markdown').status(200).json({result: data});
+         return res.type('text/markdown').status(200).json({ result: data });
       });
    }
    // fs.readFile('./outputResume/sample.md', 'utf-8', (err, data) => {

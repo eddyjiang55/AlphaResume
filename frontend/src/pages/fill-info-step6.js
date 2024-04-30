@@ -9,7 +9,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/awardsAndCertificates`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/awardsAndCertificates`)
     const dbData = await res.json();
     if (dbData.data) {
       const displayAwardData = dbData.data.获奖.map((data) => {
@@ -125,7 +125,7 @@ export default function Step6Page({ dbFormData }) {
         描述: data.awardDescription,
       };
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ export default function Step6Page({ dbFormData }) {
         证书详情: data.certificateDescription,
       };
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ export default function Step6Page({ dbFormData }) {
         描述: data.awardDescription,
       };
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ export default function Step6Page({ dbFormData }) {
         证书详情: data.certificateDescription,
       };
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
