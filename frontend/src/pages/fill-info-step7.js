@@ -8,7 +8,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/researchPapersAndPatents`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/researchPapersAndPatents`)
     const dbData = await res.json()
     if (dbData.data) {
       const displayPaperData = dbData.data.科研论文.map((data) => ({
@@ -108,7 +108,7 @@ export default function Step7Page({ dbFormData }) {
       研究描述: data.description,
       个人贡献: data.contribution,
     }));
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -132,7 +132,7 @@ export default function Step7Page({ dbFormData }) {
       "申请/授权日期": data.date,
       描述: data.description,
     }));
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -168,7 +168,7 @@ export default function Step7Page({ dbFormData }) {
       研究描述: data.description,
       个人贡献: data.contribution,
     }));
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -199,7 +199,7 @@ export default function Step7Page({ dbFormData }) {
       "申请/授权日期": data.date,
       描述: data.description,
     }));
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,

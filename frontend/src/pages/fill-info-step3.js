@@ -8,7 +8,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/educationHistory`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/educationHistory`)
     const dbData = await res.json();
     if (!dbData.data) {
       dbFormData = { data: null, _id: dbData._id };
@@ -104,7 +104,7 @@ export default function Step3Page({ dbFormData }) {
           主修课程: data.courses,
         };
       });
-      fetch('http://localhost:8000/api/save-data', {
+      fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
         method: 'POST',
         body: JSON.stringify({
           id: dbFormData._id,
@@ -147,7 +147,7 @@ export default function Step3Page({ dbFormData }) {
         主修课程: data.courses,
       };
     });
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
