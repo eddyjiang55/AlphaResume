@@ -26,14 +26,14 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 
 // Define port
-const port = 8000;
+const port = 8080;
 
 const { connect } = require('./mongodb/dbconfig');
 const User = require('./mongodb/models/User');
 
 let processResult = {};
 
-app.get('/healthcheck', async (req, res) => {
+app.get('/api/healthcheck', async (req, res) => {
    res.status(200).json("hello world");
 });
 
