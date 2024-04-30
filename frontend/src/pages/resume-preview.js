@@ -55,7 +55,7 @@ const ResumePreview = (props) => {
   };
 
   const downloadResume = async () => {
-    const url = `http://localhost:8000/api/file/${taskId}`;
+    const url = process.env.NEXT_PUBLIC_API_URL + `/api/file/${taskId}`;
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', true);
@@ -83,7 +83,7 @@ const ResumePreview = (props) => {
   useEffect(() => {
     const fetchResumeData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/result/${taskId}`, { method: 'GET' });
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/result/${taskId}`, { method: 'GET' });
         if (response.status === 200) {
           const data = await response.json();
           // setResumeData(data.result);
@@ -150,7 +150,7 @@ const ResumePreview = (props) => {
                   // <div className='markdown-body'>
                   //   <Markdown className="" remarkPlugins={[remarkGfm]}>{resumeData}</Markdown>
                   // </div>
-                  // <iframe src={`http://localhost:8000/api/file/${taskId}`} className="w-full h-[864px] rounded-lg border border-solid border-px border-slate-600"></iframe>
+                  // <iframe src={process.env.NEXT_PUBLIC_API_URL + `/api/file/${taskId}`} className="w-full h-[864px] rounded-lg border border-solid border-px border-slate-600"></iframe>
                   // <div className="w-full h-auto" dangerouslySetInnerHTML={{ __html: htmlContent }}></div>
                   <div className='w-full flex flex-col justify-center items-center gap-y-8'>
                     <div className="h-[60vh] overflow-auto resume-body" ref={resumeBodyRef}>
