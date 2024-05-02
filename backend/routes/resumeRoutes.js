@@ -6,6 +6,8 @@ const multer = require('multer');
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
 const { convertToMarkdown } = require('../utils/pdfToMarkdown'); 
+const { exec } = require('child_process'); // To run Python scripts
+const { v4: uuidv4 } = require('uuid');
 
 // 假设有一个用于处理文件上传的中间件
 const storage = multer.memoryStorage(); // 使用内存存储来处理文件
@@ -22,15 +24,17 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
         const title = req.body.title;
         const position = req.body.position;
 
-        console.log('Received data:', req.body);  // 打印接收到的全部数据，以便调试
+
 
         if (!req.file) {
             return res.status(400).json({ message: "No PDF file uploaded" });
         }
 
-        const pdfData = req.file.buffer; // 获取PDF文件数据
+        const pdfData = req.file.buffer;
         const markdownData = await convertToMarkdown(pdfData); // 假设这个函数同步执行并返回Markdown数据
 
+
+        // 将简历数据保存到数据库
         const newResume = new ResumeHistory(
             account,
             createdAt,
@@ -40,11 +44,26 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
             markdownData
         );
 
-        const insertedId = await newResume.save();
-        res.status(200).json({
-            message: "Resume uploaded and processed successfully",
-            _id: insertedId
+
+        const resume_history_id = await newResume.save(); // 保存并获取ID
+        const improved_user_id = uuidv4(); // 为改进用户生成唯一ID
+
+        // 调用Python脚本进行进一步处理
+        exec(`python3 ./pyScripts/pdf_reader.py ${resume_history_id} ${improved_user_id}`, (err, stdout, stderr) => {
+            if (err) {
+                console.error("Error running Python script:", err);
+                return res.status(500).json({ message: "Failed to process PDF", error: err.toString() });
+            }
+
+            // console.log("Python script output:", stdout);
+
+            res.status(200).json({
+                message: "Resume uploaded and processed successfully",
+                resumeHistoryId: resume_history_id,
+                improvedUserId: improved_user_id
+            });
         });
+
     } catch (error) {
         console.error("Error uploading and processing resume:", error);
         res.status(500).json({ message: "Failed to upload and process resume", error: error.toString() });
