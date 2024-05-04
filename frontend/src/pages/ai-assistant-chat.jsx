@@ -132,7 +132,7 @@ const AIChat = () => {
       textInputRef.current.value = "";
       if (chatId) {
         const response = await fetch(
-          "http://localhost:8000/api/resume-chat/" + chatId,
+          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatId,
           {
             method: "PUT",
             headers: {
@@ -155,21 +155,24 @@ const AIChat = () => {
           alert("Server error");
         }
       } else {
-        const response = await fetch("http://localhost:8000/api/resume-chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userAccount: "test",
-            messages: [
-              {
-                question: question,
-                answer: message,
-              },
-            ],
-          }),
-        });
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userAccount: "test",
+              messages: [
+                {
+                  question: question,
+                  answer: message,
+                },
+              ],
+            }),
+          }
+        );
         if (response.ok) {
           const data = await response.json();
           setChatId(data._id);

@@ -9,7 +9,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/personalEvaluation`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/personalEvaluation`)
     dbFormData = await res.json()
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }
@@ -25,7 +25,7 @@ export default function Step2Page({ dbFormData }) {
   const [formData, setFormData] = useState(dbFormData.data || '');
 
   const handleSave = () => {
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -46,7 +46,7 @@ export default function Step2Page({ dbFormData }) {
   }
 
   const handleSubmit = () => {
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -70,7 +70,7 @@ export default function Step2Page({ dbFormData }) {
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-16 w-full max-w-[75%] mx-auto">

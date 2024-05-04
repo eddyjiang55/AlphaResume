@@ -9,7 +9,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/professionalExperience`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/professionalExperience`)
     const dbData = await res.json();
     if (dbData.data) {
       const displayData = dbData.data.map((data) => {
@@ -80,85 +80,81 @@ export default function step4Page({ dbFormData }) {
   }
 
   const handleSubmit = () => {
-    if (formData.length > 0) {
-      for (let i = 0; i < formData.length; i++) {
-        if (formData[i].company === "" || formData[i].city === "" || formData[i].startDate === "" || formData[i].endDate === "" || formData[i].position === "" || formData[i].description === "") {
-          setError(true);
-          return;
-        }
+    for (let i = 0; i < formData.length; i++) {
+      if (formData[i].company === "" || formData[i].city === "" || formData[i].startDate === "" || formData[i].endDate === "" || formData[i].position === "" || formData[i].description === "") {
+        setError(true);
+        return;
       }
-      const translatedData = formData.map((data) => {
-        return {
-          公司名称: data.company,
-          城市: data.city,
-          国家: data.country,
-          起始时间: data.startDate + " 至 " + data.endDate,
-          部门: data.department,
-          职位: data.position,
-          "职责/业务描述": data.description,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'professionalExperience',
-          data: translatedData
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-          router.push('/fill-info-step5');
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
     }
+    const translatedData = formData.map((data) => {
+      return {
+        公司名称: data.company,
+        城市: data.city,
+        国家: data.country,
+        起始时间: data.startDate + " 至 " + data.endDate,
+        部门: data.department,
+        职位: data.position,
+        "职责/业务描述": data.description,
+      };
+    });
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'professionalExperience',
+        data: translatedData
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+        router.push('/fill-info-step5');
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
     router.push(`/fill-info-step5?id=${dbFormData._id}`);
   }
 
   const handleSave = () => {
-    if (formData.length > 0) {
-      const translatedData = formData.map((data) => {
-        return {
-          公司名称: data.company,
-          城市: data.city,
-          国家: data.country,
-          起始时间: data.startDate + " 至 " + data.endDate,
-          部门: data.department,
-          职位: data.position,
-          "职责/业务描述": data.description,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'professionalExperience',
-          data: translatedData
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    const translatedData = formData.map((data) => {
+      return {
+        公司名称: data.company,
+        城市: data.city,
+        国家: data.country,
+        起始时间: data.startDate + " 至 " + data.endDate,
+        部门: data.department,
+        职位: data.position,
+        "职责/业务描述": data.description,
+      };
+    });
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'professionalExperience',
+        data: translatedData
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
-    }
+      .catch(error => {
+        console.error('Save error:', error);
+      });
   }
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden relative">
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">

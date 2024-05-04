@@ -5,12 +5,14 @@ import ResumeNavbar from '../components/resume-navbar';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
+  console.log(process.env.NEXT_PUBLIC_API_URL);
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/basicInformation`)
+    console.log(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/basicInformation`);
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/basicInformation`)
     dbFormData = await res.json();
   } else {
-    const res = await fetch('http://localhost:8000/api/improved-users', {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -18,7 +20,7 @@ export async function getServerSideProps(context) {
       body: JSON.stringify({}),
     })
     dbFormData = await res.json()
-    return { redirect: { destination: `/fill-info-step1?id=${data._id}`, permanent: false } }
+    return { redirect: { destination: `/fill-info-step1?id=${dbFormData._id}`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
@@ -55,7 +57,7 @@ export default function Step1Page({ dbFormData }) {
     const formData = new FormData();
     formData.append('pdfFile', file);
 
-    fetch('http://localhost:8000/api/resume-info', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/resume-info', {
       method: 'POST',
       body: formData,
     })
@@ -94,7 +96,7 @@ export default function Step1Page({ dbFormData }) {
     }
 
     // 发送表单数据到后端
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -117,7 +119,7 @@ export default function Step1Page({ dbFormData }) {
 
   const handleSave = () => {
     // 发送表单数据到后端
-    fetch('http://localhost:8000/api/save-data', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -140,7 +142,7 @@ export default function Step1Page({ dbFormData }) {
   return (
     <div className='bg-[#EDF8FD] w-full h-screen flex flex-col relative'>
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex-grow w-full max-w-[960px] mx-auto flex flex-col justify-between">
         <div>
           <div className="w-full mt-8">

@@ -29,7 +29,6 @@ def get_pdf_from_mongodb(resumehist_id):
     # 连接到MongoDB
     client = MongoClient(mongo_uri)
     db = client[database_name]
-    client.admin.command('ping')
     collection = db[collection_name]
 
     # 查询特定用户的聊天记录
@@ -297,7 +296,24 @@ def upload_standard_data_to_mongodb(json_data, improved_user_id):
 
     resume_id = "resume_2"
 
-    collection.insert_one({"_id": improved_user_id, "personal_data": json.loads(json_data)})
+    # 解析传入的 JSON 数据
+    data_to_upload = json.loads(json_data)
+
+    # 构建将要上传的数据字典
+    data_dict = {
+        "_id": improved_user_id,
+        "基础信息": data_to_upload['基础信息'],
+        "教育经历": data_to_upload['教育经历'],
+        "职业经历": data_to_upload['职业经历'],
+        "项目经历": data_to_upload['项目经历'],
+        "获奖与证书": data_to_upload['获奖与证书'],
+        "语言": data_to_upload['语言'],
+        "技能": data_to_upload['技能'],
+        "科研论文与知识产权": data_to_upload['科研论文与知识产权'],
+        "个人评价": data_to_upload['个人评价']
+    }
+
+    collection.insert_one(data_dict)
 
     # 关闭MongoDB连接
     client.close()

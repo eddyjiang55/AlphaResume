@@ -9,7 +9,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/awardsAndCertificates`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/awardsAndCertificates`)
     const dbData = await res.json();
     if (dbData.data) {
       const displayAwardData = dbData.data.获奖.map((data) => {
@@ -115,144 +115,136 @@ export default function Step6Page({ dbFormData }) {
   };
 
   const handleSave = () => {
-    if (awardFormData.length > 0) {
-      const translatedAwardFormData = awardFormData.map((data) => {
-        return {
-          奖项名称: data.awardName,
-          获奖时间: data.awardTime,
-          颁奖机构: data.awardOrg,
-          获奖级别: data.awardLevel,
-          获奖名次: data.awardRank,
-          描述: data.awardDescription,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'awardsAndCertificates',
-          data: { 获奖: translatedAwardFormData },
-        }),
+    const translatedAwardFormData = awardFormData.map((data) => {
+      return {
+        奖项名称: data.awardName,
+        获奖时间: data.awardTime,
+        颁奖机构: data.awardOrg,
+        获奖级别: data.awardLevel,
+        获奖名次: data.awardRank,
+        描述: data.awardDescription,
+      };
+    });
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'awardsAndCertificates',
+        data: { 获奖: translatedAwardFormData },
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
-    }
-    if (certificateFormData.length > 0) {
-      const translatedCertificateFormData = certificateFormData.map((data) => {
-        return {
-          证书名称: data.certificateName,
-          取得时间: data.certificateTime,
-          颁发机构: data.certificateOrg,
-          证书详情: data.certificateDescription,
-        };
+      .catch(error => {
+        console.error('Save error:', error);
       });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'awardsAndCertificates',
-          data: { 证书: translatedCertificateFormData },
-        }),
+    const translatedCertificateFormData = certificateFormData.map((data) => {
+      return {
+        证书名称: data.certificateName,
+        取得时间: data.certificateTime,
+        颁发机构: data.certificateOrg,
+        证书详情: data.certificateDescription,
+      };
+    });
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'awardsAndCertificates',
+        data: { 证书: translatedCertificateFormData },
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
-    }
+      .catch(error => {
+        console.error('Save error:', error);
+      });
   }
 
   const handleSubmit = () => {
-    if (awardFormData.length > 0) {
-      for (let i = 0; i < awardFormData.length; i++) {
-        if (!awardFormData[i].awardName || !awardFormData[i].awardTime || !awardFormData[i].awardOrg) {
-          setError(true);
-          return;
-        }
+    for (let i = 0; i < awardFormData.length; i++) {
+      if (!awardFormData[i].awardName || !awardFormData[i].awardTime || !awardFormData[i].awardOrg) {
+        setError(true);
+        return;
       }
-      const translatedAwardFormData = awardFormData.map((data) => {
-        return {
-          奖项名称: data.awardName,
-          获奖时间: data.awardTime,
-          颁奖机构: data.awardOrg,
-          获奖级别: data.awardLevel,
-          获奖名次: data.awardRank,
-          描述: data.awardDescription,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'awardsAndCertificates',
-          data: { 获奖: translatedAwardFormData },
-        }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
     }
-    if (certificateFormData.length > 0) {
-      for (let i = 0; i < certificateFormData.length; i++) {
-        if (!certificateFormData[i].certificateName || !certificateFormData[i].certificateTime || !certificateFormData[i].certificateOrg) {
-          setError(true);
-          return;
-        }
+    const translatedAwardFormData = awardFormData.map((data) => {
+      return {
+        奖项名称: data.awardName,
+        获奖时间: data.awardTime,
+        颁奖机构: data.awardOrg,
+        获奖级别: data.awardLevel,
+        获奖名次: data.awardRank,
+        描述: data.awardDescription,
+      };
+    });
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'awardsAndCertificates',
+        data: { 获奖: translatedAwardFormData },
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
+    for (let i = 0; i < certificateFormData.length; i++) {
+      if (!certificateFormData[i].certificateName || !certificateFormData[i].certificateTime || !certificateFormData[i].certificateOrg) {
+        setError(true);
+        return;
       }
-      const translatedCertificateFormData = certificateFormData.map((data) => {
-        return {
-          证书名称: data.certificateName,
-          取得时间: data.certificateTime,
-          颁发机构: data.certificateOrg,
-          证书详情: data.certificateDescription,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'awardsAndCertificates',
-          data: { 证书: translatedCertificateFormData },
-        }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
     }
+    const translatedCertificateFormData = certificateFormData.map((data) => {
+      return {
+        证书名称: data.certificateName,
+        取得时间: data.certificateTime,
+        颁发机构: data.certificateOrg,
+        证书详情: data.certificateDescription,
+      };
+    });
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'awardsAndCertificates',
+        data: { 证书: translatedCertificateFormData },
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
     router.push(`/fill-info-step7?id=${dbFormData._id}`);
   }
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">

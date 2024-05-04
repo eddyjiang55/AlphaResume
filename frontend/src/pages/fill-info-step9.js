@@ -8,7 +8,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(`http://localhost:8000/api/improved-users/${context.query.id}/languages`)
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/languages`)
     const dbData = await res.json();
     if (dbData.data) {
       const displayData = dbData.data.map(data => {
@@ -57,78 +57,74 @@ export default function Step10Page({ dbFormData }) {
   }
 
   const handleSave = () => {
-    if (languageFormData.length > 0) {
-      const translatedLanguageFormData = languageFormData.map(data => {
-        return {
-          语言: data.language,
-          熟练度: data.proficiency,
-          "证书/资格认证": data.certificate,
-          成绩: data.score,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'languages',
-          data: translatedLanguageFormData,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    const translatedLanguageFormData = languageFormData.map(data => {
+      return {
+        语言: data.language,
+        熟练度: data.proficiency,
+        "证书/资格认证": data.certificate,
+        成绩: data.score,
+      };
+    });
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'languages',
+        data: translatedLanguageFormData,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
-    }
+      .catch(error => {
+        console.error('Save error:', error);
+      });
   }
 
   const handleSubmit = () => {
-    if (languageFormData.length > 0) {
-      for (let i = 0; i < languageFormData.length; i++) {
-        if (languageFormData[i].language === '' || languageFormData[i].proficiency === '') {
-          setError(true);
-          return;
-        }
+    for (let i = 0; i < languageFormData.length; i++) {
+      if (languageFormData[i].language === '' || languageFormData[i].proficiency === '') {
+        setError(true);
+        return;
       }
-      const translatedLanguageFormData = languageFormData.map(data => {
-        return {
-          语言: data.language,
-          熟练度: data.proficiency,
-          "证书/资格认证": data.certificate,
-          成绩: data.score,
-        };
-      });
-      fetch('http://localhost:8000/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'languages',
-          data: translatedLanguageFormData,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Save successful:', data);
-        })
-        .catch(error => {
-          console.error('Save error:', error);
-        });
     }
+    const translatedLanguageFormData = languageFormData.map(data => {
+      return {
+        语言: data.language,
+        熟练度: data.proficiency,
+        "证书/资格认证": data.certificate,
+        成绩: data.score,
+      };
+    });
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'languages',
+        data: translatedLanguageFormData,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Save successful:', data);
+      })
+      .catch(error => {
+        console.error('Save error:', error);
+      });
     router.push(`/fill-info-step10?id=${dbFormData._id}`);
   }
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <ResumeNavbar />
+      <ResumeNavbar currentIndex={dbFormData._id} />
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
