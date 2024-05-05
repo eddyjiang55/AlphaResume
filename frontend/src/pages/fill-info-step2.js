@@ -60,11 +60,11 @@ export default function Step2Page({ dbFormData }) {
       .then(response => response.json())
       .then(data => {
         console.log('Save successful:', data);
-        router.push(`/fill-info-step3?id=${dbFormData._id}`);
       })
       .catch(error => {
         console.error('Save error:', error);
       });
+    router.push(`/fill-info-step3?id=${dbFormData._id}`);
   }
 
   return (

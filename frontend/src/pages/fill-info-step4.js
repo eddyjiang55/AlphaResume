@@ -111,7 +111,6 @@ export default function step4Page({ dbFormData }) {
       .then(response => response.json())
       .then(data => {
         console.log('Save successful:', data);
-        router.push('/fill-info-step5');
       })
       .catch(error => {
         console.error('Save error:', error);

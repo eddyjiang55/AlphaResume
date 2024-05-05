@@ -109,11 +109,11 @@ export default function Step1Page({ dbFormData }) {
       .then(response => response.json())
       .then(data => {
         console.log('Save successful:', data);
-        router.push(`/fill-info-step2?id=${dbFormData._id}`);
       })
       .catch(error => {
         console.error('Save error:', error);
       });
+    router.push(`/fill-info-step2?id=${dbFormData._id}`);
   }
 
   const handleSave = () => {
