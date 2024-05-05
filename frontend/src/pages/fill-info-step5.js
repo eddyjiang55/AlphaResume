@@ -237,6 +237,7 @@ export default function Step5Page({ dbFormData }) {
                   <input
                     className="flex-grow"
                     type="month"
+                    max="3000-12"
                     value={formData[activeIndex].startDate}
                     onChange={(e) => {
                       const newFormData = [...formData];
@@ -262,6 +263,7 @@ export default function Step5Page({ dbFormData }) {
                   <input
                     className="flex-grow"
                     type="month"
+                    max="3000-12"
                     value={formData[activeIndex].endDate}
                     onChange={(e) => {
                       const newFormData = [...formData];
