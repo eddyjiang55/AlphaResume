@@ -7,13 +7,21 @@ const Navbar = () => {
     const [openDropdown, setOpenDropdown] = useState(null);
     const ref = useRef(null);
 
-    const toggleDropdown = (index) => {
-        if (openDropdown === index) {
-            setOpenDropdown(null);
-        } else {
-            setOpenDropdown(index);
-        }
+    // const toggleDropdown = (index) => {
+    //     if (openDropdown === index) {
+    //         setOpenDropdown(null);
+    //     } else {
+    //         setOpenDropdown(index);
+    //     }
+    // };
+
+    const handleMouseEnter = (index) => {
+        setOpenDropdown(index);
     };
+
+    // const handleMouseLeave = () => {
+    //     setOpenDropdown(null);
+    // };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -39,7 +47,11 @@ const Navbar = () => {
                 <div className="flex flex-row justify-between items-center gap-x-24" ref={ref}>
                     {navigationItems.map((item, index) => (
                         <div key={index} className="inline-block relative">
-                            <button className={`w-full flex items-center text-lg text-alpha-blue p-2 border-b-2 ${openDropdown === index ? "border-alpha-blue" : "border-transparent"}`} onClick={() => toggleDropdown(index)}>
+                            <div className={`w-full flex items-center text-lg text-alpha-blue p-2 border-b-2 ${openDropdown === index ? "border-alpha-blue" : "border-transparent"}`}
+                                // onClick={() => toggleDropdown(index)}
+                                onMouseEnter={() => handleMouseEnter(index)}
+                                // onMouseLeave={handleMouseLeave}
+                            >
                                 {item.title}
                                 {openDropdown === index ? (
                                     <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-chevron-up w-4 h-4" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -52,7 +64,7 @@ const Navbar = () => {
                                         <path d="M6 9l6 6l6 -6" />
                                     </svg>
                                 )}
-                            </button>
+                            </div>
                             {openDropdown === index && (
                                 <div className="absolute w-auto min-w-[460px] left-0 bg-white text-black mt-6 p-1 z-50 rounded-lg border-[#b2ddee] border-2 shadow-inner">
                                     {item.links.map((link, linkIndex) => (
