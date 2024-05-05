@@ -294,6 +294,7 @@ export default function Step7Page({ dbFormData }) {
                   />
                   <label>*出版时间</label>
                   <input type="date"
+                    max="3000-12-31"
                     value={paperFormData[activePaperIndex].date}
                     onChange={(e) => {
                       const newPaperFormData = [...paperFormData];
@@ -439,6 +440,7 @@ export default function Step7Page({ dbFormData }) {
                   />
                   <label>*申请/授权日期</label>
                   <input type="date"
+                    max="3000-12-31"
                     value={patentFormData[activePatentIndex].date}
                     onChange={(e) => {
                       const newPatentFormData = [...patentFormData];

@@ -295,6 +295,7 @@ export default function Step6Page({ dbFormData }) {
                   />
                   <label>*获奖时间</label>
                   <input type="date"
+                    max="3000-12-31"
                     value={awardFormData[activeAwardIndex].awardTime}
                     onChange={(e) => {
                       const newFormData = [...awardFormData];
@@ -440,6 +441,7 @@ export default function Step6Page({ dbFormData }) {
                   />
                   <label>*取得时间</label>
                   <input type="date"
+                    max="3000-12-31"
                     value={certificateFormData[activeCertificateIndex].certificateTime}
                     onChange={(e) => {
                       const newFormData = [...certificateFormData];
