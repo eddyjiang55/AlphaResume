@@ -3,9 +3,11 @@ const cors = require('cors');
 const app = express();
 const path = require('path');
 const jobInfoRoutes = require('./routes/jobInfoRoutes');
-const resumeRoutes = require('./routes/resumeRoutes'); 
-const chatHisRoutes = require('./routes/chatHisRoutes'); 
+const resumeRoutes = require('./routes/resumeRoutes');
+const chatHisRoutes = require('./routes/chatHisRoutes');
 const impUserRoutes = require('./routes/impUserRoutes');
+const resumeChatRoutes = require('./routes/resumeChatRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -14,6 +16,8 @@ app.use('/api', jobInfoRoutes);
 app.use('/api', resumeRoutes);
 app.use('/api', chatHisRoutes);
 app.use('/api', impUserRoutes);
+app.use('/api', resumeChatRoutes);
+app.use('/api', authRoutes);
 
 const { Queue, Worker } = require('bull');
 const WebSocket = require('ws');
@@ -22,12 +26,16 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 
 // Define port
-const port = 8000;
+const port = 8080;
 
 const { connect } = require('./mongodb/dbconfig');
 const User = require('./mongodb/models/User');
 
 let processResult = {};
+
+app.get('/api/healthcheck', async (req, res) => {
+   res.status(200).json("hello world");
+});
 
 // Route for handling POST requests
 app.post('/api/resume', async (req, res) => {
@@ -42,7 +50,7 @@ app.post('/api/resume', async (req, res) => {
    }
 
    const pythonProcess = spawn('python3', ['./pyScripts/ResumeProcess.py', req.body.id]);
-   processResult[req.body.id] = { status: 'running', md_path: "./outputResume/" + req.body.id + ".md", pdf_path: "./outputResume/" + req.body.id + ".pdf", filename: req.body.基本信息.姓 + req.body.基本信息.名 + "_简历.pdf"};
+   processResult[req.body.id] = { status: 'running', path: "./outputResume/" + req.body.id + ".md" };
    console.log('Python process started');
    // console.log(processResult);
 
@@ -74,11 +82,11 @@ app.get('/api/result/:id', (req, res) => {
       return res.status(202).json({ message: 'Result is still running' });
    }
    if (result.status === 'done') {
-      fs.readFile(result.md_path, 'utf-8', (err, data) => {
+      fs.readFile(result.path, 'utf-8', (err, data) => {
          if (err) {
             return res.status(500).json({ message: 'Error reading file', error: err });
          }
-         return res.type('text/markdown').status(200).json({result: data});
+         return res.type('text/markdown').status(200).json({ result: data });
       });
    }
    // fs.readFile('./outputResume/sample.md', 'utf-8', (err, data) => {
@@ -92,13 +100,12 @@ app.get('/api/result/:id', (req, res) => {
 app.get('/api/file/:id', (req, res) => {
    const id = req.params.id;
    const result = processResult[id];
-   fs.access(result.pdf_path, fs.F_OK, (err) => {
+   fs.access(result.path, fs.F_OK, (err) => {
       if (err) {
          return res.status(404).json({ message: 'File not found' });
       }
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename=' + encodeURIComponent(result.filename));
-      const filestream = fs.createReadStream(result.pdf_path);
+      const filestream = fs.createReadStream(result.path);
       filestream.pipe(res);
    });
 });

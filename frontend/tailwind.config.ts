@@ -15,6 +15,7 @@ const config: Config = {
       },
       colors: {
         'custom-blue': '#1D80A7',
+        'alpha-blue': '#1d80a7'
       }
     },
   },

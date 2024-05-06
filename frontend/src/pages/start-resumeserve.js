@@ -1,13 +1,13 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/navbar';
 
 const SplitBackgroundPage = () => {
     return (
         <>
-        <Navbar />
+            <Navbar />
             <div className="background">
                 <div className='backward'>
-                    <img src='/img/back.svg'width={40} height={40} ></img>
+                    <img src='/img/back.svg' width={40} height={40} ></img>
                     <a href='/'>返回</a>
                 </div>
                 <div className='inner-div'>
@@ -26,7 +26,7 @@ const SplitBackgroundPage = () => {
                             <span>我们将助您快速构建简历</span>
                         </div>
                         <div className='container'>
-                            <button className='form-b' type="submit"><a href='/fill-info-step1'>开始填写</a></button>
+                            <a href='/fill-info-step1'><button className='form-b' type="button">开始填写</button></a>
                         </div>
                     </div>
                     <div className='title'>方式二：</div>
@@ -40,7 +40,7 @@ const SplitBackgroundPage = () => {
                             <span>将根据聊天信息助您快速构建</span>
                         </div>
                         <div className='container'>
-                            <button className='form-b' type="submit">进入聊天</button>
+                        <a href='/ai-assistant-chat'><button className='form-b' type="submit">进入聊天</button></a>
                         </div>
                     </div>
                 </div>

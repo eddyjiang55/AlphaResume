@@ -83,15 +83,13 @@ origin_mkd_cv = re.sub(r'```','',origin_mkd_cv)
 improved_mkd_cv = re.sub(r'```markdown','',improved_mkd_cv)
 improved_mkd_cv = re.sub(r'```','',improved_mkd_cv)
 
-with open('./outputResume/imporved_cv.json', model ='w', encoding='utf-8')as f:
-    json.dump(improved information,f)
 with open(f'./outputResume/{userId}.md',mode='w',encoding='utf-8') as f:
     f.write(improved_mkd_cv)
 with open('./outputResume/origin_cv.md',mode='w',encoding='utf-8') as f:
     f.write(origin_mkd_cv)
 
 # # Convert Markdown to HTML
-html_text = markdown.markdown(improved_mkd_cv)
+# html_text = markdown.markdown(improved_mkd_cv)
 
 # # Convert the HTML to a PDF file
-HTML(string=html_text).write_pdf(f'./outputResume/{userId}.pdf')
+# HTML(string=html_text).write_pdf(f'./outputResume/{userId}.pdf')

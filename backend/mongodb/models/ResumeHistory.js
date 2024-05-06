@@ -1,25 +1,21 @@
 const { connect } = require('../dbconfig');
 const { v4: uuidv4 } = require('uuid'); // 引入UUID生成器
-const { ObjectId } = require('mongodb');
 
 class ResumeHistory {
-    constructor(account, createdAt, pdfPath, id = null) {
-        // 如果前端提供了id，则使用该id，否则生成一个新的UUID
+    constructor(account, createdAt, title, position, pdfData, markdownData,id = null) {
         this._id = id || uuidv4();
         this.account = account;
         this.createdAt = createdAt;
-        this.pdfPath = pdfPath;
+        this.pdfData = pdfData; // Storing PDF file data
+        this.markdownData = markdownData; // Storing converted Markdown data
+        this.title = title;
+        this.position = position;
     }
 
     async save() {
         const db = await connect();
         const collection = db.collection('resumeHistories');
-        const result = await collection.insertOne({
-            account: this.account,
-            createdAt: this.createdAt,
-            pdfPath: this.pdfPath
-        });
-        // 只返回insertedId
+        const result = await collection.insertOne(this);
         return result.insertedId;
     }
   
@@ -27,7 +23,7 @@ class ResumeHistory {
     static async findById(id) {
         const db = await connect();
         const collection = db.collection('resumeHistories');
-        const resumeHistory = await collection.findOne({ id: id });
+        const resumeHistory = await collection.findOne({ _id: id });
         return resumeHistory;
     }
 
@@ -37,16 +33,15 @@ class ResumeHistory {
         const collection = db.collection('resumeHistories');
         return await collection.find({ account: account }).toArray();
     }
-    
 
-    // 读取（Find By Account and CreatedAt）
-    static async findByAccountAndCreatedAt(account, createdAt) {
+    // 新增方法：根据账号和岗位查找简历
+    static async findByAccountAndPosition(account, position) {
         const db = await connect();
         const collection = db.collection('resumeHistories');
-        const resumeHistory = await collection.findOne({ account: account, createdAt: createdAt });
-        return resumeHistory;
+        const resumes = await collection.find({ account: account, position: position }).toArray();
+        return resumes;
     }
-  
+
     // 删除（Delete）
     static async deleteById(_id) {
         const db = await connect();
@@ -55,8 +50,6 @@ class ResumeHistory {
         const result = await collection.deleteOne({ _id: _id });
         return result;
     }
-    
-    
 }
 
 module.exports = ResumeHistory;

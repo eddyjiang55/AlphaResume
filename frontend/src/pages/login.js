@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import React from 'react';
+import Navbar from '../components/navbar';
 
 const LoginPage = () => {
   const [phone, setPhone] = useState('');
