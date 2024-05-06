@@ -12,8 +12,18 @@ const LoginPage = () => {
                     <a href='/'>返回</a>
             </div>
                 <div className="text-title">登陆</div>
-                <input type="text" placeholder="手机号码" />
-                <input type="password" placeholder="验证码" />
+                <div class="input-container">
+                    <select className='select'>
+                        <option value="+86">+86</option>
+                        <option value="+1">+1</option>
+                        <option value="+44">+44</option>
+                    </select>
+                    <input type="text" placeholder="手机号码"/>
+                </div>
+                <div class="input-container">
+                    <input type="password" placeholder="验证码"/>
+                    <button class="button-send">发送验证码</button>
+                </div>
                 <button className='action-button'>登录</button>
                 <p className="hint">未注册的手机号验证后自动创建账号</p>
                 <div className='third-party'>
@@ -90,11 +100,10 @@ const LoginPage = () => {
         }
         button {
           padding: 10px;
-          background-color: blue;
+          background-color: #B2DDEE;
           color: white;
-          border: none;
-          border-radius: 4px;
           cursor: pointer;
+          border-radius: 0 4px 4px 0;
         }
         .hint {
           font-size: 12px;
@@ -132,6 +141,45 @@ const LoginPage = () => {
         .action-button:hover {
             background-color: #EDF8FD;
         }
+        .input-container {
+          margin-bottom: 10px;
+          position: relative;
+      }
+      .input-container input[type="text"],
+      .input-container input[type="password"] {
+          width: calc(100% - 45px);
+          padding: 10px;
+          box-sizing: border-box;
+      }
+      .input-container select {
+          position: absolute;
+          left: 0;
+          top: 0;
+          padding: 10px;
+          height: 100%;
+      }
+      .select {
+        background-color: white;
+        color:black;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        cursor: pointer;
+        padding:10px;
+        width:100px;
+        height:45px;
+        border-radius: 4px 0 0 4px;
+      }
+      input[type="password"] {
+        border-radius: 4px 0 0 4px;
+      }
+      input[type="text"] {
+        border-radius: 0 4px 4px 0;
+      }
+      .select option {
+        font-size: 16px;  /* 增大字体大小 */
+        margin: 10px;  /* 添加更多的内部空间 */
+    }
       `}</style>
     </div>
     </>
