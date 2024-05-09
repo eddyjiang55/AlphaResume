@@ -50,6 +50,14 @@ class ResumeHistory {
         const result = await collection.deleteOne({ _id: _id });
         return result;
     }
+
+    static async getPDFData(resumeHistoryId) {
+        const db = await connect();
+        const collection = db.collection('resumeHistories');
+        const resumeHistory = await collection.findOne({ _id: resumeHistoryId });
+        await db.client.close(); // 确保在数据被成功获取后关闭数据库连接
+        return resumeHistory ? resumeHistory.pdfData : null;
+    }
 }
 
 module.exports = ResumeHistory;
