@@ -13,7 +13,7 @@ const LoginPage = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:8000/api/send-verification-code', {
+      const response = await fetch('http://localhost:8080/api/send-verification-code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ const LoginPage = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
+      const response = await fetch('http://localhost:8080/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
