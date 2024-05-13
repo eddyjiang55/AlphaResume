@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-//import { useHistory } from 'react-router-dom'; // Import useHistory from react-router-dom
+import { useRouter } from 'next/router';
 
 const LoginPage = () => {
+  const router = useRouter();
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+86');
   const [verificationCode, setVerificationCode] = useState('');
   const [receivedCode, setReceivedCode] = useState('');
   const [message, setMessage] = useState('未注册的手机号验证后自动创建账号');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const history = useHistory(); // For programmatic navigation
 
   const handleSendCode = async () => {
     if (phone.length === 0) {
@@ -44,10 +44,11 @@ const LoginPage = () => {
       setMessage('请先阅读并同意相关条款');
       return;
     }
-    if (verificationCode !== receivedCode) {
-      setMessage('验证码错误');
-      return;
-    }
+    // Check if entered code matches the received code
+    //if (verificationCode !== receivedCode) {
+    //  setMessage('验证码错误');
+    //  return;
+    //}
 
     try {
       const response = await fetch('http://localhost:8080/api/login', {
@@ -59,9 +60,11 @@ const LoginPage = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('userData', JSON.stringify(data)); // Save login data to localStorage
+        // Store phone number in localStorage
+        localStorage.setItem('phoneNumber', countryCode + phone);
         setMessage('登录成功');
-        history.push('/'); // Redirect to home page
+        // Redirect to home page
+        router.push('/');
       } else {
         setMessage(data.message || '登录失败');
       }
@@ -69,6 +72,7 @@ const LoginPage = () => {
       setMessage('网络错误，请稍后重试');
     }
   };
+  
 
   return (
     <>
