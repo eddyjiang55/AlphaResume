@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '../components/navbar';
+import ResumeCard from '../components/resumeCard';
+ 
 
 const SplitBackgroundPage = () => {
+    
+    const [resumeData, setResumeData] = useState( [{
+        title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
+    },{
+        title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
+    }]);
+
+
+    const addResume = (newResume) => {
+        setResumeData([...resumeData, newResume]);
+    };
     return (
         <>
         <Navbar></Navbar>
@@ -87,50 +100,74 @@ const SplitBackgroundPage = () => {
                     </div>
                 </div>
                 <div className="bottom-half"></div>
+                <div className="resumeContainer">
+                    {resumeData.map((data, index) => (
+                        <ResumeCard key={index} resumeData={data} />
+                    ))}
+                </div>
             </div>
+
+
             <style jsx>{`
                 .split-background {
+                    display: grid;
+                    grid-template-rows: auto auto 1fr;
+                    gap:20px;
+                    align-items: start; /* 对齐到容器的顶部 */
+                    justify-content: center; /* 水平居中 */
+                    min-height: 100vh;
+                    width: 100%;
                     position: relative;
-                    height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1;
                 }
                 .top-half, .bottom-half {
                     position: absolute;
                     width: 100%;
-                    z-index: -1;
+                    height: 50%; /* 设置为视窗高度的一半 */
+                    z-index: 0; /* 确保它们位于背景层 */
+                 
                 }
                 .top-half {
-                    top: 0;
-                    height: 50%;
                     background-color: #1D80A7;
+                    top: 0; /* 顶部对齐 */
                 }
+                
                 .bottom-half {
-                    bottom: 0;
-                    height: 50%;
                     background-color: #EDF8FD;
+                    bottom: 0; /* 底部对齐 */
                 }
+                
                 .content-container {
+                    z-index: 1;
+                    position: relative;
                     display: flex;
                     flex-direction: column;
+                    justify-content: center;
                     align-items: center;
-                    gap: 50px;
+                    min-height: 100vh;
                 }
                 .text-container {
                     font-size: 32px;
                     color: #EDF8FD;
+                    z-index: 2;
                 }
                 .text-container-lower {
                     font-size: 24px;
                     color: #1D80A7;
                     text-align: center;
+                    z-index: 2;
                 }
                 .rectangle-container {
-                    display: flex;
-                    gap: 100px;
+                    grid-row: 2; 
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr); /* 两列布局 */
+                    gap: 100px; /* 列之间的间隔 */
+                    justify-content: center; /* 水平居中 */
+                    align-items: start; /* 对齐到顶部 */
+                    padding: 20px;
+                    box-sizing: border-box;
+                    width: 100%; /* 使用 100% 宽度 */
+                    z-index: 1;
+                    margin-bottom: 50px; 
                 }
                 .rectangle {
                     width: 800px;
@@ -191,6 +228,21 @@ const SplitBackgroundPage = () => {
                     padding-left: 30px;
                     padding-right: 30px;
                 }
+                .resumeContainer{
+                    display: grid;
+                    grid-row: 3;
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 动态数量的列 */
+                    gap: 40px;
+                    align-items: start;
+                    justify-content: center;
+                    padding: 20px;
+                    box-sizing: border-box;
+                    width: 100%; /* 使用 100% 宽度 */
+                    z-index: 1;
+                    position: relative; /* 确保它相对于分割背景定位 */
+                }
+
+               
             `}</style>
         </>
     );

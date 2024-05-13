@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
+import { useDispatch } from 'react-redux';
+import { toggleResume } from '../store/features/resumeSlice'; 
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -208,6 +210,13 @@ export default function Step1Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
+       
+    //   //显示前端小卡片
+    // const dispatch = useDispatch();
+    // const handleSave = () => {
+    //     dispatch(toggleResume());
+    // };
+
   }
 
   return (
