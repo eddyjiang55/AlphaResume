@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 
 const LoginPage = () => {
+  const router = useRouter();
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+86');
   const [verificationCode, setVerificationCode] = useState('');
-  const [receivedCode, setReceivedCode] = useState(''); // Store the received code
+  const [receivedCode, setReceivedCode] = useState('');
   const [message, setMessage] = useState('未注册的手机号验证后自动创建账号');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
@@ -24,7 +26,7 @@ const LoginPage = () => {
       const data = await response.json();
       if (response.ok) {
         setMessage('验证码已发送，请查收');
-        setReceivedCode(data.response); // Store the code sent from backend
+        setReceivedCode(data.response);
       } else {
         setMessage(data.message || '发送验证码失败');
       }
@@ -58,8 +60,11 @@ const LoginPage = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        // Store phone number in localStorage
+        localStorage.setItem('phoneNumber', countryCode + phone);
         setMessage('登录成功');
-        // Handle further logic such as redirection or storing tokens
+        // Redirect to home page
+        router.push('/');
       } else {
         setMessage(data.message || '登录失败');
       }
