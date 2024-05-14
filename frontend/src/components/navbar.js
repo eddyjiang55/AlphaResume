@@ -2,26 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { navigationItems } from '../lib/navbarData';
+import { useAuth } from '../components/AuthContext';  // Adjust path as necessary
 
 const Navbar = () => {
     const [openDropdown, setOpenDropdown] = useState(null);
     const ref = useRef(null);
-
-    // const toggleDropdown = (index) => {
-    //     if (openDropdown === index) {
-    //         setOpenDropdown(null);
-    //     } else {
-    //         setOpenDropdown(index);
-    //     }
-    // };
-
-    const handleMouseEnter = (index) => {
-        setOpenDropdown(index);
-    };
-
-    //const handleMouseLeave = () => {
-    //     setOpenDropdown(null);
-    // };
+    const { phoneNumber, logout } = useAuth(); // Use phoneNumber to check login status
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -30,13 +16,15 @@ const Navbar = () => {
             }
         };
 
-        // Bind the event listener
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
-            // Unbind the event listener on clean up
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    const handleLogout = () => {
+        logout();  // Logout user
+    };
 
     return (
         <>
@@ -48,9 +36,7 @@ const Navbar = () => {
                     {navigationItems.map((item, index) => (
                         <div key={index} className="inline-block relative">
                             <div className={`w-full flex items-center text-lg text-alpha-blue p-2 border-b-2 ${openDropdown === index ? "border-alpha-blue" : "border-transparent"}`}
-                                // onClick={() => toggleDropdown(index)}
-                                onMouseEnter={() => handleMouseEnter(index)}
-                                // onMouseLeave={handleMouseLeave}
+                                onMouseEnter={() => setOpenDropdown(index)}
                             >
                                 {item.title}
                                 {openDropdown === index ? (
@@ -86,10 +72,21 @@ const Navbar = () => {
                     ))}
                 </div>
                 <div className="actions flex gap-2.5 mr-18">
-                    <Link href='/login'>
-                        <button className="action-button px-7 py-2 border border-[#1D80A7] bg-white text-[#1D80A7] cursor-pointer rounded-md hover:bg-[#1D80A7] hover:text-white">登陆</button>
-                    </Link>
-                    <button className="action-button px-7 py-2 border border-[#1D80A7] bg-white text-[#1D80A7] cursor-pointer rounded-md hover:bg-[#1D80A7] hover:text-white">获取</button>
+                    {phoneNumber ? (
+                        <>
+                            <div className="user-avatar">
+                                <Image src="/img/user-avatar.jpg" alt="User Avatar" width={40} height={40} className="rounded-full" />
+                            </div>
+                            <button className="action-button px-7 py-2 border border-[#1D80A7] bg-white text-[#1D80A7] cursor-pointer rounded-md hover:bg-[#1D80A7] hover:text-white" onClick={handleLogout}>登出</button>
+                        </>
+                    ) : (
+                        <>
+                            <Link href='/login'>
+                                <button className="action-button px-7 py-2 border border-[#1D80A7] bg-white text-[#1D80A7] cursor-pointer rounded-md hover:bg-[#1D80A7] hover:text-white">登陆</button>
+                            </Link>
+                            <button className="action-button px-7 py-2 border border-[#1D80A7] bg-white text-[#1D80A7] cursor-pointer rounded-md hover:bg-[#1D80A7] hover:text-white">获取</button>
+                        </>
+                    )}
                 </div>
             </nav>
         </>
