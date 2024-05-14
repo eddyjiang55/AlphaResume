@@ -19,7 +19,7 @@ const Navbar = () => {
         setOpenDropdown(index);
     };
 
-    // const handleMouseLeave = () => {
+    //const handleMouseLeave = () => {
     //     setOpenDropdown(null);
     // };
 
@@ -85,103 +85,13 @@ const Navbar = () => {
                         </div>
                     ))}
                 </div>
-                <div className="actions">
-                    <Link href='/login'><button className="action-button">登陆</button></Link>
-                    <button className="action-button">获取</button>
+                <div className="actions flex gap-2.5 mr-18">
+                    <Link href='/login'>
+                        <button className="action-button px-7 py-2 border border-[#1D80A7] bg-white text-[#1D80A7] cursor-pointer rounded-md hover:bg-[#1D80A7] hover:text-white">登陆</button>
+                    </Link>
+                    <button className="action-button px-7 py-2 border border-[#1D80A7] bg-white text-[#1D80A7] cursor-pointer rounded-md hover:bg-[#1D80A7] hover:text-white">获取</button>
                 </div>
             </nav>
-            <style jsx>{`
-                .navbar {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    background-color: white;
-                    width: 100%;
-                    font-size: 20px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                }
-                .logo {
-                    flex-shrink: 0;
-                    margin-left: 70px;
-                }
-                .navigation {
-                    display: flex;
-                    justify-content: space-between;
-                    gap: 100px;
-                    color: #1D80A7;
-                }
-                .dropdown {
-                    position: relative;
-                    display: inline-block;
-                }
-                .dropdown-content {
-                    display: none;
-                    position: absolute;
-                    background-color: white;
-                    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-                    z-index: 1000;
-                    min-width: 300px;
-                    border-radius: 10px;
-                }
-                .dropdown:hover .dropdown-content {
-                    display: block;
-                }
-                .dropdown-item {
-                    display: flex;
-                    align-items: center; /* 确保图片和文本在垂直方向上居中 */
-                    gap: 10px;
-                    padding: 12px;
-                    border-bottom: 1px solid #f0f0f0;
-                    text-decoration: none;
-                    color: black;
-                }
-                .item-text {
-                    display: flex;
-                    flex-direction: column;
-                    padding:30px 60px;
-                }
-                .item-text:hover{
-                    background-color: #B2DDEE;
-                    border-radius: 10px;
-                }
-                .item-title {
-                    font-weight: bold;
-                }
-                .item-description {
-                    font-size: 12px;
-                    color: #888;
-                }
-                .nav-link {
-                    color: #1D80A7;
-                    text-decoration: none;
-                    font-size: 16px;
-                    cursor: pointer;
-                    display: block;
-                    padding: 12px 16px;
-                }
-                .nav-link:hover {
-                    text-decoration: underline;
-                }
-                .actions {
-                    display: flex;
-                    gap: 10px;
-                    margin-right: 70px;
-                }
-                .action-button {
-                    padding: 8px 16px;
-                    border: 1px solid #1D80A7;
-                    background-color: white;
-                    color: #1D80A7;
-                    cursor: pointer;
-                    border-radius: 5px;
-                    padding-left: 30px;
-                    padding-right: 30px;
-                }
-                .action-button:hover {
-                    background-color: #1D80A7;
-                    color: white;
-                }
-            `}</style>
         </>
     );
 };
