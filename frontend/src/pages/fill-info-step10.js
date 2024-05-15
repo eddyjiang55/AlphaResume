@@ -39,7 +39,7 @@ const Step10Page = () => {
             ))}
           </div>
           <div className="mx-auto w-fit">
-            <Link href='/fill-info-step11'><button className='form-b' type="button" disabled={selectedImage === ''}>生成简历</button></Link>
+            <Link href='/generate-resume'><button className='form-b' type="button" disabled={selectedImage === ''}>生成简历</button></Link>
           </div>
         </div>
         <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch gap-y-8 px-6 py-8 overflow-y-auto'>

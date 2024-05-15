@@ -14,6 +14,7 @@ const typeToChinese = {
     languages: '语言',
     researchPapersAndPatents: '科研论文与知识产权'
 };
+
 // 创建新的用户
 router.post('/improved-users', async (req, res) => {
     try {
@@ -55,26 +56,15 @@ router.get('/improved-users/:_id', async (req, res) => {
 router.get('/improved-users/:_id/:type', async (req, res) => {
     try {
         const { _id, type } = req.params;
-        const typeMap = {
-            basicInformation: '基本信息',
-            personalEvaluation: '个人评价',
-            educationHistory: '教育经历',
-            professionalExperience: '职业经历',
-            projectExperience: '项目经历',
-            awardsAndCertificates: '获奖与证书',
-            skills: '技能',
-            languages: '语言',
-            researchPapersAndPatents: '科研论文与知识产权'
-        };
 
-        const chineseType = typeMap[type]; // 获得中文字段名
+        const chineseType = typeToChinese[type]; // 获得中文字段名
         if (!chineseType) {
             return res.status(400).json({ message: "Invalid type specified" });
         }
 
         const user = await ImprovedUser.findById(_id);
         if (user) {
-            const responseData = user[chineseType] || null; // 如果指定类型不存在，返回 null
+            const responseData = user.personal_data[chineseType] || null; // 如果指定类型不存在，返回 null
             res.status(200).json({ data: responseData, _id: _id });
         } else {
             res.status(404).json({ message: 'User not found' });

@@ -70,10 +70,9 @@ md_simple = qwen.wirteCV_simple(template_null, template, improved_cv_md)
 md_simple = re.sub(r'```markdown','',md_simple)
 md_simple = re.sub(r'```','',md_simple)
 
-with open('Resume_API\simple_cv.md', 'w', encoding='utf-8') as f:
-    f.write(md_simple)
+# with open('Resume_API\simple_cv.md', 'w', encoding='utf-8') as f:
+#     f.write(md_simple)
 
-'''
 # results send back to database
 feedback_cv = {
     "improved_cv_md" : md_simple,
@@ -84,5 +83,3 @@ feedback_cv = {
 
 ut.sent_cv_to_mongodb(feedback_cv)
 print('generate and send resume successfully!')
-'''
-
