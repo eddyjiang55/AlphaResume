@@ -29,13 +29,10 @@ export async function getServerSideProps(context) {
 
 export default function Step1Page({ dbFormData }) {
   const router = useRouter();
-<<<<<<< HEAD
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   console.log(dbFormData);
-=======
   const id = useSelector((state) => state.user.id); // 获取 Redux 中的 id
->>>>>>> 154862a (saveUserID)
 
   // 使用 useState 钩子初始化表单状态
   const [form, setForm] = useState(dbFormData.data || {
