@@ -1,14 +1,15 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from bson import ObjectId
 import qwen
 import time
 
 
 
-def get_cv_from_mongodb(db, resume_id):  # user's id
+def get_cv_from_mongodb(db, user_id):  # user's id
     collection_name = "improvedUsers"
     collection = db[collection_name]
-    query = {'resumeId': resume_id}
+    query = {'_id': ObjectId(user_id)}
     cv_cursor = collection.find(query)
     results = [doc for doc in cv_cursor]
     return results[0]['personal_data']

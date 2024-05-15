@@ -19,8 +19,8 @@ database_name = "airesumedb"
 db = client[database_name]
 
 # get original personal cv json
-resume_id = 'resume_1'
-cv_json = ut.get_cv_from_mongodb(db, resume_id)
+user_id = '662db8610d04dcf0a4ba0351'
+cv_json = ut.get_cv_from_mongodb(db, user_id)
 
 # get job imformation
 job_name = '软件工程师'
