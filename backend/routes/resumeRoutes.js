@@ -23,7 +23,8 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
         const createdAt = req.body.createdAt;
         const title = req.body.title;
         const position = req.body.position;
-
+        const improved_user_id = req.body.improvedUserId;
+        const resume_history_id = req.body.resumeHistoryId;
 
 
         if (!req.file) {
@@ -32,7 +33,7 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
 
         const pdfData = req.file.buffer;
         const markdownData = await convertToMarkdown(pdfData); // 假设这个函数同步执行并返回Markdown数据
-
+        
 
         // 将简历数据保存到数据库
         const newResume = new ResumeHistory(
@@ -41,12 +42,12 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
             title,
             position,
             pdfData,
-            markdownData
+            markdownData,
+            resume_history_id
         );
 
 
-        const resume_history_id = await newResume.save(); // 保存并获取ID
-        const improved_user_id = uuidv4(); // 为改进用户生成唯一ID
+        await newResume.save(); // 保存并获取ID
 
         // 调用Python脚本进行进一步处理
         exec(`python3 ./pyScripts/pdf_reader.py ${resume_history_id} ${improved_user_id}`, (err, stdout, stderr) => {
@@ -172,8 +173,19 @@ router.post('/resume-info', upload.single('pdfFile'), async (req, res) => {
     }
 });
 
+router.get('/download-pdf/:resumeHistoryId', async (req, res) => {
+    const { resumeHistoryId } = req.params;
+    const pdfData = await ResumeHistory.getPDFData(resumeHistoryId);
 
+    if (!pdfData) {
+        return res.status(404).send('PDF not found');
+    }
 
+    // 设置适当的响应头以返回文件内容
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="downloaded_resume.pdf"');
+    res.send(pdfData);
+});
 
 
 
