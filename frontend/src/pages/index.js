@@ -1,15 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Navbar from '../components/navbar';
+import { useDispatch, useSelector } from 'react-redux';
 import ResumeCard from '../components/resumeCard';
+import { setUserDetail, setResumeCards } from '../store/features/resumeSlice';
  
 
 const SplitBackgroundPage = () => {
+
+    const dispatch = useDispatch();
+    const resumeData = useSelector((state) => state.resume.cards);
+    const userId = useSelector((state) => state.user.id); // 从 Redux 获取用户 ID
+
+    useEffect(() => {
+        if (userId) {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${userId}`)
+            .then(response => response.json())
+            .then(userData => {
+              dispatch(setUserDetail(userData));
+              dispatch(setResumeCards([userData])); 
+            })
+            .catch(error => {
+              console.error('Error fetching user detail:', error);
+            });
+        }
+    },[userId, dispatch])
     
-    const [resumeData, setResumeData] = useState( [{
-        title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
-    },{
-        title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
-    }]);
+    // const [resumeData, setResumeData] = useState( [{
+    //     title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
+    // },{
+    //     title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
+    // }]);
 
 
     const addResume = (newResume) => {
@@ -101,10 +121,10 @@ const SplitBackgroundPage = () => {
                 </div>
                 <div className="bottom-half"></div>
                 <div className="resumeContainer">
-                    {resumeData.map((data, index) => (
-                        <ResumeCard key={index} resumeData={data} />
-                    ))}
-                </div>
+          {resumeData.length > 0 && resumeData.map((data, index) => (
+            <ResumeCard key={index} resumeData={data} />
+          ))}
+        </div>
             </div>
 
 

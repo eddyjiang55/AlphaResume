@@ -1,11 +1,15 @@
 import React ,{ useState,useEffect, useRef }from 'react';
-import { useRouter } from 'next/router'; 
+import { useRouter } from 'next/router';
+import { useSelector ,useDispatch} from 'react-redux'; 
 
 function ResumeBox({ resumeData}) {
     const router = useRouter();
     const [showConfirm, setShowConfirm] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
     const menuRef = useRef();
+
+   // 从 Redux 中获取存储的 id
+   const userId = useSelector((state) => state.user.id);
 
     const confirmDelete = () => {
         setShowConfirm(true);
@@ -28,14 +32,14 @@ function ResumeBox({ resumeData}) {
         };
     }, []);
 
-    const handleClick = (_id) => {
+    const handleClick = () => {
         // 使用写死的 ID 进行路由跳转
-        router.push(`/fill-info-step10?${_id}`);
+        router.push(`/fill-info-step10?${userId}`);
     };
 
 
-    const handleDelete = (_id) => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${_id}`, {
+    const handleDelete = () => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${userId}`, {
             method: 'DELETE',
         })
         .then(response => {
@@ -46,6 +50,7 @@ function ResumeBox({ resumeData}) {
         })
         .then(data => {
             console.log('Delete successful:', data);
+            dispatch(deleteResumeCard(userId));
             setShowConfirm(false); // 关闭确认框
         })
         .catch(error => {
@@ -54,7 +59,7 @@ function ResumeBox({ resumeData}) {
     }
 
     const handleDownloadPdf = (resumeHistoryId) => {
-        const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL}/download-pdf/${resumeHistoryId}`;
+        const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/download-pdf/${resumeHistoryId}`;
     
         fetch(downloadUrl)
             .then(response => {
@@ -89,7 +94,9 @@ function ResumeBox({ resumeData}) {
             </div>
             <div className="inner-div">
                 <div className="newActions">
-                    <button className="actionButton">编辑</button>
+                    <button className="actionButton" onClick={
+                        ()=>handleClick('f0c086b6-1c3b-4e87-b39e-39e7d4392b1b'
+    )}>编辑</button>
                     <button className="actionButton" onClick={()=>{handleDownloadPdf('87c1fbdc-a883-48ce-9864-0cc2b1e34138')}}>下载PDF</button>
                 </div>
             </div>
@@ -98,7 +105,9 @@ function ResumeBox({ resumeData}) {
                 {menuVisible && (
                     <div className="dropdown-menu" ref={menuRef}>
                         <ul>
-                            <li>编辑</li>
+                            <li  onClick={
+                        ()=>handleClick('f0c086b6-1c3b-4e87-b39e-39e7d4392b1b'
+    )}>编辑</li>
                             <li onClick={()=>handleClick('f0c086b6-1c3b-4e87-b39e-39e7d4392b1b')}>预览</li>
                             <li onClick={confirmDelete}>删除</li>
                         </ul>
@@ -112,7 +121,7 @@ function ResumeBox({ resumeData}) {
                 <div className="confirmContainer">
                     <p>是否确认删除简历？</p>
                     <div className="buttonGroup">
-                        <button className="confirmButton" onClick={()=>handleDelete('f0c086b6-1c3b-4e87-b39e-39e7d4392b1b')}>删除</button>
+                        <button className="confirmButton" onClick={handleDelete}>删除</button>
                         <button className="cancelButton" onClick={() => setShowConfirm(false)}>取消</button>
                     </div>
                 </div>
