@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ImprovedUser = require('../mongodb/models/ImprovedUser.js'); // 确保路径与你的项目结构相匹配
+const { spawn } = require('child_process');
 
 // 定义英文到中文的映射
 const typeToChinese = {
@@ -14,6 +15,8 @@ const typeToChinese = {
     languages: '语言',
     researchPapersAndPatents: '科研论文与知识产权'
 };
+
+let processResult = {};
 
 // 创建新的用户
 router.post('/improved-users', async (req, res) => {
@@ -153,6 +156,58 @@ router.post('/save-data', async (req, res) => {
         res.status(200).json({ message: "Data updated successfully" });
     } catch (error) {
         res.status(500).json({ message: "Failed to update data", error: error.toString() });
+    }
+});
+
+router.post('/improved-users/generate-resume', async (req, res) => {
+    const { id } = req.body;
+    const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id]);
+    processResult[id] = { status: 'running' };
+    pythonProcess.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    pythonProcess.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+        processResult[id].status = 'done';
+    });
+
+    res.status(200).json({ message: "Resume generation started" });
+});
+
+router.get('/improved-users/result/:id', (req, res) => {
+    const id = req.params.id;
+    const result = processResult[id];
+    if (!result) {
+        return res.status(404).json({ message: 'No result found' });
+    }
+    if (result.status === 'running') {
+        return res.status(202).json({ message: 'Result is still running' });
+    }
+    if (result.status === 'done') {
+        return res.status(200).json({ message: 'Result is ready' });
+    }
+});
+
+router.get('/improved-users/markdown/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const record = await ImprovedUser.findById(id);
+        if (!record) {
+            return res.status(404).send({ message: "User not found" });
+        }
+        const markdown = record.personal_data;
+        if (!markdown) {
+            return res.status(404).send({ message: "Markdown data not found for the user" });
+        }
+        res.type('text/markdown').status(200).send(markdown);
+    } catch (error) {
+        console.error('Failed to retrieve user data:', error);
+        res.status(500).send({ message: "Server error while retrieving data" });
     }
 });
 

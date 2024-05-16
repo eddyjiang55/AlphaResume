@@ -50,7 +50,11 @@ class ImprovedUser {
     static async update(_id, updateData) {
         const db = await connect();
         const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUser'
-        const result = await collection.updateOne({ _id }, { $set: updateData });
+        const setUpdateData = {};
+        for (const key in updateData) {
+            setUpdateData[`personal_data.${key}`] = updateData[key];
+        }
+        const result = await collection.updateOne({ _id }, { $set: setUpdateData });
         return result;
     }
 

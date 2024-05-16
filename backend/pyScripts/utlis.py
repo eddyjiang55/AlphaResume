@@ -5,10 +5,10 @@ import time
 
 
 
-def get_cv_from_mongodb(db, resume_id):  # user's id
+def get_cv_from_mongodb(db, user_id):  # user's id
     collection_name = "improvedUsers"
     collection = db[collection_name]
-    query = {'resumeId': resume_id}
+    query = {'_id': ObjectId(user_id)}
     cv_cursor = collection.find(query)
     results = [doc for doc in cv_cursor]
     return results[0]['personal_data']
@@ -50,5 +50,15 @@ def split_cv_into_twoparts(improved_cv_json):
 def sent_cv_to_mongodb(db, insert_data): # usr's id and job's id
     collection_name = "improvedUsers"
     collection = db[collection_name]
-    result = collection.insert_one(insert_data)
-    return 'Insert successfully!'
+    record_id = update_data.pop('_id', None)
+    
+    if record_id is None:
+        return 'Error: No _id provided in update data.'
+    
+    result = collection.update_one({'_id': record_id}, {'$set': update_data})
+    if result.matched_count == 0:
+        return 'No record found with the specified _id.'
+    elif result.modified_count == 0:
+        return 'No changes were made to the existing record.'
+    else:
+        return 'Update successfully!'

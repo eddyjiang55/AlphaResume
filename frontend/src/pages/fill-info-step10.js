@@ -4,8 +4,33 @@ import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 
+export async function getServerSideProps(context) {
+  let dbFormData = { _id: context.query.id };
+  // if (context.query.id) {
+  //   // Fetch dbFormData from external API
+  //   const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/basicInformation`)
+  //   const dbData = await res.json();
+  //   if (dbData.data) {
+  //     const displayData = dbData.data.map(data => {
+  //       return {
+  //         language: data.语言,
+  //         proficiency: data.熟练度,
+  //         certificate: data["证书/资格认证"],
+  //         score: data.成绩,
+  //       };
+  //     });
+  //     dbFormData = { _id: dbData._id, data: displayData };
+  //   } else {
+  //     dbFormData = { _id: dbData._id, data: null };
+  //   }
+  // } else {
+  //   return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+  // }
+  // Pass data to the page via props
+  return { props: { dbFormData } }
+}
 
-const Step10Page = () => {
+export default function Step10Page({ dbFormData }) {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
 
   const [selectedImage, setSelectedImage] = useState('');
@@ -15,6 +40,27 @@ const Step10Page = () => {
     '/img/result-3.png',
     '/img/result-4.png'
   ];
+
+  const handleSubmit = async () => {
+    // Save the selected image to the database
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users/generate-resume', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: dbFormData._id,
+      })
+    });
+    if (response.status === 200) {
+      router.push('/generate-resume');
+    } else {
+      alert('Failed to generate resume');
+    }
+    // Redirect to the next page
+    // router.push('/generate-resume');
+  }
+
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       <Navbar />
@@ -39,7 +85,7 @@ const Step10Page = () => {
             ))}
           </div>
           <div className="mx-auto w-fit">
-            <Link href='/generate-resume'><button className='form-b' type="button" disabled={selectedImage === ''}>生成简历</button></Link>
+            <button className='form-b' type="button" onClick={handleSubmit} disabled={selectedImage === ''}>生成简历</button>
           </div>
         </div>
         <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch gap-y-8 px-6 py-8 overflow-y-auto'>
@@ -263,8 +309,6 @@ const Step10Page = () => {
     </div >
   );
 };
-
-export default Step10Page;
 
 
 
