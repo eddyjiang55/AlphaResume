@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ImprovedUser = require('../mongodb/models/ImprovedUser.js'); // 确保路径与你的项目结构相匹配
+const Account = require('../mongodb/models/Account'); // 引入Account模型
 
 // 定义英文到中文的映射
 const typeToChinese = {
@@ -19,7 +20,7 @@ router.post('/improved-users', async (req, res) => {
     try {
         const newUser = new ImprovedUser(
             req.body.基本信息,
-            req.body.个人评价, // 添加个人评价的处理
+            req.body.个人评价,
             req.body.教育经历,
             req.body.职业经历,
             req.body.项目经历,
@@ -28,11 +29,25 @@ router.post('/improved-users', async (req, res) => {
             req.body.技能,
             req.body.科研论文与知识产权
         );
-        const _id = await newUser.save();
-        res.status(201).json({ message: 'Improved user created successfully', _id: _id });
+        const _id = await newUser.save();  // 保存ImprovedUser并获取其ID
+
+        // 从请求中获取Account的phoneNumber
+        const { phoneNumber } = req.body;
+        if (!phoneNumber) {
+            return res.status(400).json({ message: 'Phone number is required to link account' });
+        }
+
+        // 查找Account并添加ImprovedUser的ID
+        const account = await Account.findByPhoneNumber(phoneNumber);
+        if (account) {
+            await Account.addImprovedUser(account._id, _id);
+            res.status(201).json({ message: 'Improved user created successfully and added to account', _id: _id });
+        } else {
+            res.status(404).json({ message: 'Account not found' });
+        }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to create improved user', error: error.toString() });
+        res.status(500).json({ message: 'Failed to create improved user or update account', error: error.toString() });
     }
 });
 
