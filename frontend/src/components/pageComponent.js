@@ -22,7 +22,7 @@ export default function PageComponent({ content, pageIndex, onElementClick }) {
 
   return (
     <div className="page" id={`page-${pageIndex}`}>
-      <div className='markdown-body'>
+      <div className='markdown-body overflow-y-auto'>
         <Markdown remarkPlugins={[remarkGfm]} components={customRenderers}>{content}</Markdown>
       </div>
     </div>

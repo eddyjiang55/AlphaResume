@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ImprovedUser = require('../mongodb/models/ImprovedUser.js'); // 确保路径与你的项目结构相匹配
+const { spawn } = require('child_process');
 
 // 定义英文到中文的映射
 const typeToChinese = {
@@ -14,6 +15,9 @@ const typeToChinese = {
     languages: '语言',
     researchPapersAndPatents: '科研论文与知识产权'
 };
+
+let processResult = {};
+
 // 创建新的用户
 router.post('/improved-users', async (req, res) => {
     try {
@@ -55,26 +59,15 @@ router.get('/improved-users/:_id', async (req, res) => {
 router.get('/improved-users/:_id/:type', async (req, res) => {
     try {
         const { _id, type } = req.params;
-        const typeMap = {
-            basicInformation: '基本信息',
-            personalEvaluation: '个人评价',
-            educationHistory: '教育经历',
-            professionalExperience: '职业经历',
-            projectExperience: '项目经历',
-            awardsAndCertificates: '获奖与证书',
-            skills: '技能',
-            languages: '语言',
-            researchPapersAndPatents: '科研论文与知识产权'
-        };
 
-        const chineseType = typeMap[type]; // 获得中文字段名
+        const chineseType = typeToChinese[type]; // 获得中文字段名
         if (!chineseType) {
             return res.status(400).json({ message: "Invalid type specified" });
         }
 
         const user = await ImprovedUser.findById(_id);
         if (user) {
-            const responseData = user[chineseType] || null; // 如果指定类型不存在，返回 null
+            const responseData = user.personal_data[chineseType] || null; // 如果指定类型不存在，返回 null
             res.status(200).json({ data: responseData, _id: _id });
         } else {
             res.status(404).json({ message: 'User not found' });
@@ -163,6 +156,64 @@ router.post('/save-data', async (req, res) => {
         res.status(200).json({ message: "Data updated successfully" });
     } catch (error) {
         res.status(500).json({ message: "Failed to update data", error: error.toString() });
+    }
+});
+
+router.post('/improved-users/generate-resume', async (req, res) => {
+    const { id } = req.body;
+    const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id],
+        {
+            env: {
+                ...process.env,
+            }
+        }
+    );
+    processResult[id] = { status: 'running' };
+    pythonProcess.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    pythonProcess.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+        processResult[id].status = 'done';
+    });
+
+    res.status(200).json({ message: "Resume generation started" });
+});
+
+router.post('/improved-users/resume-result', (req, res) => {
+    const { id } = req.body;
+    const result = processResult[id];
+    if (!result) {
+        return res.status(404).json({ message: 'No result found' });
+    }
+    if (result.status === 'running') {
+        return res.status(202).json({ message: 'Result is still running' });
+    }
+    if (result.status === 'done') {
+        return res.status(200).json({ message: 'Result is ready' });
+    }
+});
+
+router.post('/improved-users/markdown', async (req, res) => {
+    const { id } = req.body;
+    try {
+        const record = await ImprovedUser.findById(id);
+        if (!record) {
+            return res.status(404).send({ message: "User not found" });
+        }
+        const markdown = record.improved_cv_md;
+        if (!markdown) {
+            return res.status(404).send({ message: "Markdown data not found for the user" });
+        }
+        res.type('text/markdown').status(200).send(markdown);
+    } catch (error) {
+        console.error('Failed to retrieve user data:', error);
+        res.status(500).send({ message: "Server error while retrieving data" });
     }
 });
 

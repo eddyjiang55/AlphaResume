@@ -6,10 +6,12 @@ import ResumeNavbar from "../components/resume-navbar";
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
+  console.log(context.query);
   if (context.query.id) {
     // Fetch dbFormData from external API
     const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/skills`)
     const dbData = await res.json();
+    console.log(dbData);
     if (dbData.data) {
       const displayData = dbData.data.map((data) => {
         return {
