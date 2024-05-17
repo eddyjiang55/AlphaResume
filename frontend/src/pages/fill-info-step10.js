@@ -53,7 +53,7 @@ export default function Step10Page({ dbFormData }) {
       })
     });
     if (response.status === 200) {
-      router.push('/generate-resume');
+      router.push('/generated-resume?id=' + dbFormData._id);
     } else {
       alert('Failed to generate resume');
     }

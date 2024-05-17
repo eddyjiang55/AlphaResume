@@ -8,6 +8,7 @@ const chatHisRoutes = require('./routes/chatHisRoutes');
 const impUserRoutes = require('./routes/impUserRoutes');
 const resumeChatRoutes = require('./routes/resumeChatRoutes');
 const authRoutes = require('./routes/authRoutes');
+require('dotenv').config();
 
 app.use(cors());
 app.use(express.json());
@@ -74,6 +75,7 @@ app.post('/api/resume', async (req, res) => {
 
 app.get('/api/result/:id', (req, res) => {
    const id = req.params.id;
+   console.log(id);
    const result = processResult[id];
    if (!result) {
       return res.status(404).json({ message: 'No result found' });

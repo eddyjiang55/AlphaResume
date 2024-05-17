@@ -182,7 +182,6 @@ export default function Step7Page({ dbFormData }) {
       .then(response => response.json())
       .then(data => {
         console.log('Save successful:', data);
-        router.push('/fill-info-step8');
       })
       .catch(error => {
         console.error('Save error:', error);
@@ -516,7 +515,7 @@ export default function Step7Page({ dbFormData }) {
             </button>
           </div>
         </div>
-        <div className='w-1/2 bg-[#EDF8FD] h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch '>
+        <div className='w-1/2 bg-light-blue h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch '>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
           <p className='text-black text-base font-normal'>
             Tips（未完善）

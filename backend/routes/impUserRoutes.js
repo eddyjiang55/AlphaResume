@@ -161,7 +161,13 @@ router.post('/save-data', async (req, res) => {
 
 router.post('/improved-users/generate-resume', async (req, res) => {
     const { id } = req.body;
-    const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id]);
+    const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id],
+        {
+            env: {
+                ...process.env,
+            }
+        }
+    );
     processResult[id] = { status: 'running' };
     pythonProcess.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);
@@ -179,8 +185,8 @@ router.post('/improved-users/generate-resume', async (req, res) => {
     res.status(200).json({ message: "Resume generation started" });
 });
 
-router.get('/improved-users/result/:id', (req, res) => {
-    const id = req.params.id;
+router.post('/improved-users/resume-result', (req, res) => {
+    const { id } = req.body;
     const result = processResult[id];
     if (!result) {
         return res.status(404).json({ message: 'No result found' });
@@ -193,14 +199,14 @@ router.get('/improved-users/result/:id', (req, res) => {
     }
 });
 
-router.get('/improved-users/markdown/:id', async (req, res) => {
-    const id = req.params.id;
+router.post('/improved-users/markdown', async (req, res) => {
+    const { id } = req.body;
     try {
         const record = await ImprovedUser.findById(id);
         if (!record) {
             return res.status(404).send({ message: "User not found" });
         }
-        const markdown = record.personal_data;
+        const markdown = record.improved_cv_md;
         if (!markdown) {
             return res.status(404).send({ message: "Markdown data not found for the user" });
         }
