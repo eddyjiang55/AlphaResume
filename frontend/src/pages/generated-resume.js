@@ -83,8 +83,8 @@ export default function GeneratedResumePage({ dbFormData }) {
     <div className="w-full h-screen flex flex-col overflow-hidden bg-light-blue">
       <Navbar />
       <ResumeNavbar />
-      <div className='grid grid-cols-12 max-h-[calc(100%-170px)] h-full gap-x-8 pb-2'>
-        <div id="edit zone" className='col-span-5 overflow-y-auto p-8 flex flex-col justify-center items-center'>
+      <div className='grid grid-cols-12 max-h-[calc(100%-250px)] h-full gap-x-8 pb-2 overflow-y-auto'>
+        <div id="edit zone" className='col-span-5 p-8 flex flex-col justify-center items-center'>
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">编辑简历</h2>
           <div className='w-full rounded-lg bg-white shadow-lg flex-1'>
             {loading ? <p>Loading...</p> :
@@ -93,7 +93,7 @@ export default function GeneratedResumePage({ dbFormData }) {
           </div>
 
         </div>
-        <div id="output zone" className='col-span-5 overflow-y-auto p-8 flex flex-col justify-center items-center'>
+        <div id="output zone" className='col-span-5 p-8 flex flex-col justify-center items-center'>
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">导出效果</h2>
           <div className='w-full rounded-lg bg-white shadow-lg flex-1'>
             {loading ? <p>Loading...</p> :
