@@ -116,19 +116,44 @@ router.patch('/improved-users/:_id', async (req, res) => {
     }
 });
 
-// 删除用户
-router.delete('/improved-users/:_id', async (req, res) => {
+// 删除用户，并从账户的 improvedUsers 列表中删除其 ID
+router.delete('/improved-users', async (req, res) => {
+    const { phoneNumber, improvedUserId } = req.body;
+
+    if (!phoneNumber || !improvedUserId) {
+        return res.status(400).json({ message: 'Phone number and improvedUserId are required' });
+    }
+
     try {
-        const deleteResult = await ImprovedUser.deleteById(req.params._id);
-        if (deleteResult.deletedCount === 0) {
-            return res.status(404).json({ message: 'No user found to delete' });
+        // 查找对应的账户
+        const account = await Account.findByPhoneNumber(phoneNumber);
+        if (!account) {
+            return res.status(404).json({ message: 'Account not found' });
         }
-        res.json({ message: 'User deleted successfully' });
+
+        // 从账户的 improvedUsers 列表中删除 improvedUserId
+        const updateResult = await Account.updateOne(
+            { _id: account._id },
+            { $pull: { improvedUsers: improvedUserId } }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+            return res.status(404).json({ message: 'ImprovedUser ID not found in account' });
+        }
+
+        // 删除 improvedUser
+        const deleteResult = await ImprovedUser.deleteById(improvedUserId);
+        if (deleteResult.deletedCount === 0) {
+            return res.status(404).json({ message: 'ImprovedUser not found' });
+        }
+
+        res.json({ message: 'ImprovedUser deleted successfully and removed from account' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to delete user', error: error.toString() });
+        res.status(500).json({ message: 'Failed to delete improved user or update account', error: error.toString() });
     }
 });
+
 
 // POST请求，保存数据到相应的集合
 // 更新个人信息数据

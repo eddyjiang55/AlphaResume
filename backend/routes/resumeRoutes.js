@@ -72,12 +72,6 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
 });
 
 
-
-
-
-
-
-
 router.delete('/resume-history/:_id', async (req, res) => {
     try {
         const _id = req.params._id; // 从URL参数中获取_id
@@ -175,17 +169,22 @@ router.post('/resume-info', upload.single('pdfFile'), async (req, res) => {
 
 router.get('/download-pdf/:resumeHistoryId', async (req, res) => {
     const { resumeHistoryId } = req.params;
-    const pdfData = await ResumeHistory.getPDFData(resumeHistoryId);
+    const resumeHistory = await ResumeHistory.findById(resumeHistoryId);
 
-    if (!pdfData) {
+    if (!resumeHistory || !resumeHistory.pdfData) {
         return res.status(404).send('PDF not found');
     }
 
-    // 设置适当的响应头以返回文件内容
+    const pdfData = Buffer.from(resumeHistory.pdfData, 'base64');
+    console.log("PDF data length: ", pdfData.length);
+        if (pdfData.length === 0) {
+            console.log("Warning: PDF data is empty after conversion from Base64.");
+        }
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="downloaded_resume.pdf"');
     res.send(pdfData);
 });
+
 
 
 
