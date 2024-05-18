@@ -77,7 +77,7 @@ const LoginPage = () => {
   return (
     <>
       <div className="flex justify-between min-h-screen">
-      <div className="flex flex-col justify-center items-center w-1/2 bg-custom-blue text-white">
+      <div className="flex flex-col justify-center items-center w-1/2 bg-alpha-blue text-white">
         <div className='flex items-center fixed left-0 top-0 pl-8 pt-5'>
             <img src='/img/back.svg' width={40} height={40} alt="Back" />
             <a href='/' className="text-white">返回</a>
