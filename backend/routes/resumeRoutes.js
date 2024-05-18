@@ -185,6 +185,26 @@ router.get('/download-pdf/:resumeHistoryId', async (req, res) => {
     res.send(pdfData);
 });
 
+router.get('/resume-details/:resumeHistoryId', async (req, res) => {
+    const { resumeHistoryId } = req.params;  // 获取路由参数中的resumeHistoryId
+
+    try {
+        const resumeHistory = await ResumeHistory.findById(resumeHistoryId);  // 使用已有的findById方法查找记录
+
+        if (!resumeHistory) {
+            return res.status(404).json({ message: 'Resume history not found' });  // 如果没有找到记录，返回404
+        }
+
+        // 返回所需的title和createdAt信息
+        res.status(200).json({
+            title: resumeHistory.title,
+            createdAt: resumeHistory.createdAt
+        });
+    } catch (error) {
+        console.error("Error fetching resume details:", error);
+        res.status(500).json({ message: "Failed to fetch resume details", error: error.toString() });
+    }
+});
 
 
 
