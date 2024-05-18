@@ -28,10 +28,10 @@ def get_improved_cv_json(information, cv_key_order, notarget_list, target_list, 
             improved_cv_json[key] = information['用户信息'][key]
         if key in target_list:
             improved_cv_json[key] = qwen.QA(key,information)
-            time.sleep(10)
+            time.sleep(1)
         if key in keywords_target_list:
             improved_cv_json[key] = qwen.QAKeywords(key,job_keywords,information)
-            time.sleep(10)
+            time.sleep(1)
     return improved_cv_json
 
 def split_cv_into_twoparts(improved_cv_json):
