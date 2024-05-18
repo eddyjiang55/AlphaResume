@@ -1,9 +1,11 @@
 import React ,{ useState,useEffect, useRef }from 'react';
 import { useRouter } from 'next/router';
 import { useSelector ,useDispatch} from 'react-redux'; 
+import { deleteResumeCard } from '../store/features/resumeSlice';
 
-function ResumeBox({ resumeData}) {
+function ResumeBox({ resumeData,onDelete}) {
     const router = useRouter();
+    const dispatch = useDispatch();
     const [showConfirm, setShowConfirm] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
     const menuRef = useRef();
@@ -34,7 +36,7 @@ function ResumeBox({ resumeData}) {
 
     const handleClick = () => {
         // 使用写死的 ID 进行路由跳转
-        router.push(`/fill-info-step10?${userId}`);
+        router.push(`/fill-info-step1?${userId}`);
     };
 
 
@@ -50,7 +52,8 @@ function ResumeBox({ resumeData}) {
         })
         .then(data => {
             console.log('Delete successful:', data);
-            dispatch(deleteResumeCard(userId));
+            // dispatch(deleteResumeCard(userId));
+            onDelete(resumeData._id); 
             setShowConfirm(false); // 关闭确认框
         })
         .catch(error => {
@@ -94,9 +97,7 @@ function ResumeBox({ resumeData}) {
             </div>
             <div className="inner-div">
                 <div className="newActions">
-                    <button className="actionButton" onClick={
-                        ()=>handleClick('f0c086b6-1c3b-4e87-b39e-39e7d4392b1b'
-    )}>编辑</button>
+                    <button className="actionButton" onClick={handleClick}>编辑</button>
                     <button className="actionButton" onClick={()=>{handleDownloadPdf('87c1fbdc-a883-48ce-9864-0cc2b1e34138')}}>下载PDF</button>
                 </div>
             </div>
@@ -105,9 +106,7 @@ function ResumeBox({ resumeData}) {
                 {menuVisible && (
                     <div className="dropdown-menu" ref={menuRef}>
                         <ul>
-                            <li  onClick={
-                        ()=>handleClick('f0c086b6-1c3b-4e87-b39e-39e7d4392b1b'
-    )}>编辑</li>
+                            <li onClick={handleClick}>编辑</li>
                             <li onClick={()=>handleClick('f0c086b6-1c3b-4e87-b39e-39e7d4392b1b')}>预览</li>
                             <li onClick={confirmDelete}>删除</li>
                         </ul>

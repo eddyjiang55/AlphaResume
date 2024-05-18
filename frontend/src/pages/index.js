@@ -2,14 +2,15 @@ import React, { useState,useEffect } from 'react';
 import Navbar from '../components/navbar';
 import { useDispatch, useSelector } from 'react-redux';
 import ResumeCard from '../components/resumeCard';
-import { setUserDetail, setResumeCards } from '../store/features/resumeSlice';
+import { setUserDetail, setResumeCards ,toggleResume,deleteResumeCard} from '../store/features/resumeSlice';
  
 
 const SplitBackgroundPage = () => {
 
     const dispatch = useDispatch();
     const resumeData = useSelector((state) => state.resume.cards);
-    const userId = useSelector((state) => state.user.id); // 从 Redux 获取用户 ID
+    const userId = useSelector((state) => state.user.id);
+    const resumeVisible = useSelector((state) => state.resume.resumeVisible);  
 
     useEffect(() => {
         if (userId) {
@@ -18,12 +19,22 @@ const SplitBackgroundPage = () => {
             .then(userData => {
               dispatch(setUserDetail(userData));
               dispatch(setResumeCards([userData])); 
+              dispatch(toggleResume(true));
+              console.log(111111);
             })
             .catch(error => {
               console.error('Error fetching user detail:', error);
             });
         }
     },[userId, dispatch])
+
+
+  const handleDelete = (id) => {
+    dispatch(deleteResumeCard(id));
+    if (resumeData.length === 1) {
+      dispatch(toggleResume(false));  
+    }
+  };
     
     // const [resumeData, setResumeData] = useState( [{
     //     title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
@@ -121,8 +132,8 @@ const SplitBackgroundPage = () => {
                 </div>
                 <div className="bottom-half"></div>
                 <div className="resumeContainer">
-          {resumeData.length > 0 && resumeData.map((data, index) => (
-            <ResumeCard key={index} resumeData={data} />
+                {resumeVisible && resumeData.length > 0 && resumeData.map((data) => (
+            <ResumeCard key={data.id} resumeData={data} onDelete={handleDelete} />
           ))}
         </div>
             </div>
