@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ImprovedUser = require('../mongodb/models/ImprovedUser.js'); // 确保路径与你的项目结构相匹配
+const Account = require('../mongodb/models/Account'); // 引入Account模型
 const { spawn } = require('child_process');
 
 // 定义英文到中文的映射
@@ -23,7 +24,7 @@ router.post('/improved-users', async (req, res) => {
     try {
         const newUser = new ImprovedUser(
             req.body.基本信息,
-            req.body.个人评价, // 添加个人评价的处理
+            req.body.个人评价,
             req.body.教育经历,
             req.body.职业经历,
             req.body.项目经历,
@@ -32,11 +33,25 @@ router.post('/improved-users', async (req, res) => {
             req.body.技能,
             req.body.科研论文与知识产权
         );
-        const _id = await newUser.save();
-        res.status(201).json({ message: 'Improved user created successfully', _id: _id });
+        const _id = await newUser.save();  // 保存ImprovedUser并获取其ID
+
+        // 从请求中获取Account的phoneNumber
+        const { phoneNumber } = req.body;
+        if (!phoneNumber) {
+            return res.status(400).json({ message: 'Phone number is required to link account' });
+        }
+
+        // 查找Account并添加ImprovedUser的ID
+        const account = await Account.findByPhoneNumber(phoneNumber);
+        if (account) {
+            await Account.addImprovedUser(account._id, _id);
+            res.status(201).json({ message: 'Improved user created successfully and added to account', _id: _id });
+        } else {
+            res.status(404).json({ message: 'Account not found' });
+        }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to create improved user', error: error.toString() });
+        res.status(500).json({ message: 'Failed to create improved user or update account', error: error.toString() });
     }
 });
 
@@ -94,19 +109,44 @@ router.patch('/improved-users/:_id', async (req, res) => {
     }
 });
 
-// 删除用户
-router.delete('/improved-users/:_id', async (req, res) => {
+// 删除用户，并从账户的 improvedUsers 列表中删除其 ID
+router.delete('/improved-users', async (req, res) => {
+    const { phoneNumber, improvedUserId } = req.body;
+
+    if (!phoneNumber || !improvedUserId) {
+        return res.status(400).json({ message: 'Phone number and improvedUserId are required' });
+    }
+
     try {
-        const deleteResult = await ImprovedUser.deleteById(req.params._id);
-        if (deleteResult.deletedCount === 0) {
-            return res.status(404).json({ message: 'No user found to delete' });
+        // 查找对应的账户
+        const account = await Account.findByPhoneNumber(phoneNumber);
+        if (!account) {
+            return res.status(404).json({ message: 'Account not found' });
         }
-        res.json({ message: 'User deleted successfully' });
+
+        // 从账户的 improvedUsers 列表中删除 improvedUserId
+        const updateResult = await Account.updateOne(
+            { _id: account._id },
+            { $pull: { improvedUsers: improvedUserId } }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+            return res.status(404).json({ message: 'ImprovedUser ID not found in account' });
+        }
+
+        // 删除 improvedUser
+        const deleteResult = await ImprovedUser.deleteById(improvedUserId);
+        if (deleteResult.deletedCount === 0) {
+            return res.status(404).json({ message: 'ImprovedUser not found' });
+        }
+
+        res.json({ message: 'ImprovedUser deleted successfully and removed from account' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to delete user', error: error.toString() });
+        res.status(500).json({ message: 'Failed to delete improved user or update account', error: error.toString() });
     }
 });
+
 
 // POST请求，保存数据到相应的集合
 // 更新个人信息数据

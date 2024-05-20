@@ -101,7 +101,6 @@ router.post('/resume-history/resume_result', async (req, res) => {
     }
 });
 
-
 router.delete('/resume-history/:_id', async (req, res) => {
     try {
         const _id = req.params._id; // 从URL参数中获取_id
@@ -199,16 +198,41 @@ router.post('/resume-info', upload.single('pdfFile'), async (req, res) => {
 
 router.get('/download-pdf/:resumeHistoryId', async (req, res) => {
     const { resumeHistoryId } = req.params;
-    const pdfData = await ResumeHistory.getPDFData(resumeHistoryId);
+    const resumeHistory = await ResumeHistory.findById(resumeHistoryId);
 
-    if (!pdfData) {
+    if (!resumeHistory || !resumeHistory.pdfData) {
         return res.status(404).send('PDF not found');
     }
 
-    // 设置适当的响应头以返回文件内容
+    const pdfData = Buffer.from(resumeHistory.pdfData, 'base64');
+    console.log("PDF data length: ", pdfData.length);
+        if (pdfData.length === 0) {
+            console.log("Warning: PDF data is empty after conversion from Base64.");
+        }
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="downloaded_resume.pdf"');
     res.send(pdfData);
+});
+
+router.get('/resume-details/:resumeHistoryId', async (req, res) => {
+    const { resumeHistoryId } = req.params;  // 获取路由参数中的resumeHistoryId
+
+    try {
+        const resumeHistory = await ResumeHistory.findById(resumeHistoryId);  // 使用已有的findById方法查找记录
+
+        if (!resumeHistory) {
+            return res.status(404).json({ message: 'Resume history not found' });  // 如果没有找到记录，返回404
+        }
+
+        // 返回所需的title和createdAt信息
+        res.status(200).json({
+            title: resumeHistory.title,
+            createdAt: resumeHistory.createdAt
+        });
+    } catch (error) {
+        console.error("Error fetching resume details:", error);
+        res.status(500).json({ message: "Failed to fetch resume details", error: error.toString() });
+    }
 });
 
 

@@ -57,9 +57,22 @@ class ResumeHistory {
         const db = await connect();
         const collection = db.collection('resumeHistories');
         const resumeHistory = await collection.findOne({ _id: resumeHistoryId });
-        await db.client.close(); // 确保在数据被成功获取后关闭数据库连接
-        return resumeHistory ? resumeHistory.pdfData : null;
+        await db.client.close();
+    
+        if (!resumeHistory) {
+            console.log("No resume history found with ID:", resumeHistoryId);
+            return null;
+        }
+    
+        if (!resumeHistory.pdfData) {
+            console.log("Resume history found, but no PDF data available.");
+            return null;
+        }
+    
+        console.log("PDF data fetched, length:", resumeHistory.pdfData.length || "unknown");
+        return resumeHistory.pdfData;
     }
+    
 }
 
 module.exports = ResumeHistory;

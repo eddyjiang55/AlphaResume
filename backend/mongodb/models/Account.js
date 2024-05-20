@@ -1,32 +1,35 @@
 const { connect } = require('../dbconfig'); // 确保正确引入数据库配置
 const { ObjectId } = require('mongodb');
+const { v4: uuidv4 } = require('uuid');
 
 class Account {
-    constructor(phoneNumber, nickname, avatar, improvedUsers = []) {
-        this.phoneNumber = phoneNumber; // 非空验证可以在API层面处理
+    constructor(phoneNumber, nickname, avatar, improvedUsers = [], id = null) {
+        this._id = id || uuidv4(); // 生成UUID，如果未提供id
+        this.phoneNumber = phoneNumber; 
         this.nickname = nickname;
         this.avatar = avatar;
-        this.improvedUsers = improvedUsers; // 存储相关ImprovedUser的ID数组
+        this.improvedUsers = improvedUsers;
     }
 
     async save() {
         const db = await connect();
         const collection = db.collection('accounts');
+        // 检查账户是否已存在
+        const existingAccount = await collection.findOne({ phoneNumber: this.phoneNumber });
+        if (existingAccount) {
+            // 如果账户已存在，返回现有的ID
+            return existingAccount._id;
+        }
+        // 否则，插入新账户
         const result = await collection.insertOne(this);
         return result.insertedId;
     }
-
-    // static async findById(id) {
-    //     const db = await connect();
-    //     const collection = db.collection('accounts');
-    //     return await collection.findOne({ _id: ObjectId(id) });
-    // }
 
     static async addImprovedUser(accountId, improvedUserId) {
         const db = await connect();
         const collection = db.collection('accounts');
         const result = await collection.updateOne(
-            { _id: ObjectId(accountId) },
+            { _id: accountId }, // 直接使用UUID
             { $push: { improvedUsers: improvedUserId } }
         );
         return result;
@@ -39,10 +42,14 @@ class Account {
     }
     
     static async create(accountData) {
-        const db = await connect();
-        const collection = db.collection('accounts');
-        const result = await collection.insertOne(accountData);
-        return result.insertedId;
+        const account = new Account(
+            accountData.phoneNumber, 
+            accountData.nickname, 
+            accountData.avatar, 
+            accountData.improvedUsers, 
+            accountData._id
+        );
+        return await account.save();
     }
 }
 
