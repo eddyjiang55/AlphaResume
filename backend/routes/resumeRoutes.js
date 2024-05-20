@@ -5,8 +5,8 @@ const router = express.Router();
 const multer = require('multer');
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
-const { convertToMarkdown } = require('../utils/pdfToMarkdown'); 
-const { exec } = require('child_process'); // To run Python scripts
+const { convertToMarkdown } = require('../utils/pdfToMarkdown');
+const { spawn } = require('child_process'); // To run Python scripts
 const { v4: uuidv4 } = require('uuid');
 
 // 假设有一个用于处理文件上传的中间件
@@ -14,18 +14,21 @@ const storage = multer.memoryStorage(); // 使用内存存储来处理文件
 const upload = multer({ storage: storage });
 // const upload = require('../middleware/uploadMiddleware');
 
+let processResult = {};
+
 
 // 上传简历并保存记录
 router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
+    console.log(req.body);
     try {
         // 直接从 req.body 访问数据
         const account = req.body.account;
         const createdAt = req.body.createdAt;
         const title = req.body.title;
         const position = req.body.position;
-        const improved_user_id = req.body.improvedUserId;
-        const resume_history_id = req.body.resumeHistoryId;
-
+        const improved_user_id = req.body.improved_user_id;
+        // const resume_history_id = req.body.resumeHistoryId;
+        console.log(improved_user_id);
 
         if (!req.file) {
             return res.status(400).json({ message: "No PDF file uploaded" });
@@ -33,7 +36,7 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
 
         const pdfData = req.file.buffer;
         const markdownData = await convertToMarkdown(pdfData); // 假设这个函数同步执行并返回Markdown数据
-        
+
 
         // 将简历数据保存到数据库
         const newResume = new ResumeHistory(
@@ -43,26 +46,35 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
             position,
             pdfData,
             markdownData,
-            resume_history_id
+            // resume_history_id
         );
 
 
-        await newResume.save(); // 保存并获取ID
+        const resume_history_id = await newResume.save(); // 保存并获取ID
+        console.log(resume_history_id);
 
         // 调用Python脚本进行进一步处理
-        exec(`python3 ./pyScripts/pdf_reader.py ${resume_history_id} ${improved_user_id}`, (err, stdout, stderr) => {
-            if (err) {
-                console.error("Error running Python script:", err);
-                return res.status(500).json({ message: "Failed to process PDF", error: err.toString() });
-            }
+        const pythonProcess = spawn('python3', ['./pyScripts/pdf_reader.py', resume_history_id, improved_user_id]);
+        processResult[improved_user_id] = { status: 'running' };
 
-            // console.log("Python script output:", stdout);
+        pythonProcess.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+        });
 
-            res.status(200).json({
-                message: "Resume uploaded and processed successfully",
-                resumeHistoryId: resume_history_id,
-                improvedUserId: improved_user_id
-            });
+        pythonProcess.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+
+        pythonProcess.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+            processResult[improved_user_id].status = 'done';
+        });
+
+        // Return immediate response
+        res.status(200).json({
+            message: "Resume uploaded and processing started",
+            history_id: resume_history_id,
+            _id: improved_user_id,
         });
 
     } catch (error) {
@@ -71,11 +83,23 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
     }
 });
 
+router.post('/resume-history/resume_result', async (req, res) => {
+    const { id } = req.body;
+    console.log(processResult)
+    const result = processResult[id];
 
+    if (!result) {
+        return res.status(404).json({ message: 'No result found' });
+    }
 
-
-
-
+    if (result.status === 'running') {
+        return res.status(202).json({ message: 'Result is still running' });
+    } else if (result.status === 'done') {
+        // remove from processResult
+        delete processResult[id];
+        return res.status(200).json({ message: 'Result is ready' });
+    }
+});
 
 
 router.delete('/resume-history/:_id', async (req, res) => {
