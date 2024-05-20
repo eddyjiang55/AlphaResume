@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
@@ -7,7 +7,7 @@ export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    console.log(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/basicInformation`);
+    // console.log(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/basicInformation`);
     const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/basicInformation`)
     dbFormData = await res.json();
   } else {
@@ -27,6 +27,9 @@ export async function getServerSideProps(context) {
 
 export default function Step1Page({ dbFormData }) {
   const router = useRouter();
+  const [isDragging, setIsDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
+  console.log(dbFormData);
 
   // 使用 useState 钩子初始化表单状态
   const [form, setForm] = useState(dbFormData.data || {
@@ -42,40 +45,109 @@ export default function Step1Page({ dbFormData }) {
 
   const handleDragOver = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const files = e.dataTransfer.files;
-    if (files.length) {
-      uploadFile(files[0]);
+    e.stopPropagation();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      uploadFile(file, {
+        account: 'sample_acccount',
+        createdAt: new Date(),
+        title: 'sample_title',
+        position: 'sample_position',
+        improved_user_id: dbFormData._id,
+      });
     }
+    setIsDragging(false);
   };
 
-  const uploadFile = (file) => {
+  const fileInputRef = useRef(null);
+
+  const handleClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const uploadFile = (file, additionalParams) => {
+    console.log(additionalParams);
     const formData = new FormData();
     formData.append('pdfFile', file);
+    for (const key in additionalParams) {
+      formData.append(key, additionalParams[key]);
+    }
 
-    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/resume-info', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/resume-history', {
       method: 'POST',
       body: formData,
     })
       .then(response => response.json())
       .then(data => {
-        console.log('Upload successful:', data);
-        // 使用上传成功的数据更新表单状态
-        setForm({
-          ...form, // 保留其他表单项
-          名: data.givenName,
-          姓: data.surname,
-          电话号码: data.phones[0],
-          邮箱地址: data.emails[0],
-          微信号: data.wechats[0]
-        });
+        setLoading(true);
       })
       .catch(error => {
         console.error('Upload error:', error);
       });
+  };
+
+  useEffect(() => {
+    let fetchStatusInterval;
+
+    const checkStatus = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resume-history/resume_result`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: dbFormData._id }),
+        });
+
+        if (response.status === 200) {
+          clearInterval(fetchStatusInterval);
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${dbFormData._id}/basicInformation`);
+          const formData = await res.json();
+          setForm(formData.data);
+          console.log(formData);
+          setLoading(false);
+        } else if (response.status === 202) {
+          console.log('Processing...');
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+
+    if (loading) {
+      fetchStatusInterval = setInterval(checkStatus, 10000);
+    }
+
+    return () => clearInterval(fetchStatusInterval);
+  }, [loading, dbFormData._id]);
+
+
+
+
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      uploadFile(file, {
+        account: 'sample_acccount',
+        createdAt: new Date(),
+        title: 'sample_title',
+        position: 'sample_position',
+        improvedUserId: dbFormData._id,
+        resume_history_id: 'sample_resume_history_id',
+      }); // Replace this with your upload function
+    }
   };
 
   // 更新表单字段的处理函数
@@ -147,7 +219,14 @@ export default function Step1Page({ dbFormData }) {
           <div className="w-full mt-8">
             <div className='w-auto mx-auto flex flex-row justify-center items-center gap-x-10'>
               <span className="info-text">若已有简历，上传简历我们帮您解析：</span>
-              <button className="info-button" onDragOver={handleDragOver} onDrop={handleDrop}>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className='hidden'
+                onChange={handleFileInputChange}
+                accept=".pdf"
+              />
+              <button className={`flex flex-row items-center px-12 border border-solid border-alpha-blue rounded cursor-pointer transition-colors duration-100 ${isDragging ? 'bg-gray-300' : 'bg-white'}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick}>
                 <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
                 拖曳文件到此处上传
               </button>
@@ -193,11 +272,34 @@ export default function Step1Page({ dbFormData }) {
           <button className='form-b' type="button" onClick={handleSubmit}>下一步</button>
         </div>
       </div>
-      {error && <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2'>
-        <p className='text-base font-bold text-wrap text-center py-4 px-4'>本页存在必填项未填写，请检查并完成所有*标记项后重试。</p>
-        <div className='w-full border border-alpha-blue ' />
-        <button className='py-2 px-4 text-base' onClick={() => setError(false)}>了解</button>
-      </div>}
+      {
+        error && (<div>
+          <div
+            className='fixed inset-0 bg-black opacity-50 z-40'
+            onClick={() => setError(false)}
+          />
+          <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
+            <p className='text-base font-bold text-wrap text-center py-4 px-4'>
+              本页存在必填项未填写，请检查并完成所有*标记项后重试。
+            </p>
+            <div className='w-full border border-alpha-blue' />
+            <button className='py-2 px-4 text-base' onClick={() => setError(false)}>了解</button>
+          </div>
+        </div>)
+      }
+      {loading && (
+        <div>
+          <div className='fixed inset-0 bg-black opacity-50 z-40' />
+          <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
+            <p className='text-base font-bold text-wrap text-center py-4 px-4'>
+              正在上传文件，请稍后...
+            </p>
+            <div className='w-full border border-alpha-blue' />
+            <button className='py-2 px-4 text-base' disabled>了解</button>
+          </div>
+        </div>
+      )
+      }
       <style jsx>{`
         .background{
           background-color: #EDF8FD;
@@ -323,7 +425,7 @@ export default function Step1Page({ dbFormData }) {
           height: 50px; // 调整图标大小
         }
       `}</style>
-    </div>
+    </div >
   );
 }
 

@@ -15,7 +15,9 @@ class ResumeHistory {
     async save() {
         const db = await connect();
         const collection = db.collection('resumeHistories');
+        console.log("connected to db");
         const result = await collection.insertOne(this);
+        console.log(result);
         return result.insertedId;
     }
   
