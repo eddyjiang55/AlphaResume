@@ -1,7 +1,35 @@
 import React from 'react';
 import Navbar from '../components/navbar';
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
+import { setId } from '../store/slices/userSlice';
 
 const SplitBackgroundPage = () => {
+
+    const router = useRouter();
+    const dispatch = useDispatch();
+
+    const handleClick = async (event) => {
+        event.preventDefault(); 
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+    
+          if (response.ok) {
+            const data = await response.json();
+            dispatch(setId(data._id)); // 将ID存储到Redux
+            router.push('/fill-info-step1'); 
+          } else {
+            console.error('Request failed');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
     return (
         <>
             <Navbar />
@@ -26,7 +54,7 @@ const SplitBackgroundPage = () => {
                             <span>我们将助您快速构建简历</span>
                         </div>
                         <div className='container'>
-                            <a href='/fill-info-step1'><button className='form-b' type="button">开始填写</button></a>
+                           <button className='form-b' type="button" onClick={handleClick}>开始填写</button>
                         </div>
                     </div>
                     <div className='title'>方式二：</div>

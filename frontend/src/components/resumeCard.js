@@ -90,7 +90,7 @@ function ResumeBox({ resumeData}) {
             <div className="inner-div">
                 <div className="newActions">
                     <button className="actionButton">编辑</button>
-                    <button className="actionButton" onClick={()=>{handleDownloadPdf('f0c086b6-1c3b-4e87-b39e-39e7d4392b1b')}}>下载PDF</button>
+                    <button className="actionButton" onClick={()=>{handleDownloadPdf('87c1fbdc-a883-48ce-9864-0cc2b1e34138')}}>下载PDF</button>
                 </div>
             </div>
             <div className="menu-container">
