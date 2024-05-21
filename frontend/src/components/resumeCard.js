@@ -3,13 +3,14 @@ import { useRouter } from 'next/router';
 import { useSelector ,useDispatch} from 'react-redux'; 
 import { deleteResumeCard } from '../store/features/resumeSlice';
 
-function ResumeBox({ resumeData,onDelete}) {
+function ResumeBox({ resumeData,onDelete,title}) {
     const router = useRouter();
     const dispatch = useDispatch();
     const [showConfirm, setShowConfirm] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
     const menuRef = useRef();
 
+    console.log(title,"---")
    // 从 Redux 中获取存储的 id
    const userId = useSelector((state) => state.user.id);
 
@@ -92,7 +93,7 @@ function ResumeBox({ resumeData,onDelete}) {
         <>
         <div className="resumeBox">
             <div className="inner-div">
-                <div className="resumeTitle">{resumeData.title}</div>
+                <div className="resumeTitle">{title}</div>
                 <div className='textDetail'>{resumeData.details}</div>
             </div>
             <div className="inner-div">

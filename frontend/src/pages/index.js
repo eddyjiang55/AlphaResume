@@ -10,7 +10,8 @@ const SplitBackgroundPage = () => {
     const dispatch = useDispatch();
     const resumeData = useSelector((state) => state.resume.cards);
     const userId = useSelector((state) => state.user.id);
-    const resumeVisible = useSelector((state) => state.resume.resumeVisible);  
+    const resumeVisible = useSelector((state) => state.resume.resumeVisible); 
+    const [title, setTitle] = useState(''); 
 
     useEffect(() => {
         if (userId) {
@@ -20,7 +21,7 @@ const SplitBackgroundPage = () => {
               dispatch(setUserDetail(userData));
               dispatch(setResumeCards([userData])); 
               dispatch(toggleResume(true));
-              console.log(111111);
+              setTitle(userData["基本信息"].title); 
             })
             .catch(error => {
               console.error('Error fetching user detail:', error);
@@ -133,7 +134,7 @@ const SplitBackgroundPage = () => {
                 <div className="bottom-half"></div>
                 <div className="resumeContainer">
                 {resumeVisible && resumeData.length > 0 && resumeData.map((data) => (
-            <ResumeCard key={data.id} resumeData={data} onDelete={handleDelete} />
+            <ResumeCard key={data.id} resumeData={data} title={title} onDelete={handleDelete} />
           ))}
         </div>
             </div>
