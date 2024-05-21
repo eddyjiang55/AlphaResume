@@ -73,6 +73,12 @@ class ResumeHistory {
         return resumeHistory.pdfData;
     }
     
+    static async update(id, updateData) {
+        const db = await connect();
+        const collection = db.collection('resumeHistories');
+        const result = await collection.updateOne({ _id: id }, { $set: updateData });
+        return result;
+    }
 }
 
 module.exports = ResumeHistory;
