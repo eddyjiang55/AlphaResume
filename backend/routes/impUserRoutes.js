@@ -3,6 +3,7 @@ const router = express.Router();
 const ImprovedUser = require('../mongodb/models/ImprovedUser.js'); // 确保路径与你的项目结构相匹配
 const Account = require('../mongodb/models/Account'); // 引入Account模型
 const { spawn } = require('child_process');
+const ResumeHistory = require('../mongodb/models/ResumeHistory');
 
 // 定义英文到中文的映射
 const typeToChinese = {
@@ -16,6 +17,14 @@ const typeToChinese = {
     languages: '语言',
     researchPapersAndPatents: '科研论文与知识产权'
 };
+// 辅助函数：格式化日期为 YYYY-MM-DD
+function formatDate(date) {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始，所以需要加1
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
 
 let processResult = {};
 
@@ -33,7 +42,7 @@ router.post('/improved-users', async (req, res) => {
             req.body.技能,
             req.body.科研论文与知识产权
         );
-        const _id = await newUser.save();  // 保存ImprovedUser并获取其ID
+        const _id = newUser._id;  // 获取新的ImprovedUser的ID
 
         // 从请求中获取Account的phoneNumber
         const { phoneNumber } = req.body;
@@ -45,7 +54,27 @@ router.post('/improved-users', async (req, res) => {
         const account = await Account.findByPhoneNumber(phoneNumber);
         if (account) {
             await Account.addImprovedUser(account._id, _id);
-            res.status(201).json({ message: 'Improved user created successfully and added to account', _id: _id });
+
+            // 创建空白的 ResumeHistory，格式化日期
+            const defaultTitle = "Default Title";
+            const createdAt = formatDate(new Date()); // 当前时间，格式化为 YYYY-MM-DD
+            const newResumeHistory = new ResumeHistory(
+                account._id,
+                createdAt,
+                defaultTitle,
+                "", // position 为空
+                "", // pdfData 为空
+                ""  // markdownData 为空
+            );
+            const resumeHistoryId = await newResumeHistory.save(); // 保存ResumeHistory并获取其ID
+
+            // 将 resumeHistoryId 关联到 ImprovedUser
+            newUser.resumeId = resumeHistoryId;
+
+            // 只需保存一次 ImprovedUser
+            await newUser.save(); 
+
+            res.status(201).json({ message: 'Improved user and resume history created successfully', _id: _id, resumeHistoryId: resumeHistoryId });
         } else {
             res.status(404).json({ message: 'Account not found' });
         }
@@ -159,6 +188,15 @@ router.post('/save-data', async (req, res) => {
         switch (type) {
             case 'basicInformation':  // 新增的基本信息处理
                 updatePath['基本信息'] = data;
+
+                // 从基本信息中找到简历标题并更新到对应的 ResumeHistory 记录
+                const resumeTitle = data.find(item => item.key === '简历标题')?.value;
+                if (resumeTitle) {
+                    const improvedUser = await ImprovedUser.findById(id);
+                    if (improvedUser && improvedUser.resumeId) {
+                        await ResumeHistory.update(improvedUser.resumeId, { title: resumeTitle });
+                    }
+                }
                 break;
             case 'personalEvaluation':
                 updatePath['个人评价'] = data;
