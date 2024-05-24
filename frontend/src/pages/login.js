@@ -113,16 +113,16 @@ const LoginPage = () => {
           <p className="text-sm mb-10 border-b border-gray-300 pb-10">{message}</p>
           <div className='flex flex-col items-center p-4 gap-8'>
             <span>第三方账号快速登录</span>
-            <Image src='/img/wechat.svg' width={50} alt="WeChat Login" />
+            <Image src='/img/wechat.svg' width={50} height={50} alt="WeChat Login" />
           </div>
         </div>
         <div className="flex flex-col justify-center items-center w-1/2 bg-white">
-          <Image src='/img/Logo_y.jpg' width={190} alt="Logo" />
+          <img src='/img/Logo_y.jpg' width={190} alt="Logo" />
           <div className='flex flex-col justify-center text-center p-24 gap-8 text-lg'>
             <p className='text-custom-blue'>从简历到面试，每一步都需精心准备，确保领先在起跑线！简历和面试是求职关键，充足准备才能脱颖而出。别小看每一步，从展现经历到面试应对，都至关重要。</p>
             <p className='text-custom-blue'>放心，我们全程陪伴，助你求职之路更顺畅简单！</p>
           </div>
-          <Image src='/img/background.jpg' alt="Background" />
+          <img src='/img/background.jpg'  alt="Background" />
         </div>
       </div>
     </>
