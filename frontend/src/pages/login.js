@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -72,14 +73,14 @@ const LoginPage = () => {
       setMessage('网络错误，请稍后重试');
     }
   };
-  
+
 
   return (
     <>
       <div className="flex justify-between min-h-screen">
-      <div className="flex flex-col justify-center items-center w-1/2 bg-alpha-blue text-white">
-        <div className='flex items-center fixed left-0 top-0 pl-8 pt-5'>
-            <img src='/img/back.svg' width={40} height={40} alt="Back" />
+        <div className="flex flex-col justify-center items-center w-1/2 bg-alpha-blue text-white">
+          <div className='flex items-center fixed left-0 top-0 pl-8 pt-5'>
+            <Image src='/img/back.svg' width={40} height={40} alt="Back" />
             <a href='/' className="text-white">返回</a>
           </div>
           <div className="text-4xl font-bold py-8">登陆</div>
@@ -106,22 +107,22 @@ const LoginPage = () => {
               同意并阅读 <a href="/terms" className="underline">XX协议</a>
             </label>
           </div>
-        <button className='px-20 py-2 mb-5 bg-white text-blue-600 rounded-full shadow-md hover:bg-blue-50' onClick={handleLogin}>
-          登录
-        </button>
-        <p className="text-sm mb-10 border-b border-gray-300 pb-10">{message}</p>
-        <div className='flex flex-col items-center p-4 gap-8'>
+          <button className='px-20 py-2 mb-5 bg-white text-blue-600 rounded-full shadow-md hover:bg-blue-50' onClick={handleLogin}>
+            登录
+          </button>
+          <p className="text-sm mb-10 border-b border-gray-300 pb-10">{message}</p>
+          <div className='flex flex-col items-center p-4 gap-8'>
             <span>第三方账号快速登录</span>
-            <img src='/img/wechat.svg' width={50} alt="WeChat Login"></img>
+            <Image src='/img/wechat.svg' width={50} alt="WeChat Login" />
           </div>
         </div>
         <div className="flex flex-col justify-center items-center w-1/2 bg-white">
-          <img src='/img/logo_y.jpg' width={190} alt="Logo"></img>
+          <Image src='/img/Logo_y.jpg' width={190} alt="Logo" />
           <div className='flex flex-col justify-center text-center p-24 gap-8 text-lg'>
             <p className='text-custom-blue'>从简历到面试，每一步都需精心准备，确保领先在起跑线！简历和面试是求职关键，充足准备才能脱颖而出。别小看每一步，从展现经历到面试应对，都至关重要。</p>
             <p className='text-custom-blue'>放心，我们全程陪伴，助你求职之路更顺畅简单！</p>
           </div>
-          <img src='/img/background.jpg' alt="Background"></img>
+          <Image src='/img/background.jpg' alt="Background" />
         </div>
       </div>
     </>
