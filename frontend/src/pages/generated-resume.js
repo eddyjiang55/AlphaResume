@@ -6,8 +6,8 @@ import ResumeEditer from '../components/editer';
 import ResumeRender from '../components/renderer';
 
 export async function getServerSideProps(context) {
-  // let dbFormData = { _id: context.query.id };
-  let dbFormData = { _id: '123' };
+  let dbFormData = { _id: context.query.id };
+  // let dbFormData = { _id: '123' };
   return { props: { dbFormData } }
 }
 
@@ -16,74 +16,68 @@ export default function GeneratedResumePage({ dbFormData }) {
   const [loading, setLoading] = useState(false);
   const [markdownContent, setMarkdownContent] = useState('');
 
-  // useEffect(() => {
+  useEffect(() => {
 
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/api/improved-users/resume-result",
-  //         {
-  //           method: 'POST',
-  //           headers: {
-  //             'Content-Type': 'application/json'
-  //           },
-  //           body: JSON.stringify({
-  //             id: dbFormData._id
-  //           }),
-  //         }
-  //       );
-  //       console.log(response.status === 200);
-  //       if (response.status === 200) {
-  //         setLoading(false);
-  //         clearInterval(intervalId);
-  //       } else if (response.status === 202) {
-  //         console.log('Result is still running');
-  //       } else {
-  //         throw new Error('Failed to fetch: ' + response.statusText);
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //       setLoading(false);
-  //     }
-  //   };
-  //   if (loading) {
-  //     fetchData();
-  //   }
+    const fetchData = async () => {
+      try {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/api/improved-users/resume-result",
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              id: dbFormData._id
+            }),
+          }
+        );
+        console.log(response.status === 200);
+        if (response.status === 200) {
+          setLoading(false);
+          clearInterval(intervalId);
+        } else if (response.status === 202) {
+          console.log('Result is still running');
+        } else {
+          throw new Error('Failed to fetch: ' + response.statusText);
+        }
+      } catch (error) {
+        console.error(error);
+        setLoading(false);
+      }
+    };
+    if (loading) {
+      fetchData();
+    }
 
-  //   const intervalId = setInterval(fetchData, 30000);
+    const intervalId = setInterval(fetchData, 30000);
 
-  //   return () => clearInterval(intervalId);
-  // }, [dbFormData]);
+    return () => clearInterval(intervalId);
+  }, [dbFormData]);
 
   useEffect(() => {
-    // const fetchMarkdown = async () => {
-    //   try {
-    //     const markdownResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/markdown`, {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json'
-    //       },
-    //       body: JSON.stringify({ id: dbFormData._id })
-    //     });
-    //     if (markdownResponse.status === 200) {
-    //       const markdownData = await markdownResponse.text();  // Assuming server responds with text
-    //       setMarkdownContent(markdownData);
-    //     } else {
-    //       throw new Error('Failed to fetch markdown: ' + markdownResponse.statusText);
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
+    const fetchMarkdown = async () => {
+      try {
+        const markdownResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/markdown`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: dbFormData._id })
+        });
+        if (markdownResponse.status === 200) {
+          const markdownData = await markdownResponse.text();  // Assuming server responds with text
+          setMarkdownContent(markdownData);
+        } else {
+          throw new Error('Failed to fetch markdown: ' + markdownResponse.statusText);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
-    // if (!loading) {
-    //   fetchMarkdown();
-    // }
-    setMarkdownContent(`---
-    title: Just hack'n
-    description: Nothing to see here
-    ---
-    
-    This is some text about some stuff that happened sometime ago`);
+    if (!loading) {
+      fetchMarkdown();
+    }
   }, [loading]);
 
   return (
