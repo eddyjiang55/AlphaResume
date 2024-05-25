@@ -3,32 +3,33 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
+import { processTimeStr, fetchPartData } from '../utils/fetchResumePartData';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/researchPapersAndPatents`)
-    const dbData = await res.json()
-    if (dbData.data) {
-      const displayPaperData = dbData.data.科研论文.map((data) => ({
+    const preformattedData = await fetchPartData(context.query.id, 'researchPapersAndPatents');
+    // console.log(preformattedData.data);
+    if (preformattedData.data) {
+      const displayPaperData = preformattedData.data.科研论文.map((data) => ({
         title: data.论文标题,
         authors: data.作者顺序,
         journal: data["期刊/会议"],
-        date: data.出版时间,
+        date: processTimeStr(data.出版时间, "year"),
         doi: data["DOI/链接"],
         description: data.研究描述,
         contribution: data.个人贡献,
       }));
-      const displayPatentData = dbData.data.知识产权.map((data) => ({
+      const displayPatentData = preformattedData.data.知识产权.map((data) => ({
         title: data.专利名称,
         number: data.专利号,
-        date: data["申请/授权日期"],
+        date: processTimeStr(data["申请/授权日期"], "year"),
         description: data.描述,
       }));
-      dbFormData = { _id: context.query.id, data: { papers: displayPaperData, patents: displayPatentData } };
+      dbFormData = { _id: preformattedData._id, data: { papers: displayPaperData, patents: displayPatentData } };
     } else {
-      dbFormData = { _id: context.query.id, data: { papers: null, patents: null } };
+      dbFormData = { _id: preformattedData._id, data: { papers: null, patents: null } };
     }
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }

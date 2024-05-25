@@ -3,24 +3,24 @@ import { useRouter } from 'next/router';
 import Navbar from "../components/navbar";
 import ResumeNavbar from "../components/resume-navbar";
 import { step3Tips } from '../lib/tips';
+import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/educationHistory`)
-    const dbData = await res.json();
-    if (!dbData.data) {
-      dbFormData = { data: null, _id: dbData._id };
-    } else {
-      const displayData = dbData.data.map((data) => {
+    const preformattedData = await fetchPartData(context.query.id, 'educationHistory');
+    // console.log(preformattedData);
+    if (preformattedData.data) {
+      const displayData = preformattedData.data.map((data) => {
+        const [formattedStart, formattedEnd] = extractDateRange(data.起止时间);
         return {
           degree: data.学历,
           school: data.学校名称,
           city: data.城市,
           country: data.国家,
-          startDate: data.起止时间.split(" 至 ")[0],
-          endDate: data.起止时间.split(" 至 ")[1],
+          startDate: formattedStart,
+          endDate: formattedEnd,
           department: data.院系,
           major: data.专业,
           gpa: data.GPA,
@@ -29,7 +29,9 @@ export async function getServerSideProps(context) {
           courses: data.主修课程,
         };
       });
-      dbFormData = { data: displayData, _id: dbData._id };
+      dbFormData = { data: displayData, _id: preformattedData._id };
+    } else {
+      dbFormData = { data: null, _id: preformattedData._id };
     }
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }
@@ -95,7 +97,7 @@ export default function Step3Page({ dbFormData }) {
           学校名称: data.school,
           城市: data.city,
           国家: data.country,
-          起止时间: data.startDate + " 至 " + data.endDate,
+          起止时间: data.startDate + "-" + data.endDate,
           院系: data.department,
           专业: data.major,
           GPA: data.gpa,
@@ -138,7 +140,7 @@ export default function Step3Page({ dbFormData }) {
         学校名称: data.school,
         城市: data.city,
         国家: data.country,
-        起止时间: data.startDate + " 至 " + data.endDate,
+        起止时间: data.startDate + "-" + data.endDate,
         院系: data.department,
         专业: data.major,
         GPA: data.gpa,

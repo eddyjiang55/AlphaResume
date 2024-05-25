@@ -4,35 +4,36 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { step6Tips } from '../lib/tips';
+import { processTimeStr, fetchPartData } from '../utils/fetchResumePartData';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/awardsAndCertificates`)
-    const dbData = await res.json();
-    if (dbData.data) {
-      const displayAwardData = dbData.data.获奖.map((data) => {
+    const preformattedData = await fetchPartData(context.query.id, 'awardsAndCertificates');
+    // console.log(preformattedData.data.获奖);
+    if (preformattedData.data) {
+      const displayAwardData = preformattedData.data.获奖.map((data) => {
         return {
           awardName: data.奖项名称,
-          awardTime: data.获奖时间,
+          awardTime: processTimeStr(data.获奖时间, "year"),
           awardOrg: data.颁奖机构,
           awardLevel: data.获奖级别,
           awardRank: data.获奖名次,
           awardDescription: data.描述,
         };
       });
-      const displayCertificateData = dbData.data.证书.map((data) => {
+      const displayCertificateData = preformattedData.data.证书.map((data) => {
         return {
           certificateName: data.证书名称,
-          certificateTime: data.取得时间,
+          certificateTime: processTimeStr(data.取得时间, "year"),
           certificateOrg: data.颁发机构,
           certificateDescription: data.证书详情,
         };
       });
-      dbFormData = { _id: context.query.id, data: { awards: displayAwardData, certificates: displayCertificateData } };
+      dbFormData = { _id: preformattedData._id, data: { awards: displayAwardData, certificates: displayCertificateData } };
     } else {
-      dbFormData = { _id: context.query.id, data: { awards: null, certificates: null } };
+      dbFormData = { _id: preformattedData._id, data: { awards: null, certificates: null } };
     }
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }

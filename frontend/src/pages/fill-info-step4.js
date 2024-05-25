@@ -4,29 +4,31 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { step4Tips } from '../lib/tips';
+import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/professionalExperience`)
-    const dbData = await res.json();
-    if (dbData.data) {
-      const displayData = dbData.data.map((data) => {
+    const preformattedData = await fetchPartData(context.query.id, 'professionalExperience');
+    // console.log(preformattedData);
+    if (preformattedData.data) {
+      const displayData = preformattedData.data.map((data) => {
+        const [formattedStart, formattedEnd] = extractDateRange(data.起止时间);
         return {
           company: data.公司名称,
           city: data.城市,
           country: data.国家,
-          startDate: data.起始时间.split(" 至 ")[0],
-          endDate: data.起始时间.split(" 至 ")[1],
+          startDate: formattedStart,
+          endDate: formattedEnd,
           department: data.部门,
           position: data.职位,
-          description: data["职责/业务描述"],
+          description: data["职责/业绩描述"],
         };
       });
-      dbFormData = { _id: dbData._id, data: displayData };
+      dbFormData = { _id: preformattedData._id, data: displayData };
     } else {
-      dbFormData = { _id: dbData._id, data: null };
+      dbFormData = { _id: preformattedData._id, data: null };
     }
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }
@@ -91,10 +93,10 @@ export default function step4Page({ dbFormData }) {
         公司名称: data.company,
         城市: data.city,
         国家: data.country,
-        起始时间: data.startDate + " 至 " + data.endDate,
+        起始时间: data.startDate + "-" + data.endDate,
         部门: data.department,
         职位: data.position,
-        "职责/业务描述": data.description,
+        "职责/业绩描述": data.description,
       };
     });
     fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
@@ -124,10 +126,10 @@ export default function step4Page({ dbFormData }) {
         公司名称: data.company,
         城市: data.city,
         国家: data.country,
-        起始时间: data.startDate + " 至 " + data.endDate,
+        起始时间: data.startDate + "-" + data.endDate,
         部门: data.department,
         职位: data.position,
-        "职责/业务描述": data.description,
+        "职责/业绩描述": data.description,
       };
     });
     fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {

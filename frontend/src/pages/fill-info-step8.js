@@ -3,25 +3,25 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
+import { fetchPartData } from '../utils/fetchResumePartData';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
-  console.log(context.query);
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/skills`)
-    const dbData = await res.json();
-    console.log(dbData);
-    if (dbData.data) {
-      const displayData = dbData.data.map((data) => {
+    const preformattedData = await fetchPartData(context.query.id, "skills");
+    // console.log(preformattedData);
+    if (preformattedData.data) {
+      const displayData = preformattedData.data.map((data) => {
         return {
-          skill: data["技能名称"],
-          proficiency: data["熟练度"],
+          skill: data["技能名称"] ? data["技能名称"] : data["skill_name"],
+          proficiency: data["熟练度"] ? data["熟练度"] : data["proficiency"] || "",
         };
       });
-      dbFormData = { _id: dbData._id, data: displayData };
+      // console.log(displayData);
+      dbFormData = { _id: preformattedData._id, data: displayData };
     } else {
-      dbFormData = { _id: dbData._id, data: null };
+      dbFormData = { _id: preformattedData._id, data: null };
     }
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }

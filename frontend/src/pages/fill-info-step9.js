@@ -3,15 +3,16 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
+import { fetchPartData } from '../utils/fetchResumePartData';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/languages`)
-    const dbData = await res.json();
-    if (dbData.data) {
-      const displayData = dbData.data.map(data => {
+    const preformattedData = await fetchPartData(context.query.id, 'languages');
+    // console.log(preformattedData);
+    if (preformattedData.data) {
+      const displayData = preformattedData.data.map(data => {
         return {
           language: data.语言,
           proficiency: data.熟练度,
@@ -19,9 +20,9 @@ export async function getServerSideProps(context) {
           score: data.成绩,
         };
       });
-      dbFormData = { _id: dbData._id, data: displayData };
+      dbFormData = { _id: preformattedData._id, data: displayData };
     } else {
-      dbFormData = { _id: dbData._id, data: null };
+      dbFormData = { _id: preformattedData._id, data: null };
     }
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }

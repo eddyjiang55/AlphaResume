@@ -4,6 +4,7 @@ import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import ResumeEditer from '../components/editer';
 import ResumeRender from '../components/renderer';
+import LoadingBar from '../components/LoadingBar';
 
 export async function getServerSideProps(context) {
   let dbFormData = { _id: context.query.id };
@@ -13,7 +14,7 @@ export async function getServerSideProps(context) {
 
 export default function GeneratedResumePage({ dbFormData }) {
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [markdownContent, setMarkdownContent] = useState('');
 
   useEffect(() => {
@@ -88,7 +89,7 @@ export default function GeneratedResumePage({ dbFormData }) {
         <div id="edit zone" className='col-span-5 p-8 flex flex-col justify-center items-center'>
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">编辑简历</h2>
           <div className='w-full rounded-lg bg-white shadow-lg flex-1'>
-            {loading ? <p>Loading...</p> :
+            {loading ? <LoadingBar /> :
               <ResumeEditer markdownData={markdownContent} editMarkdownData={setMarkdownContent} />
             }
           </div>
@@ -97,7 +98,7 @@ export default function GeneratedResumePage({ dbFormData }) {
         <div id="output zone" className='col-span-5 p-8 flex flex-col justify-center items-center'>
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">导出效果</h2>
           <div className='w-full rounded-lg bg-white shadow-lg flex-1'>
-            {loading ? <p>Loading...</p> :
+            {loading ? <LoadingBar /> :
               <ResumeRender markdownData={markdownContent} />
             }
           </div>
