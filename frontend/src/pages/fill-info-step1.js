@@ -132,7 +132,9 @@ export default function Step1Page({ dbFormData }) {
       fetchStatusInterval = setInterval(checkStatus, 10000);
     }
 
-    return () => clearInterval(fetchStatusInterval);
+    return () => {
+      clearInterval(fetchStatusInterval);
+    };
   }, [loading, dbFormData._id]);
 
 
@@ -147,7 +149,7 @@ export default function Step1Page({ dbFormData }) {
         title: 'sample_title',
         position: 'sample_position',
         improvedUserId: dbFormData._id,
-        resume_history_id: 'sample_resume_history_id',
+        // resume_history_id: 'sample_resume_history_id',
       }); // Replace this with your upload function
     }
   };
