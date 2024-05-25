@@ -148,7 +148,7 @@ export default function Step1Page({ dbFormData }) {
         createdAt: new Date(),
         title: 'sample_title',
         position: 'sample_position',
-        improvedUserId: dbFormData._id,
+        improved_user_id: dbFormData._id,
         // resume_history_id: 'sample_resume_history_id',
       }); // Replace this with your upload function
     }
