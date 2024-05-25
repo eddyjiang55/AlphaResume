@@ -16,7 +16,9 @@ export async function getServerSideProps(context) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify({
+        phoneNumber: "+8613387543505",
+      }),
     })
     dbFormData = await res.json()
     return { redirect: { destination: `/fill-info-step1?id=${dbFormData._id}`, permanent: false } }

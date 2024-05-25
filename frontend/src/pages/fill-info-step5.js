@@ -4,21 +4,23 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { step5Tips } from '../lib/tips';
+import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/projectExperience`)
-    const dbData = await res.json();
-    if (dbData.data) {
-      const displayData = dbData.data.map((data) => {
+    const preformattedData = await fetchPartData(context.query.id, 'projectExperience');
+    // console.log(preformattedData)
+    if (preformattedData.data) {
+      const displayData = preformattedData.data.map((data) => {
+        const [formattedStart, formattedEnd] = extractDateRange(data.起止时间);
         return {
           name: data['项目名称'],
           city: data['城市'],
           country: data['国家'],
-          startDate: data['起止时间'].split(' 至 ')[0],
-          endDate: data['起止时间'].split(' 至 ')[1],
+          startDate: formattedStart,
+          endDate: formattedEnd,
           role: data['项目角色'],
           link: data['项目链接'],
           achievement: data['项目成就'],
@@ -26,9 +28,9 @@ export async function getServerSideProps(context) {
           responsibility: data['项目职责']
         }
       });
-      dbFormData = { _id: context.query.id, data: displayData };
+      dbFormData = { _id: preformattedData._id, data: displayData };
     } else {
-      dbFormData = { _id: context.query.id, data: null };
+      dbFormData = { _id: preformattedData._id, data: null };
     }
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }

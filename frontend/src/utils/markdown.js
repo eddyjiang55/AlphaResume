@@ -1,10 +1,69 @@
 import MarkdownIt from "markdown-it";
+import yaml from "js-yaml";
 import MarkdownItDeflist from "markdown-it-deflist";
 import LinkAttributes from "markdown-it-link-attributes";
 import MarkdownItKatex from "markdown-it-katex";
 import MarkdownItCite from "markdown-it-cross-ref";
 import MarkdownItLatexCmds from "markdown-it-latex-cmds";
 import frontmatter from "front-matter";
+
+const preprocessMarkdown = (md) => {
+  // Function to replace double quotes inside text values with single quotes
+  const replaceQuotes = (line) => {
+    return line.replace(/"(.*?)"/g, (match, p1) => {
+      return '"' + p1.replace(/"/g, '\'') + '"';
+    });
+  };
+
+  // Function to sanitize lines by removing colon and any value following it within text properties
+  const sanitizeLine = (line) => {
+    console.log(line);
+    // Find and sanitize text properties
+    if (line.includes('text:')) {
+      const parts = line.split('</span>');
+      if (parts.length > 1) {
+        parts[1] = parts[1].replace(/:.*/, '');
+        return parts.join('</span>');
+      }
+    }
+    return line;
+  };
+
+  // Split the markdown into lines
+  const lines = md.split('\n');
+  let inYamlBlock = false;
+  let yamlIndentation = 0;
+
+  const processedLines = lines.map((line) => {
+    if (/^---$/.test(line)) {
+      inYamlBlock = !inYamlBlock;
+      return line;
+    }
+    if (inYamlBlock) {
+      // Replace quotes inside text values for the current line
+      line = replaceQuotes(line);
+      // Sanitize specific problematic values
+      line = sanitizeLine(line);
+      // console.log(line);
+
+      const match = /^(\s*-\s*[^:]+:)\s*(.*)$/.exec(line);
+      if (match) {
+        // Ensure correct indentation for sequence entries
+        yamlIndentation = match[1].length;
+        return match[1] + ' ' + match[2];
+      }
+      if (line.trim().startsWith('- ')) {
+        // Adjust indentation for list items within YAML block
+        return ' '.repeat(yamlIndentation) + line.trim();
+      }
+    }
+    return line;
+  });
+
+  return processedLines.join('\n');
+};
+
+
 
 const markdown = (() => {
   const md = new MarkdownIt({ html: true });
@@ -53,9 +112,8 @@ const resolveHeader = (html, frontmatter) => {
 
       header += item.newLine ? "<br>\n" : "";
 
-      header += `<span class="resume-header-item${
-        i === n - 1 || frontmatter.header[i + 1].newLine ? " no-separator" : ""
-      }">`;
+      header += `<span class="resume-header-item${i === n - 1 || frontmatter.header[i + 1].newLine ? " no-separator" : ""
+        }">`;
 
       if (item.link)
         header += `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.text}</a>`;
@@ -69,7 +127,10 @@ const resolveHeader = (html, frontmatter) => {
 };
 
 export const renderMarkdown = (md) => {
-  const { body, attributes } = frontmatter(md);
+  // console.log(md);
+  const preprocessedMd = preprocessMarkdown(md);
+  // console.log(preprocessedMd);
+  const { body, attributes } = frontmatter(preprocessedMd);
 
   let html = markdown.render(body);
   html = resolveDeflist(html);

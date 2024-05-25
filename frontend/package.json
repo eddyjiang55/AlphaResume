@@ -20,6 +20,7 @@
     "dompurify": "^3.0.8",
     "front-matter": "^4.0.2",
     "install": "^0.13.0",
+    "js-yaml": "^4.1.0",
     "markdown-it": "^14.1.0",
     "markdown-it-cross-ref": "^0.1.1",
     "markdown-it-deflist": "^3.0.0",

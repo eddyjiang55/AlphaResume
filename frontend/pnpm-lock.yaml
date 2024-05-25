@@ -35,6 +35,9 @@ dependencies:
   install:
     specifier: ^0.13.0
     version: 0.13.0
+  js-yaml:
+    specifier: ^4.1.0
+    version: 4.1.0
   markdown-it:
     specifier: ^14.1.0
     version: 14.1.0
@@ -2827,7 +2830,6 @@ packages:
     hasBin: true
     dependencies:
       argparse: 2.0.1
-    dev: true
 
   /json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
