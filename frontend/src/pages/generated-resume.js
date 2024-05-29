@@ -85,7 +85,7 @@ export default function GeneratedResumePage({ dbFormData }) {
     <div className="w-full h-screen flex flex-col overflow-hidden bg-light-blue">
       <Navbar />
       <ResumeNavbar />
-      <div className='grid grid-cols-12 max-h-[calc(100%-250px)] h-full gap-x-8 pb-2 overflow-y-auto'>
+      <div className='grid grid-cols-12 max-h-[calc(100%-250px)] h-full pb-2 overflow-y-auto gap-x-1'>
         <div id="edit zone" className='col-span-5 p-8 flex flex-col justify-center items-center'>
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">编辑简历</h2>
           <div className='w-full rounded-lg bg-white shadow-lg flex-1'>
@@ -108,17 +108,17 @@ export default function GeneratedResumePage({ dbFormData }) {
         <div id="format zone" className='p-8 flex flex-col justify-center items-center w-72'>
         <h2 class="text-alpha-blue font-bold text-4xl mb-8">格式调节</h2>
         <div class="w-full rounded-lg bg-white shadow-lg flex-1 p-4">
-            <div class="mb-4">
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40">
+            <div class="mb-4 flex flex-col items-center">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     导入 Markdown
                 </button>
             </div>
-            <div class="mb-4">
+            <div class="mb-4 flex flex-col items-center">
                 <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-40">
                     导出为 PDF
                 </button>
             </div>
-            <div class="mb-4">
+            <div class="mb-4 flex flex-col items-center">
                 <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-40">
                     导出为 Markdown
                 </button>
@@ -141,27 +141,28 @@ export default function GeneratedResumePage({ dbFormData }) {
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="font-chinese">
-                    字体 (华康宋体)
+                    语言
                 </label>
                 <select id="font-chinese" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    <option>中日韩</option>
-                    <option>繁体</option>
+                    <option>中文</option>
+                    <option>English</option>
                 </select>
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="font-english">
-                    字体 (Minion Pro)
+                    字体
                 </label>
                 <select id="font-english" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    <option>英文</option>
+                    <option>微软雅黑</option>
+                    <option>仿宋</option>
                 </select>
             </div>
             <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="font-size">
-                    字号
-                </label>
-                <input type="range" id="font-size" name="font-size" min="12" max="20" value="16" class="w-full"></input>
-            </div>
+              <label class="block text-gray-700 text-sm font-bold mb-2" for="font-size">
+                  字号: <span id="font-size-value">16</span>
+              </label>
+              <input type="range" id="font-size" name="font-size" min="12" max="20" value="16" class="w-full"></input>
+          </div>
         </div>
         </div>
       </div>
