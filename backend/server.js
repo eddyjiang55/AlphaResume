@@ -10,7 +10,12 @@ const resumeChatRoutes = require('./routes/resumeChatRoutes');
 const authRoutes = require('./routes/authRoutes');
 require('dotenv').config();
 
-app.use(cors());
+app.use(cors({
+   origin: 'https://be.alpharesumeai.com' , // 允许访问的前端地址
+   methods: 'GET,POST,PUT,DELETE',
+   allowedHeaders: 'Content-Type'
+ }));
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api', jobInfoRoutes);
@@ -25,9 +30,6 @@ const WebSocket = require('ws');
 const http = require('http');
 const { spawn } = require('child_process');
 const fs = require('fs');
-
-// Define port
-const port = 8080;
 
 const { connect } = require('./mongodb/dbconfig');
 const User = require('./mongodb/models/User');
@@ -112,7 +114,8 @@ app.get('/api/file/:id', (req, res) => {
    });
 });
 
-
+// Define port
+const port =  8080;
 // Start the server
 app.listen(port, () => {
    console.log(`Server listening at http://localhost:${port}`);
