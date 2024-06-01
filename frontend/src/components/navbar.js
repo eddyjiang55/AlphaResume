@@ -28,7 +28,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="w-full flex flex-row justify-between items-center bg-white px-16">
+            <nav className=" navbar w-full flex flex-row justify-between items-center bg-white px-16">
                 <div className="shrink-0">
                     <Link href='/'><Image src="/img/Logo_x.jpg" alt="Logo" width={190} height={100} /></Link>
                 </div>
@@ -91,6 +91,99 @@ const Navbar = () => {
                     )}
                 </div>
             </nav>
+            <style jsx>{`
+                .navbar {
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    background-color: white;
+                    width: 100%;
+                    font-size: 20px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                }
+                .logo {
+                    flex-shrink: 0;
+                    margin-left: 70px;
+                }
+                .navigation {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 100px;
+                    color: #1D80A7;
+                }
+                .dropdown {
+                    position: relative;
+                    display: inline-block;
+                }
+                .dropdown-content {
+                    display: none;
+                    position: absolute;
+                    background-color: white;
+                    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    min-width: 300px;
+                    border-radius: 10px;
+                }
+                .dropdown:hover .dropdown-content {
+                    display: block;
+                }
+                .dropdown-item {
+                    display: flex;
+                    align-items: center; /* 确保图片和文本在垂直方向上居中 */
+                    gap: 10px;
+                    padding: 12px;
+                    border-bottom: 1px solid #f0f0f0;
+                    text-decoration: none;
+                    color: black;
+                }
+                .item-text {
+                    display: flex;
+                    flex-direction: column;
+                    padding:30px 60px;
+                }
+                .item-text:hover{
+                    background-color: #B2DDEE;
+                    border-radius: 10px;
+                }
+                .item-title {
+                    font-weight: bold;
+                }
+                .item-description {
+                    font-size: 12px;
+                    color: #888;
+                }
+                .nav-link {
+                    color: #1D80A7;
+                    text-decoration: none;
+                    font-size: 16px;
+                    cursor: pointer;
+                    display: block;
+                    padding: 12px 16px;
+                }
+                .nav-link:hover {
+                    text-decoration: underline;
+                }
+                .actions {
+                    display: flex;
+                    gap: 10px;
+                    margin-right: 70px;
+                }
+                .action-button {
+                    padding: 8px 16px;
+                    border: 1px solid #1D80A7;
+                    background-color: white;
+                    color: #1D80A7;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    padding-left: 30px;
+                    padding-right: 30px;
+                }
+                .action-button:hover {
+                    background-color: #1D80A7;
+                    color: white;
+                }
+            `}</style>
         </>
     );
 };
