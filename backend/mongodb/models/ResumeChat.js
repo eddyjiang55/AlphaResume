@@ -30,6 +30,12 @@ class ResumeChat {
         return await collection.find({ userAccount }).toArray();
     }
 
+    static async findById(_id) {
+        const db = await connect();
+        const collection = db.collection('resumeChats');
+        return await collection.findOne({ _id });
+    }
+
     static async deleteById(_id) {
         const db = await connect();
         const collection = db.collection('resumeChats');
