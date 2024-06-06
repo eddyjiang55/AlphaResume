@@ -31,6 +31,12 @@ let processResult = {};
 // 创建新的用户
 router.post('/improved-users', async (req, res) => {
     try {
+        // 从请求中获取Account的phoneNumber
+        const { phoneNumber } = req.body;
+        if (!phoneNumber) {
+            return res.status(400).json({ message: 'Phone number is required to link account' });
+        }
+
         const newUser = new ImprovedUser(
             req.body.基本信息,
             req.body.个人评价,
@@ -43,12 +49,6 @@ router.post('/improved-users', async (req, res) => {
             req.body.科研论文与知识产权
         );
         const _id = newUser._id;  // 获取新的ImprovedUser的ID
-
-        // 从请求中获取Account的phoneNumber
-        const { phoneNumber } = req.body;
-        if (!phoneNumber) {
-            return res.status(400).json({ message: 'Phone number is required to link account' });
-        }
 
         // 查找Account并添加ImprovedUser的ID
         const account = await Account.findByPhoneNumber(phoneNumber);

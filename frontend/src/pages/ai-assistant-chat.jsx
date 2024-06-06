@@ -5,6 +5,7 @@ import Navbar from "../components/navbar";
 import ChatSegment from "../components/chat";
 import ChatChoice from "../components/chat-choice";
 import { blockData } from "../lib/quesLib";
+import { useSelector } from "react-redux";
 
 const avatar = (
   <svg
@@ -25,6 +26,7 @@ const avatar = (
 );
 
 const AIChat = () => {
+  const user = useSelector((state) => state.user);
   const [chatHistory, setChatHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showLeaveBtn, setShowLeaveBtn] = useState(false);
