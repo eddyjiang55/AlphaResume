@@ -11,7 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 require('dotenv').config();
 
 app.use(cors({
-   origin: ['https://be.alpharesumeai.com', 'http://localhost:3000'], // 允许访问的前端地址
+   origin: ['https://be.alpharesumeai.com', 'http://localhost:3000', 'https://www.alpharesumeai.com'], // 允许访问的前端地址
    methods: 'GET,POST,PUT,DELETE',
    allowedHeaders: 'Content-Type'
  }));
