@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ResumeChat = require('../mongodb/models/ResumeChat'); // 根据你实际的models文件路径修改
+const ImprovedUser = require('../mongodb/models/ImprovedUser.js');
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -10,20 +11,111 @@ const pythonScriptPath = path.resolve(__dirname, '../pyScripts/AI_asking.py');
 router.post('/resume-chat', async (req, res) => {
     try {
         const { userAccount, messages } = req.body;
-        const resumeChat = new ResumeChat(userAccount, messages);
+
+        const newUser = new ImprovedUser(
+            { 姓: "", 名: "", 电话号码: "", 邮箱地址: "", 微信号: "" },
+            "",
+            [{
+                "学历": "",
+                "学校名称": "",
+                "城市": "",
+                "国家": "",
+                "起止时间": "",
+                "院系": "",
+                "专业": "",
+                "GPA": "",
+                "获奖记录": [""],
+                "主修课程": [""]
+            }],
+            [{
+                "公司名称": "",
+                "城市": "",
+                "国家": "",
+                "起止时间": "",
+                "部门": "",
+                "职位": "",
+                "职责/业绩描述": "",
+            }],
+            [{
+                "项目名称": "",
+                "城市": "",
+                "国家": "",
+                "起止时间": "",
+                "项目角色": "",
+                "项目链接": "",
+                "项目成就": "",
+                "项目描述": "",
+                "项目职责": ""
+            }],
+            {
+                "获奖": [{
+                    "奖项名称": "",
+                    "获奖时间": "",
+                    "颁奖机构": "",
+                    "获奖级别": "",
+                    "获奖名次": "",
+                    "描述": "",
+                }],
+                "证书": [{
+                    "证书名称": "",
+                    "取得时间": "",
+                    "颁发机构": "",
+                    "证书详情": "",
+                }]
+            },
+            [{
+                "语言": "",
+                "熟练度": "",
+                "证书/资格认证": "",
+                "成绩": ""
+            }],
+            [{
+                "技能名称": "",
+                "熟练度": "",
+            }],
+            {
+                "科研论文": [{
+                    "论文标题": "",
+                    "作者顺序": "",
+                    "期刊/会议": "",
+                    "出版时间": "",
+                    "DOI/链接": "",
+                    "研究描述": "",
+                    "个人贡献": "",
+                }],
+                "知识产权": [{
+                    "专利名称": "",
+                    "申请/授权日期": "",
+                    "专利号": "",
+                    "描述": "",
+                }]
+            },
+        );
+        const resume_id = await newUser.save();
+
+        const resumeChat = new ResumeChat(userAccount, messages, resume_id);
         const _id = await resumeChat.save();
 
         // 调用 Python 文件
-        const pythonProcess = spawn('python3', [pythonScriptPath, JSON.stringify(messages)]);
+        const pythonProcess = spawn('python3', [pythonScriptPath, _id, resume_id]);
 
         pythonProcess.stdout.on('data', (data) => {
-            const responseMessage = data.toString();
-            res.status(201).json({ message: 'Resume chat created successfully', _id, response: responseMessage });
+            console.log(data.toString());
         });
 
         pythonProcess.stderr.on('data', (data) => {
             console.error(`stderr: ${data}`);
             res.status(500).json({ message: 'Failed to create resume chat', error: data.toString() });
+        });
+
+        pythonProcess.on('close', async (code) => {
+            console.log(`child process exited with code ${code}`);
+            const record = await ResumeChat.findById(_id);
+            const messageList = record.messages;
+            const lastRoundOfChat = messageList[messageList.length - 1];
+            const lastMessage = lastRoundOfChat.question;
+            const quesId = lastRoundOfChat.id;
+            res.status(200).json({ id: _id, message: lastMessage, quesId: quesId });
         });
 
     } catch (error) {
@@ -35,20 +127,31 @@ router.post('/resume-chat', async (req, res) => {
 router.put('/resume-chat/:_id', async (req, res) => {
     try {
         const _id = req.params._id;
-        const newMessage = req.body; // Assume the new message is sent in the request body
-        await ResumeChat.addMessage(_id, newMessage);
+        const chatRecord = await ResumeChat.findById(_id);
+        const resumeId = chatRecord.resumeId;
+        const { quesId, answer } = req.body; // Assume the new message is sent in the request body
+        await ResumeChat.addAnswer(_id, quesId, answer);
 
         // 调用 Python 文件
-        const pythonProcess = spawn('python3', [pythonScriptPath, JSON.stringify(newMessage)]);
+        const pythonProcess = spawn('python3', [pythonScriptPath, _id, resumeId]);
 
         pythonProcess.stdout.on('data', (data) => {
-            const responseMessage = data.toString();
-            res.status(200).json({ message: "Message added successfully.", response: responseMessage });
+            console.log(data.toString());
         });
 
         pythonProcess.stderr.on('data', (data) => {
             console.error(`stderr: ${data}`);
             res.status(500).json({ message: 'Failed to add message', error: data.toString() });
+        });
+
+        pythonProcess.on('close', async (code) => {
+            console.log(`child process exited with code ${code}`);
+            const record = await ResumeChat.findById(_id);
+            const messageList = record.messages;
+            const lastRoundOfChat = messageList[messageList.length - 1];
+            const lastMessage = lastRoundOfChat.question;
+            const quesId = lastRoundOfChat.id;
+            res.status(200).json({ id: _id, message: lastMessage, quesId: quesId });
         });
 
     } catch (error) {

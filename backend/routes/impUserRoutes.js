@@ -72,7 +72,7 @@ router.post('/improved-users', async (req, res) => {
             newUser.resumeId = resumeHistoryId;
 
             // 只需保存一次 ImprovedUser
-            await newUser.save(); 
+            await newUser.save();
 
             res.status(201).json({ message: 'Improved user and resume history created successfully', _id: _id, resumeHistoryId: resumeHistoryId });
         } else {

@@ -3,8 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "../components/navbar";
 import ChatSegment from "../components/chat";
-import ChatChoice from "../components/chat-choice";
-import { blockData } from "../lib/quesLib";
+// import ChatChoice from "../components/chat-choice";
+// import { blockData } from "../lib/quesLib";
 import { useSelector } from "react-redux";
 
 const avatar = (
@@ -25,27 +25,64 @@ const avatar = (
   </svg>
 );
 
-const AIChat = () => {
+export async function getServerSideProps(context) {
+  let dbFormData = {};
+  if (context.query.id) {
+    const res = await fetch(
+      process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + context.query.id
+    );
+    const data = await res.json();
+    const messageList = data.messages;
+    // messageList = { question: string, answer: string}[]
+    const reformattedMessageList = messageList
+      .map((message) => {
+        return [
+          { text: message.question, sender: "bot" },
+          { text: message.answer, sender: "user" },
+        ];
+      })
+      .flat();
+
+    dbFormData = { _id: data._id, messages: reformattedMessageList };
+  } else {
+    dbFormData = { _id: "", messages: [] };
+  }
+  // let dbFormData = { _id: '123' };
+  return { props: { dbFormData } };
+}
+
+export default function AIChat({ dbFormData }) {
   const user = useSelector((state) => state.user);
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory] = useState(dbFormData.messages);
   const [loading, setLoading] = useState(false);
   const [showLeaveBtn, setShowLeaveBtn] = useState(false);
-  const [chatId, setChatId] = useState(null);
-  const [currentBlockId, setCurrentBlockId] = useState(null);
-  const [currentQuestionId, setCurrentQuestionId] = useState(null);
+  const [chatId, setChatId] = useState(dbFormData._id);
+  // const [currentBlockId, setCurrentBlockId] = useState(null);
+  // const [currentQuestionId, setCurrentQuestionId] = useState(null);
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
-    setCurrentBlockId(blockData[0].id);
-    setCurrentQuestionId(blockData[0].questions[0].id);
-  }, [blockData]);
+    if (chatHistory.length === 0) {
+      setChatHistory([
+        {
+          sender: "bot",
+          text: "[xxx]你好，我是你的简历规划师[xxx]，在帮助你制作一份[应届生求职]简历之前，我需要了解你的一些个人基本信息和过往学习实习经历，对话可以随时开始或暂停，你的资料会被妥善保存，仅用于简历制作。\n 此次交流仅作为初步信息搜集，如有遗漏不用担心，你可以随时告诉我们，我们将为你修改并补充。\n首先，可以告诉我你的中文姓名和英文名吗？",
+          id: 1,
+        },
+      ]);
+    }
+  }, []);
+  // useEffect(() => {
+  //   setCurrentBlockId(blockData[0].id);
+  //   setCurrentQuestionId(blockData[0].questions[0].id);
+  // }, [blockData]);
 
-  useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      processCurrentQuestion();
-    }, 1000);
-  }, [currentQuestionId, currentBlockId]);
+  // useEffect(() => {
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //     processCurrentQuestion();
+  //   }, 1000);
+  // }, [currentQuestionId, currentBlockId]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -55,54 +92,54 @@ const AIChat = () => {
     }
   }, [chatHistory]);
 
-  const processCurrentQuestion = () => {
-    const currentBlock = blockData.find((block) => block.id === currentBlockId);
-    if (!currentBlock) return;
+  // const processCurrentQuestion = () => {
+  //   const currentBlock = blockData.find((block) => block.id === currentBlockId);
+  //   if (!currentBlock) return;
 
-    const currentQuestion = currentBlock.questions.find(
-      (question) => question.id === currentQuestionId
-    );
-    if (!currentQuestion) return;
+  //   const currentQuestion = currentBlock.questions.find(
+  //     (question) => question.id === currentQuestionId
+  //   );
+  //   if (!currentQuestion) return;
 
-    setChatHistory((prev) => [
-      ...prev,
-      { ...currentQuestion, key: Date.now() },
-    ]);
+  //   setChatHistory((prev) => [
+  //     ...prev,
+  //     { ...currentQuestion, key: Date.now() },
+  //   ]);
 
-    if (currentQuestion.type === "text") {
-      // Automatically move to the next question
-      let nextQuestionId = currentQuestion.next.default;
-      setCurrentQuestionId(nextQuestionId);
-    } else if (currentQuestion.type === "end") {
-      let nextBlockId = currentBlock.next;
-      if (nextBlockId) {
-        setCurrentBlockId(nextBlockId);
-        setCurrentQuestionId(
-          blockData.find((block) => block.id === nextBlockId).questions[0].id
-        );
-      } else {
-        // End of the chat
-        console.log("End of the chat");
-      }
-    }
-    setLoading(false);
-  };
+  //   if (currentQuestion.type === "text") {
+  //     // Automatically move to the next question
+  //     let nextQuestionId = currentQuestion.next.default;
+  //     setCurrentQuestionId(nextQuestionId);
+  //   } else if (currentQuestion.type === "end") {
+  //     let nextBlockId = currentBlock.next;
+  //     if (nextBlockId) {
+  //       setCurrentBlockId(nextBlockId);
+  //       setCurrentQuestionId(
+  //         blockData.find((block) => block.id === nextBlockId).questions[0].id
+  //       );
+  //     } else {
+  //       // End of the chat
+  //       console.log("End of the chat");
+  //     }
+  //   }
+  //   setLoading(false);
+  // };
 
-  const handleChoiceClick = (choice) => {
-    if (choice) {
-      let nextQuestionId = blockData
-        .find((block) => block.id === currentBlockId)
-        .questions.find((question) => question.id === currentQuestionId)
-        .next.yes;
-      setCurrentQuestionId(nextQuestionId);
-    } else {
-      let nextQuestionId = blockData
-        .find((block) => block.id === currentBlockId)
-        .questions.find((question) => question.id === currentQuestionId)
-        .next.no;
-      setCurrentQuestionId(nextQuestionId);
-    }
-  };
+  // const handleChoiceClick = (choice) => {
+  //   if (choice) {
+  //     let nextQuestionId = blockData
+  //       .find((block) => block.id === currentBlockId)
+  //       .questions.find((question) => question.id === currentQuestionId)
+  //       .next.yes;
+  //     setCurrentQuestionId(nextQuestionId);
+  //   } else {
+  //     let nextQuestionId = blockData
+  //       .find((block) => block.id === currentBlockId)
+  //       .questions.find((question) => question.id === currentQuestionId)
+  //       .next.no;
+  //     setCurrentQuestionId(nextQuestionId);
+  //   }
+  // };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -116,15 +153,10 @@ const AIChat = () => {
     event.preventDefault();
 
     const message = textInputRef.current.value;
-    if (
-      message.trim().length > 0 &&
-      blockData
-        .find((block) => block.id === currentBlockId)
-        .questions.find((question) => question.id === currentQuestionId)
-        .type === "ques"
-    ) {
+    if (message.trim().length > 0) {
       setLoading(true);
       const question = chatHistory[chatHistory.length - 1].text;
+      const quesId = chatHistory[chatHistory.length - 1].id;
       const newChat = {
         id: chatHistory.length + 1,
         text: message,
@@ -141,17 +173,19 @@ const AIChat = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              question: question,
+              quesId: quesId,
               answer: message,
             }),
           }
         );
         if (response.ok) {
-          const nextQuestionId = blockData
-            .find((block) => block.id === currentBlockId)
-            .questions.find((question) => question.id === currentQuestionId)
-            .next.default;
-          setCurrentQuestionId(nextQuestionId);
+          const data = await response.json();
+          const nextQuestion = data.message;
+          const nextQuesId = data.quesId;
+          setChatHistory((prevChatHistory) => [
+            ...prevChatHistory,
+            { text: nextQuestion, sender: "bot", id: nextQuesId },
+          ]);
         } else {
           console.error("Failed to save chat");
           alert("Server error");
@@ -165,9 +199,10 @@ const AIChat = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              userAccount: "test",
+              userAccount: user.phoneNumber,
               messages: [
                 {
+                  id: quesId,
                   question: question,
                   answer: message,
                 },
@@ -177,12 +212,13 @@ const AIChat = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          setChatId(data._id);
-          const nextQuestionId = blockData
-            .find((block) => block.id === currentBlockId)
-            .questions.find((question) => question.id === currentQuestionId)
-            .next.default;
-          setCurrentQuestionId(nextQuestionId);
+          setChatId(data.id);
+          const nextQuestion = data.message;
+          const nextQuesId = data.quesId;
+          setChatHistory((prevChatHistory) => [
+            ...prevChatHistory,
+            { text: nextQuestion, sender: "bot", id: nextQuesId },
+          ]);
         } else {
           console.error("Failed to save chat");
           alert("Server error");
@@ -233,9 +269,6 @@ const AIChat = () => {
               >
                 {avatar}
                 <ChatSegment sender={chat.sender} chatMessage={chat.text} />
-                {chat.type === "choice" ? (
-                  <ChatChoice onClick={handleChoiceClick} />
-                ) : null}
               </li>
             ))}
           </ul>
@@ -287,6 +320,4 @@ const AIChat = () => {
       </div>
     </div>
   );
-};
-
-export default AIChat;
+}
