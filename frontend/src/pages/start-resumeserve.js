@@ -3,33 +3,40 @@ import Navbar from '../components/navbar';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { setId } from '../store/slices/userSlice';
+import { useSelector } from 'react-redux';
 
 const SplitBackgroundPage = () => {
-
     const router = useRouter();
     const dispatch = useDispatch();
-
-    const handleClick = async (event) => {
-        event.preventDefault(); 
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-    
-          if (response.ok) {
-            const data = await response.json();
-            dispatch(setId(data._id)); // 将ID存储到Redux
-            router.push('/fill-info-step1'); 
-          } else {
-            console.error('Request failed');
-          }
-        } catch (error) {
-          console.error('Error:', error);
+    const user = useSelector((state) => state.user);
+    const handleManualFill = async () => {
+        if (!user.phoneNumber) {
+            router.push('/login');
+            return;
         }
-      };
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ phoneNumber: user.phoneNumber })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                dispatch(setId(data._id)); // 将ID存储到Redux
+                router.push('/fill-info-step1');
+            } else {
+                console.error('Request failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+    const handleChatFill = () => {
+        router.push('/ai-assistant-chat');
+    }
     return (
         <>
             <Navbar />
@@ -54,7 +61,7 @@ const SplitBackgroundPage = () => {
                             <span>我们将助您快速构建简历</span>
                         </div>
                         <div className='container'>
-                           <button className='form-b' type="button" onClick={handleClick}>开始填写</button>
+                            <button className='form-b' type="button" onClick={handleManualFill}>开始填写</button>
                         </div>
                     </div>
                     <div className='title'>方式二：</div>
@@ -68,7 +75,7 @@ const SplitBackgroundPage = () => {
                             <span>将根据聊天信息助您快速构建</span>
                         </div>
                         <div className='container'>
-                        <a href='/ai-assistant-chat'><button className='form-b' type="submit">进入聊天</button></a>
+                            <a href='/ai-assistant-chat'><button className='form-b' type="button" onClick={handleChatFill}>进入聊天</button></a>
                         </div>
                     </div>
                 </div>

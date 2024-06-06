@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const resumeSlice = createSlice({
+export const resumeSlice = createSlice({
     name: 'resume',
     initialState: {
         resumeVisible: false,
@@ -27,4 +27,4 @@ const resumeSlice = createSlice({
 });
 
 export const { toggleResume, addResumeCard, setResumeCards, setUserDetail, deleteResumeCard } = resumeSlice.actions;
-export default resumeSlice.reducer;
+export const resumeReducer = resumeSlice.reducer;

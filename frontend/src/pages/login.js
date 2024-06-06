@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
+import { useDispatch } from 'react-redux';
+import { setPhoneNumber } from '../store/slices/userSlice';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -10,6 +12,7 @@ const LoginPage = () => {
   const [receivedCode, setReceivedCode] = useState('');
   const [message, setMessage] = useState('未注册的手机号验证后自动创建账号');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const dispatch = useDispatch();
 
   const handleSendCode = async () => {
     if (phone.length === 0) {
@@ -57,12 +60,12 @@ const LoginPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ phoneNumber: countryCode + phone }),
+        body: JSON.stringify({ phoneNumber: countryCode + phone, code: verificationCode}),
       });
       const data = await response.json();
       if (response.ok) {
         // Store phone number in localStorage
-        localStorage.setItem('phoneNumber', countryCode + phone);
+        dispatch(setPhoneNumber(countryCode + phone));
         setMessage('登录成功');
         // Redirect to home page
         router.push('/');
@@ -93,7 +96,7 @@ const LoginPage = () => {
             <input type="text" placeholder="手机号码" className="text-black pl-32 pr-4 py-3 w-full rounded-md border border-gray-300" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <div className="relative mb-4">
-            <input type="password" placeholder="验证码" className="text-black pl-4 pr-32 py-3 w-full rounded-md border border-gray-300" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value)} />
+            <input type="text" placeholder="验证码" className="text-black pl-4 pr-32 py-3 w-full rounded-md border border-gray-300" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value)} />
             <button className="absolute inset-y-0 right-0 px-6 bg-blue-200 text-white rounded-r-md" onClick={handleSendCode}>发送验证码</button>
           </div>
           <div className="flex items-center mb-4">
