@@ -21,22 +21,20 @@ let processResult = {};
 router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
     console.log(req.body);
     try {
-        // 直接从 req.body 访问数据
         const account = req.body.account;
         const createdAt = req.body.createdAt;
         const title = req.body.title;
         const position = req.body.position;
         const improved_user_id = req.body.improved_user_id;
-        // const resume_history_id = req.body.resumeHistoryId;
-        console.log(improved_user_id);
 
         if (!req.file) {
             return res.status(400).json({ message: "No PDF file uploaded" });
         }
 
-        const pdfData = req.file.buffer;
-        const markdownData = await convertToMarkdown(pdfData); // 假设这个函数同步执行并返回Markdown数据
-
+        const pdfData = req.file.buffer.toString('base64'); // 确保正确编码为Base64
+        console.log(`PDF data encoded to Base64, length: ${pdfData.length}`);
+        
+        const markdownData = await convertToMarkdown(req.file.buffer); // 假设这个函数同步执行并返回Markdown数据
 
         // 将简历数据保存到数据库
         const newResume = new ResumeHistory(
@@ -45,13 +43,11 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
             title,
             position,
             pdfData,
-            markdownData,
-            // resume_history_id
+            markdownData
         );
 
-
         const resume_history_id = await newResume.save(); // 保存并获取ID
-        console.log(resume_history_id);
+        console.log(`Resume history saved with ID: ${resume_history_id}`);
 
         // 调用Python脚本进行进一步处理
         const pythonProcess = spawn('python3', ['./pyScripts/pdf_reader.py', resume_history_id, improved_user_id]);
@@ -82,6 +78,7 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
         res.status(500).json({ message: "Failed to upload and process resume", error: error.toString() });
     }
 });
+
 
 router.post('/resume-history/resume_result', async (req, res) => {
     const { id } = req.body;
@@ -198,21 +195,40 @@ router.post('/resume-info', upload.single('pdfFile'), async (req, res) => {
 
 router.get('/download-pdf/:resumeHistoryId', async (req, res) => {
     const { resumeHistoryId } = req.params;
-    const resumeHistory = await ResumeHistory.findById(resumeHistoryId);
 
-    if (!resumeHistory || !resumeHistory.pdfData) {
-        return res.status(404).send('PDF not found');
-    }
+    try {
+        const resumeHistory = await ResumeHistory.findById(resumeHistoryId);
 
-    const pdfData = Buffer.from(resumeHistory.pdfData, 'base64');
-    console.log("PDF data length: ", pdfData.length);
-        if (pdfData.length === 0) {
-            console.log("Warning: PDF data is empty after conversion from Base64.");
+        if (!resumeHistory) {
+            console.log(`No resume history found with ID: ${resumeHistoryId}`);
+            return res.status(404).send('PDF not found');
         }
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="downloaded_resume.pdf"');
-    res.send(pdfData);
+
+        if (!resumeHistory.pdfData) {
+            console.log(`Resume history found, but no PDF data available for ID: ${resumeHistoryId}`);
+            return res.status(404).send('PDF not found');
+        }
+
+        console.log(`Base64 PDF data length: ${resumeHistory.pdfData.length}`);
+
+        const pdfData = Buffer.from(resumeHistory.pdfData, 'base64');
+
+        console.log(`Decoded PDF data length: ${pdfData.length}`);
+
+        if (pdfData.length === 0) {
+            console.log(`Warning: PDF data is empty after conversion from Base64 for ID: ${resumeHistoryId}`);
+        }
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="downloaded_resume.pdf"');
+        res.send(pdfData);
+    } catch (error) {
+        console.error(`Error fetching PDF data for ID: ${resumeHistoryId}`, error);
+        res.status(500).send('Internal Server Error');
+    }
 });
+
+
 
 router.get('/resume-details/:resumeHistoryId', async (req, res) => {
     const { resumeHistoryId } = req.params;  // 获取路由参数中的resumeHistoryId
