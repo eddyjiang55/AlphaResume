@@ -38,6 +38,7 @@
   --dl-space-space-threeunits: 48px;
   --dl-space-space-oneandhalfunits: 24px;
 }
+
 .button {
   cursor: pointer;
   display: inline-block;
@@ -55,9 +56,11 @@
   padding-right: var(--dl-space-space-oneandhalfunits);
   padding-bottom: var(--dl-space-space-unit);
 }
+
 .button:hover {
   opacity: 0.5;
 }
+
 .input {
   color: var(--dl-color-gray-black);
   cursor: auto;
@@ -67,6 +70,7 @@
   border-radius: 4px;
   background-color: var(--dl-color-gray-white);
 }
+
 .textarea {
   color: var(--dl-color-gray-black);
   cursor: auto;
@@ -76,6 +80,7 @@
   border-radius: 4px;
   background-color: var(--dl-color-gray-white);
 }
+
 .list {
   width: 100%;
   margin: 1em 0px 1em 0px;
@@ -84,13 +89,16 @@
   list-style-type: none;
   list-style-position: outside;
 }
+
 .list-item {
   display: list-item;
 }
+
 .teleport-show {
   display: flex !important;
   transform: none !important;
 }
+
 .social {
   width: 20px;
   display: flex;
@@ -103,6 +111,7 @@
   justify-content: center;
   background-color: transparent;
 }
+
 .button-clean {
   border: none;
   padding: 0px;
@@ -113,6 +122,7 @@
   padding-bottom: 0px;
   background-color: transparent;
 }
+
 .button-link {
   color: rgb(255, 255, 255);
   display: flex;
@@ -135,6 +145,7 @@
   border-top-width: 1px;
   border-bottom-width: 1px;
 }
+
 .accordion {
   color: rgba(255, 255, 255, 0.6);
   width: 100%;
@@ -148,10 +159,12 @@
   justify-content: space-between;
   border-bottom-width: 1px;
 }
+
 .accordion:hover {
   color: white;
   border-color: white;
 }
+
 .Heading {
   font-size: 32px;
   font-family: Inter;
@@ -160,6 +173,7 @@
   text-transform: none;
   text-decoration: none;
 }
+
 .Content {
   font-size: 16px;
   font-family: Inter;
@@ -175,6 +189,7 @@
     padding-bottom: var(--dl-space-space-oneandhalfunits);
   }
 }
+
 @media(max-width: 479px) {
   .accordion {
     padding-top: var(--dl-space-space-oneandhalfunits);
@@ -280,7 +295,7 @@
 }
 
 .markdown-body code {
-  background-color: rgba(27,31,35,.05);
+  background-color: rgba(27, 31, 35, .05);
   border-radius: 3px;
   font-size: 85%;
   margin: 0;
@@ -295,11 +310,16 @@
 }
 
 .page {
-  max-height: 1056px; /* Height of a letter page in pixels */
-  overflow: hidden; /* Hide overflow */
-  margin-bottom: 20px; /* Space between "pages" */
-  padding: 20px; /* Page padding */
-  border: 1px solid #ccc; /* Page border */
+  max-height: 1056px;
+  /* Height of a letter page in pixels */
+  overflow: hidden;
+  /* Hide overflow */
+  margin-bottom: 20px;
+  /* Space between "pages" */
+  padding: 20px;
+  /* Page padding */
+  border: 1px solid #ccc;
+  /* Page border */
 }
 
 .page-indicator {
@@ -313,26 +333,34 @@
 
 /* Styles the scrollbar track (the background) */
 ::-webkit-scrollbar-track {
-  background-color: #f0f0f0; /* Light grey track */
-  border-radius: 10px; /* Rounded corners of the track */
+  background-color: #f0f0f0;
+  /* Light grey track */
+  border-radius: 10px;
+  /* Rounded corners of the track */
 }
 
 /* Styles the scrollbar thumb (the moving part) */
 ::-webkit-scrollbar-thumb {
-  background-color: #a6a6a6; /* Darker grey thumb */
-  border-radius: 10px; /* Rounded corners of the thumb */
-  border: 3px solid #f0f0f0; /* Creates a border around the thumb with the same color as the track for a "floating" effect */
+  background-color: #a6a6a6;
+  /* Darker grey thumb */
+  border-radius: 10px;
+  /* Rounded corners of the thumb */
+  border: 3px solid #f0f0f0;
+  /* Creates a border around the thumb with the same color as the track for a "floating" effect */
 }
 
 /* Styles the scrollbar itself (width and height) */
 ::-webkit-scrollbar {
-  width: 12px; /* Width of the vertical scrollbar */
-  height: 12px; /* Height of the horizontal scrollbar */
+  width: 12px;
+  /* Width of the vertical scrollbar */
+  height: 12px;
+  /* Height of the horizontal scrollbar */
 }
 
 /* Optional: Styles the scrollbar thumb on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #8d8d8d; /* Slightly darker thumb on hover for visual feedback */
+  background-color: #8d8d8d;
+  /* Slightly darker thumb on hover for visual feedback */
 }
 
 /* Container for the entire resume header */
@@ -352,6 +380,7 @@
   font-size: 32px;
   margin: 0 0 20px;
   color: #333;
+  font-family: "Times New Roman", Times, serif;
 }
 
 /* Style for each header item */
@@ -361,6 +390,7 @@
   padding: 0 10px;
   font-size: 16px;
   color: #333;
+  font-family: "Times New Roman", Times, serif;
 }
 
 /* Adding vertical line separator between header items */
@@ -383,4 +413,193 @@
 /* No-separator class to remove vertical line for specific items */
 .no-separator::after {
   content: none;
+}
+
+/* Icon styles */
+.icon {
+  margin-right: 5px;
+}
+
+
+.education-section {
+  padding: 20px;
+}
+
+.education-section h2 {
+  font-size: 24px;
+  color: #0073e6;
+  /* 蓝色标题 */
+  border-bottom: 1px solid #0073e6;
+  /* 下划线 */
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+/* Style for each education item */
+.education-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.education-item h3 {
+  font-size: 18px;
+  font-weight: bold;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.education-item p {
+  margin: 0;
+  font-size: 16px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+/* Style for location and date */
+.education-details {
+  text-align: right;
+  font-size: 16px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.publications-section {
+  padding: 20px;
+}
+
+.publications-section h2 {
+  font-size: 24px;
+  color: #0073e6;
+  /* 蓝色标题 */
+  border-bottom: 1px solid #0073e6;
+  /* 下划线 */
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+/* Style for each publication item */
+.publication-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.publication-item-number {
+  font-weight: bold;
+  margin-right: 10px;
+  color: #0073e6;
+}
+
+.publication-details {
+  max-width: 100%;
+}
+
+.publication-title {
+  font-size: 18px;
+  font-weight: bold;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.publication-authors {
+  margin: 0;
+  font-size: 16px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.publication-conference {
+  font-style: italic;
+  font-size: 16px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.experience-section {
+  padding: 20px;
+}
+
+.experience-section h2 {
+  font-size: 24px;
+  color: #0073e6;
+  /* 蓝色标题 */
+  border-bottom: 1px solid #0073e6;
+  /* 下划线 */
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+/* Style for each experience item */
+.experience-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.experience-item h3 {
+  font-size: 18px;
+  font-weight: bold;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.experience-item p {
+  margin: 0;
+  font-size: 16px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+/* Style for company name and date */
+.experience-details {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.company {
+  font-style: italic;
+}
+
+.date {
+  text-align: right;
+  font-size: 16px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.awards-section,
+.skills-section {
+  padding: 20px;
+}
+
+.awards-section h2,
+.skills-section h2 {
+  font-size: 24px;
+  color: #0073e6;
+  /* 蓝色标题 */
+  border-bottom: 1px solid #0073e6;
+  /* 下划线 */
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.award-item,
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.award-title {
+  font-weight: bold;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.award-year,
+.skill-content {
+  text-align: right;
+  font-size: 16px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.skill-category {
+  font-weight: bold;
+  font-family: "Times New Roman", Times, serif;
 }
