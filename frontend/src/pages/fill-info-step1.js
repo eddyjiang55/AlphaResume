@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
-import { useDispatch, useSelector } from 'react-redux';
-import { toggleResume,setUserDetail, addResumeCard } from '../store/features/resumeSlice'; 
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -33,9 +31,6 @@ export default function Step1Page({ dbFormData }) {
   const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
-  console.log(dbFormData);
-  const dispatch = useDispatch();
-  const id = useSelector((state) => state.user.id); // 获取 Redux 中的 id
 
   // 使用 useState 钩子初始化表单状态
   const [form, setForm] = useState(dbFormData.data || {
@@ -197,12 +192,6 @@ export default function Step1Page({ dbFormData }) {
   }
 
   const handleSave = () => {
-    console.log('Saving data with ID:', id);  // 打印当前ID
-
-  if (!id) {
-    console.error('保存失败,ID为空');
-    return;
-  }
     // 发送表单数据到后端
     fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
@@ -210,7 +199,7 @@ export default function Step1Page({ dbFormData }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: id || '',
+        id: dbFormData._id,
         type: 'basicInformation',
         data: form,
       }),
@@ -220,23 +209,10 @@ export default function Step1Page({ dbFormData }) {
     return response.json();
     })
       .then((res)=> {
-        console.log(id,"get请求id-----");
-        console.log('Response:', res);
         if (res.message && res.message.includes('User not found')) {
           // 处理后端返回“找不到记录”的情况
-          console.error('No record found to update with ID:', id);
+          console.error('No record found to update with ID:', dbFormData._id);
         }
-         // 发送请求获取用户详情
-         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${id}`)
-         .then(response => {
-          return response.json();
-        })
-         .then(userData => {
-           dispatch(addResumeCard(userData)); // 添加小卡片数据
-         })
-         .catch(error => {
-           console.error('get请求失败', error);
-         });
       })
       .catch(error => {
         console.error('保存失败', error);

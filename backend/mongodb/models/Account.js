@@ -35,10 +35,27 @@ class Account {
         return result;
     }
 
+    static async deleteImprovedUser(accountId, improvedUserId) {
+        const db = await connect();
+        const collection = db.collection('accounts');
+        const result = await collection.updateOne(
+            { _id: accountId }, // 直接使用UUID
+            { $pull: { improvedUsers: improvedUserId } }
+        );
+        return result;
+    }
+
     static async findByPhoneNumber(phoneNumber) {
         const db = await connect();
         const collection = db.collection('accounts');
         return await collection.findOne({ phoneNumber: phoneNumber });
+    }
+
+    static async findById(id) {
+        const db = await connect();
+        const collection = db.collection('accounts');
+        const objectid = new ObjectId(id);
+        return await collection.findOne({ _id: objectid });
     }
     
     static async create(accountData) {

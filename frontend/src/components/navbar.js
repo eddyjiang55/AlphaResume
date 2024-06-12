@@ -32,7 +32,7 @@ const Navbar = () => {
         <>
             <nav className="w-full flex flex-row justify-between items-center bg-white px-16">
                 <div className="shrink-0">
-                    <Link href='/'><Image src="/img/Logo_x.jpg" alt="Logo" width={190} height={100} /></Link>
+                    <Link href='/'><Image src="/img/Logo_x.jpg" alt="Logo" width={190} height={100} fetchPriority='high' /></Link>
                 </div>
                 <div className="flex flex-row justify-between items-center gap-x-24" ref={ref}>
                     {navigationItems.map((item, index) => (
@@ -56,7 +56,7 @@ const Navbar = () => {
                             {openDropdown === index && (
                                 <div className="absolute w-auto min-w-[460px] left-0 bg-white text-black mt-6 p-1 z-50 rounded-lg border-[#b2ddee] border-2 shadow-inner">
                                     {item.links.map((link, linkIndex) => (
-                                        <div className="grid grid-cols-5 items-center gap-x-4 px-8">
+                                        <div key={linkIndex} className="grid grid-cols-5 items-center gap-x-4 px-8">
                                             <div className='w-16 h-16 rounded-full p-2 bg-[#b2ddee] text-alpha-blue'>
                                                 {link.icon}
                                             </div>
