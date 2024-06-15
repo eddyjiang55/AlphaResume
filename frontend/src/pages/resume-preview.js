@@ -20,34 +20,48 @@ const ResumePreview = (props) => {
 
   const onElementClick = (node) => {
     let contentArray = [];
+    let textToDisplay = '';
     console.log(node);
-    // if (node.tagName === 'p') {
-    //   // Extract text content directly from the paragraph node
-    //   textToDisplay = node.children.map(child => child.value).join('');
-    // } else if (node.tagName === 'li') {
+    if (node.tagName === 'p') {
+      // Extract text content directly from the paragraph node
+      textToDisplay = node.children.map((child) => child.value).join('');
+    }
+    // else if (node.tagName === 'li') {
     //   // Extract text from all list items within the parent list
     //   // console.log(node);
     //   // textToDisplay = node.parentNode.children.map(item => item.children.map(child => child.value).join('')).join('\n');
     // }
-    node.children.forEach((child) => {
-      // Each child's actual text content is nested inside its properties, so we need to access it
+    else {
+      node.children.forEach((child) => {
+        // Each child's actual text content is nested inside its properties, so we need to access it
 
-      // If the text content is a simple string, add it to the array
-      if (child.type === 'text') {
-        contentArray.push(child.value);
-      } else if (child.type === 'element') {
-        // If the text content is an array (for nested elements within the list item), join them
-        const combinedText = child.children.map((item) => {
-          // This assumes the nested structure isn't too complex; adjust as needed for deeper nesting
-          return item.type === 'text' ? item.value : item.children;
-        }).join('');
-        contentArray.push(combinedText);
-      }
-    });
+        // If the text content is a simple string, add it to the array
+        if (child.type === 'text') {
+          contentArray.push(child.value);
+        } else if (child.type === 'element') {
+          // If the text content is an array (for nested elements within the list item), join them
+          const combinedText = child.children.map((item) => {
+            // This assumes the nested structure isn't too complex; adjust as needed for deeper nesting
+            return item.type === 'text' ? item.value : item.children;
+          }).join('');
+          contentArray.push(combinedText);
+        }
+      });
+    }
     // console.log(contentArray);
-    const textToDisplay = contentArray.join('');
+    textToDisplay += contentArray.join('');
 
     setResumeData(textToDisplay);
+  };
+
+  const downloadResume = async () => {
+    const url = process.env.NEXT_PUBLIC_API_URL + `/api/file/${taskId}`;
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', true);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   useEffect(() => {
@@ -69,7 +83,7 @@ const ResumePreview = (props) => {
   useEffect(() => {
     const fetchResumeData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/result/${taskId}`, { method: 'GET' });
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/result/${taskId}`, { method: 'GET' });
         if (response.status === 200) {
           const data = await response.json();
           // setResumeData(data.result);
@@ -136,7 +150,7 @@ const ResumePreview = (props) => {
                   // <div className='markdown-body'>
                   //   <Markdown className="" remarkPlugins={[remarkGfm]}>{resumeData}</Markdown>
                   // </div>
-                  // <iframe src={`http://localhost:8000/api/file/${taskId}`} className="w-full h-[864px] rounded-lg border border-solid border-px border-slate-600"></iframe>
+                  // <iframe src={process.env.NEXT_PUBLIC_API_URL + `/api/file/${taskId}`} className="w-full h-[864px] rounded-lg border border-solid border-px border-slate-600"></iframe>
                   // <div className="w-full h-auto" dangerouslySetInnerHTML={{ __html: htmlContent }}></div>
                   <div className='w-full flex flex-col justify-center items-center gap-y-8'>
                     <div className="h-[60vh] overflow-auto resume-body" ref={resumeBodyRef}>
@@ -158,7 +172,7 @@ const ResumePreview = (props) => {
                 <br />
               </span>
             </Link>
-            <button type="button" className="text-black text-lg bg-[#85DCFF] button">
+            <button type="button" className="text-black text-lg bg-[#85DCFF] button" onClick={() => downloadResume(taskId)}>
               <span>
                 <span>导出简历</span>
                 <br />

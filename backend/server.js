@@ -1,8 +1,33 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-app.use(cors());
+const path = require('path');
+const jobInfoRoutes = require('./routes/jobInfoRoutes');
+const resumeRoutes = require('./routes/resumeRoutes');
+const chatHisRoutes = require('./routes/chatHisRoutes');
+const impUserRoutes = require('./routes/impUserRoutes');
+const resumeChatRoutes = require('./routes/resumeChatRoutes');
+const authRoutes = require('./routes/authRoutes');
+const resumeTemplateRoutes = require('./routes/resumeTemplateRoutes');
+const resumeGuidanceRoutes = require('./routes/resumeGuidanceRoutes');
+require('dotenv').config();
+
+app.use(cors({
+   origin: ['https://be.alpharesumeai.com', 'http://localhost:3000', 'https://www.alpharesumeai.com'], // 允许访问的前端地址
+   methods: 'GET,POST,PUT,DELETE',
+   allowedHeaders: 'Content-Type'
+ }));
+
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api', jobInfoRoutes);
+app.use('/api', resumeRoutes);
+app.use('/api', chatHisRoutes);
+app.use('/api', impUserRoutes);
+app.use('/api', resumeChatRoutes);
+app.use('/api', authRoutes);
+app.use('/api',resumeTemplateRoutes);
+app.use('/api', resumeGuidanceRoutes);
 
 const { Queue, Worker } = require('bull');
 const WebSocket = require('ws');
@@ -10,13 +35,14 @@ const http = require('http');
 const { spawn } = require('child_process');
 const fs = require('fs');
 
-// Define port
-const port = 8000;
-
 const { connect } = require('./mongodb/dbconfig');
-const User = require('./mongodb/models/userModel');
+const User = require('./mongodb/models/User');
 
 let processResult = {};
+
+app.get('/api/healthcheck', async (req, res) => {
+   res.status(200).json("hello world");
+});
 
 // Route for handling POST requests
 app.post('/api/resume', async (req, res) => {
@@ -55,6 +81,7 @@ app.post('/api/resume', async (req, res) => {
 
 app.get('/api/result/:id', (req, res) => {
    const id = req.params.id;
+   console.log(id);
    const result = processResult[id];
    if (!result) {
       return res.status(404).json({ message: 'No result found' });
@@ -67,7 +94,7 @@ app.get('/api/result/:id', (req, res) => {
          if (err) {
             return res.status(500).json({ message: 'Error reading file', error: err });
          }
-         return res.type('text/markdown').status(200).json({result: data});
+         return res.type('text/markdown').status(200).json({ result: data });
       });
    }
    // fs.readFile('./outputResume/sample.md', 'utf-8', (err, data) => {
@@ -91,7 +118,8 @@ app.get('/api/file/:id', (req, res) => {
    });
 });
 
-
+// Define port
+const port =  8080;
 // Start the server
 app.listen(port, () => {
    console.log(`Server listening at http://localhost:${port}`);

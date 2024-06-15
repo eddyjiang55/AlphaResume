@@ -1,107 +1,130 @@
-"use client"
-import React from 'react'
-import Link from 'next/link'
-import Head from 'next/head'
+import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import Navbar from '@/components/navbar';
+import { useDispatch, useSelector } from 'react-redux';
+import Image from 'next/image';
+import { setResumeCards } from '@/store/features/resumeSlice';
+import Link from 'next/link';
+const CardsPart = dynamic(() => import('@/components/ResumeCards/ResumeCardPart'), {
+    ssr: false,
+    loading: () => <div className='max-w-7xl 2xl:max-w-[1380px] mx-auto w-full h-2/5 rounded-lg bg-gray-200 animate-pulse' />
+});
 
-import Navbar from '../components/navbar'
 
-const Home = (props) => {
-  // const accordionContainers = window.document.querySelectorAll('[data-role="accordion-container"]'); // All accordion containers
-  // const accordionContents = document.querySelectorAll('[data-role="accordion-content"]'); // All accordion content
-  // const accordionIconsClosed = document.querySelectorAll('[data-role="accordion-icon-closed"]'); // All accordion closed icons
-  // const accordionIconsOpen = document.querySelectorAll('[data-role="accordion-icon-open"]'); // All accordion open icons
+const SplitBackgroundPage = () => {
 
-  // accordionContents.forEach((accordionContent) => {
-  //     accordionContent.style.display = "none"; //Hides all accordion contents
-  // });
+    const dispatch = useDispatch();
+    const User = useSelector((state) => state.user);
+    const ResumeCards = useSelector((state) => state.resume.cards);
+    console.log(User);
+    // const resumeVisible = useSelector((state) => state.resume.resumeVisible);
+    // const [title, setTitle] = useState('');
 
-  // accordionIconsClosed.forEach((icon) => {
-  //   icon.style.display = "flex"
-  // })
+    useEffect(() => {
+        if (User.id) {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/${User.id}`)
+                .then(response => response.json())
+                .then(userData => {
+                    console.log(userData);
+                    dispatch(setResumeCards(userData.resumeIdList));
+                })
+                .catch(error => {
+                    console.error('Error fetching user detail:', error);
+                });
+        }
+    }, [])
 
-  // accordionIconsOpen.forEach((icon) => {
-  //   icon.style.display = "none"
-  // })
+    // const [resumeData, setResumeData] = useState( [{
+    //     title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
+    // },{
+    //     title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
+    // }]);
 
-  // accordionContainers.forEach((accordionContainer, index) => {
-  //     accordionContainer.addEventListener("click", () => {
-  //         if (accordionContents[index].style.display === "flex") {
-  //             // If the accordion is already open, close it
-  //             accordionContents[index].style.display = "none";
-  //             accordionIconsClosed[index].style.display = "flex";
-  //             accordionIconsOpen[index].style.display = "none"
-  //         } else {
-  //             // If the accordion is closed, open it
-  //             accordionContents.forEach((accordionContent) => {
-  //                 accordionContent.style.display = "none"; //Hides all accordion contents
-  //             });
 
-  //             accordionIconsClosed.forEach((accordionIcon) => {
-  //                 accordionIcon.style.display = "flex"; // Resets all icon transforms to 0deg (default)
-  //             });
-
-  //             accordionIconsOpen.forEach((accordionIcon) => {
-  //               accordionIcon.style.display = "none";
-  //             })
-
-  //             accordionContents[index].style.display = "flex"; // Shows accordion content
-  //             accordionIconsClosed[index].style.display = "none"; // Rotates accordion icon 180deg
-  //             accordionIconsOpen[index].style.display = "flex";
-  //         }
-  //     });
-  // });
-
-  return (
-    <>
-      <div className="w-full flex h-full items-start flex-col justify-start bg-white">
-        <Head>
-          <title>AI Resume</title>
-          <meta property="og:title" content="AI Resume" />
-        </Head>
-        <Navbar></Navbar>
-        <section className="gap-y-6 w-full h-fit flex flex-col justify-between max-w-[1440px] items-start p-10 mt-20 mx-auto">
-          <div className="flex w-full">
-            <h1 className="text-black h-fit text-3xl max-w-[900px] normal-case text-center font-medium">我的简历</h1>
-          </div>
-          <div className="flex flex-row-reverse w-full">
-            <div className="w-52 flex flex-row items-center justify-center">
-              <Link href="/select-communication-method" id="create_resume">
-                <span className="text-black normal-case font-normal pr-6 pb-3 no-underline bg-[#14a9ff] button">新建简历</span>
-              </Link>
+    const addResume = (newResume) => {
+        setResumeData([...resumeData, newResume]);
+    };
+    return (
+        <div className="flex flex-col w-full h-screen overflow-y-auto overflow-x-hidden bg-light-blue">
+            <Navbar></Navbar>
+            <div className="w-full h-3/5 relative py-20">
+                <div className="absolute top-0 left-0 bg-alpha-blue h-1/2 w-full"></div>
+                <div className="relative flex flex-col justify-center items-center gap-y-12 z-10 mx-auto">
+                    <div className="text-3xl text-light-blue">
+                        开始创建你的专业定制简历
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-24 justify-items-center mx-auto">
+                        <div className="bg-white hover:bg-[#B2DDEE] rounded-lg p-10 shadow-lg">
+                            <div className="flex flex-col justify-center items-center gap-y-12 w-full">
+                                <h1 className="text-black text-[40px] font-bold 2xl:text-[48px]">怎么写一个好简历</h1>
+                                <p className='text-black font-normal text-lg 2xl:text-2xl'>x个来自行业专家的专业简历书写模板及其相关知识点。</p>
+                                <div className="grid grid-cols-2 gap-12 mx-auto">
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>简历优点</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>对岗位理解</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>观念靠拢</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>易错点解析</span>
+                                    </div>
+                                </div>
+                                <button className="text-2xl font-bold text-white py-4 px-8 bg-alpha-blue rounded-full">查看知识文档</button>
+                            </div>
+                        </div>
+                        <div className="bg-white hover:bg-[#B2DDEE] rounded-lg p-10 shadow-lg">
+                            <div className="flex flex-col justify-center items-center gap-y-12 w-full">
+                                <h1 className="text-black text-[40px] font-bold 2xl:text-[48px]">简历生成器</h1>
+                                <p className='text-black font-normal text-lg 2xl:text-2xl'>来自行业专家的专业简历书写模板及其相关知识点。</p>
+                                <div className="grid grid-cols-2 gap-12 mx-auto">
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'><em>AI</em> 赋能</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'><em>ATS</em> 筛选</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>专家合作</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>快速生成</span>
+                                    </div>
+                                </div>
+                                <Link href='/start-resumeserve'>
+                                    <button className="text-2xl font-bold text-white py-4 px-8 bg-alpha-blue rounded-full">
+                                        简历生成
+                                    </button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="text-2xl text-alpha-blue font-normal text-center">
+                        你的简历将会显示在这里<br />
+                        开始创建吧！
+                    </div>
+                </div>
             </div>
-          </div>
-        </section>
-        <section className="w-full h-auto flex flex-row max-w-[1440px] mt-40 items-center pt-18 pl-4 pr-3 pb-2 mx-auto">
-            <div className="flex-row w-full h-auto flex items-start pr-0 justify-around">
-              <img
-                alt="image"
-                src="https://play.teleporthq.io/static/svg/default-img.svg"
-                className="w-[var(--dl-size-size-xxlarge)] h-[280px] object-cover pl-10 pr-10"
-              />
-              <img
-                alt="image"
-                src="https://play.teleporthq.io/static/svg/default-img.svg"
-                className="w-[var(--dl-size-size-xxlarge)] h-[280px] object-cover pl-10 pr-10"
-              />
-              <img
-                alt="image"
-                src="https://play.teleporthq.io/static/svg/default-img.svg"
-                className="w-[var(--dl-size-size-xxlarge)] h-[280px] object-cover pl-10 pr-10"
-              />
-              <img
-                alt="image"
-                src="https://play.teleporthq.io/static/svg/default-img.svg"
-                className="w-[var(--dl-size-size-xxlarge)] h-[280px] object-cover pl-10 pr-10"
-              />
+            <div className="w-full h-auto max-w-7xl 2xl:max-w-[1380px] mx-auto mb-16">
+                <CardsPart resumeIdList={ResumeCards} userPhoneNumber={User.phoneNumber} />
+                {/* <div className="grid gird-cols-4 gap-x-4 justify-start items-center">
+                {User.resumeIdList.map((data, index) => (
+                    <ResumeCard key={index} resumeId={data} onDelete={handleDelete} />
+                ))}
+            </div> */}
             </div>
-        </section>
-        <div>
-          <div className="contents">
-          </div>
         </div>
-      </div>
-    </>
-  )
+    );
 }
 
-export default Home
+export default SplitBackgroundPage;
