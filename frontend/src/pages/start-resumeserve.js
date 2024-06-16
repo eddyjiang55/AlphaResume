@@ -12,33 +12,13 @@ import chatImg from '../../public/img/chat.svg';
 const SplitBackgroundPage = () => {
     const router = useRouter();
     const user = useSelector((state) => state.user);
-    const handleManualFill = async () => {
+    const handleAuth = async (destination) => {
         if (!user.phoneNumber) {
             router.push('/login');
-            return;
-        }
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ phoneNumber: user.phoneNumber })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                router.push('/fill-info-step1?id=' + data._id);
-            } else {
-                console.error('Request failed');
-            }
-        } catch (error) {
-            console.error('Error:', error);
+        } else {
+            router.push(destination);
         }
     };
-    const handleChatFill = () => {
-        router.push('/ai-assistant-chat');
-    }
     return (
         <div className='flex flex-col w-full h-screen bg-light-blue'>
             <Navbar />
@@ -69,7 +49,7 @@ const SplitBackgroundPage = () => {
                         }} />
                         <span className='font-bold text-2xl text-black whitespace-nowrap'>我们将助您快速构建简历</span>
                     </div>
-                    <button className='font-bold text-2xl text-white hover:text-black rounded-full bg-alpha-blue hover:bg-[#B2DDEE] px-12 py-3 transition-all duration-100' type="button" onClick={handleManualFill}>开始填写</button>
+                    <button className='font-bold text-2xl text-white hover:text-black rounded-full bg-alpha-blue hover:bg-[#B2DDEE] px-12 py-3 transition-all duration-100' type="button" onClick={() => handleAuth('/fill-info-step1')}>开始填写</button>
                 </div>
                 <p className='text-alpha-blue text-left font-bold text-xl'>方式二：</p>
                 <div className='w-full rounded-xl bg-white shadow-xl p-12 flex flex-row justify-evenly items-center gap-x-5'>
@@ -87,11 +67,9 @@ const SplitBackgroundPage = () => {
                         }} />
                         <span className='font-bold text-2xl text-black whitespace-nowrap'>将根据聊天信息助您快速构建</span>
                     </div>
-                    <Link href="/ai-assistant-chat">
-                        <button className='font-bold text-2xl text-white hover:text-black rounded-full bg-alpha-blue hover:bg-[#B2DDEE] px-12 py-3 transition-all duration-100' type="button">
-                            进入聊天
-                        </button>
-                    </Link>
+                    <button className='font-bold text-2xl text-white hover:text-black rounded-full bg-alpha-blue hover:bg-[#B2DDEE] px-12 py-3 transition-all duration-100' type="button" onClick={() => handleAuth('/ai-assistant-chat')}>
+                        进入聊天
+                    </button>
                 </div>
             </div>
         </div>

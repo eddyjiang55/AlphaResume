@@ -224,6 +224,10 @@ export default function AIChat({ dbFormData }) {
           alert("Server error");
         }
       }
+      // setChatHistory((prevChatHistory) => [
+      //   ...prevChatHistory,
+      //   { text: "Testing", sender: "bot", id: 2 },
+      // ]);
     }
     setLoading(false);
   };
@@ -257,7 +261,7 @@ export default function AIChat({ dbFormData }) {
         ) : null}
         <div
           ref={chatContainerRef}
-          className="overflow-y-auto max-h-[calc(100vh-270px)] mt-4 mb-32 pr-4"
+          className="overflow-y-auto max-h-[calc(100vh-350px)] mt-4 mb-32 pr-4"
         >
           <ul>
             {chatHistory.map((chat, index) => (
@@ -274,49 +278,51 @@ export default function AIChat({ dbFormData }) {
           </ul>
         </div>
       </div>
-      <div className="fixed inset-x-0 bottom-0 p-2 flex justify-center items-center flex-row gap-x-4 w-full max-w-[864px] mx-auto mb-6 border border-solid border-alpha-blue rounded-lg bg-white shadow-lg">
-        <input
-          type="text"
-          className="w-full p-1 focus:outline-none"
-          placeholder={loading ? "请稍等……" : "请输入您的回答"}
-          ref={textInputRef}
-          onKeyUp={handleKeyUp}
-          onKeyDown={handleKeyDown}
-          disabled={loading}
-        />
-        {loading ? (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="icon icon-tabler icon-tabler-dots animate-pulse w-6 h-6 text-gray-400 hover:cursor-wait"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-            <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-            <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-          </svg>
-        ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="icon icon-tabler icon-tabler-send-2 w-6 h-6 text-black hover:cursor-pointer"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            onClick={sendMessage}
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M4.698 4.034l16.302 7.966l-16.302 7.966a.503 .503 0 0 1 -.546 -.124a.555 .555 0 0 1 -.12 -.568l2.468 -7.274l-2.468 -7.274a.555 .555 0 0 1 .12 -.568a.503 .503 0 0 1 .546 -.124z" />
-            <path d="M6.5 12h14.5" />
-          </svg>
-        )}
+      <div className="fixed inset-x-0 bottom-0 flex justify-center items-center flex-row gap-x-4 w-full">
+        <div className="flex justify-center items-center flex-row w-full max-w-[864px] p-2 mx-auto mt-2 mb-6 border border-solid border-alpha-blue rounded-lg bg-white shadow-lg">
+          <input
+            type="text"
+            className="w-full p-1 focus:outline-none"
+            placeholder={loading ? "请稍等……" : "请输入您的回答"}
+            ref={textInputRef}
+            onKeyUp={handleKeyUp}
+            onKeyDown={handleKeyDown}
+            disabled={loading}
+          />
+          {loading ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="icon icon-tabler icon-tabler-dots animate-pulse w-6 h-6 text-gray-400 hover:cursor-wait"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+              <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+              <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="icon icon-tabler icon-tabler-send-2 w-6 h-6 text-black hover:cursor-pointer"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              onClick={sendMessage}
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M4.698 4.034l16.302 7.966l-16.302 7.966a.503 .503 0 0 1 -.546 -.124a.555 .555 0 0 1 -.12 -.568l2.468 -7.274l-2.468 -7.274a.555 .555 0 0 1 .12 -.568a.503 .503 0 0 1 .546 -.124z" />
+              <path d="M6.5 12h14.5" />
+            </svg>
+          )}
+        </div>
       </div>
     </div>
   );

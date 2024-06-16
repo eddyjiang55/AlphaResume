@@ -236,9 +236,9 @@ router.post('/save-data', async (req, res) => {
         if (result.modifiedCount === 0) {
             return res.status(404).json({ message: "No record found to update." });
         }
-        res.status(200).json({ message: "Data updated successfully" });
+        res.status(200).json({ resdueId: id, message: "保存成功！" });
     } catch (error) {
-        res.status(500).json({ message: "Failed to update data", error: error.toString() });
+        res.status(500).json({ resumeId: id, message: "保存失败！", error: error.toString() });
     }
 });
 

@@ -105,7 +105,7 @@ const LoginPage = () => {
           </div>
           <div className="relative mb-4">
             <input type="text" placeholder="验证码" className="text-black pl-4 pr-32 py-3 w-full rounded-md border border-gray-300" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value)} />
-            <button className="absolute inset-y-0 right-0 px-6 bg-blue-200 text-white rounded-r-md" onClick={handleSendCode}>发送验证码</button>
+            <button className={`absolute inset-y-0 right-0 px-6 text-white rounded-r-md ${phone !== "" ? "bg-blue-400" : "bg-blue-200"} transition-colors duration-100`} onClick={handleSendCode}>发送验证码</button>
           </div>
           <div className="flex items-center mb-4">
             <input
