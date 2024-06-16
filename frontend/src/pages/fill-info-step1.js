@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
+import { useSelector } from 'react-redux';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -10,27 +11,19 @@ export async function getServerSideProps(context) {
     // console.log(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/basicInformation`);
     const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/basicInformation`)
     dbFormData = await res.json();
-  } else {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        phoneNumber: "+8613387543505",
-      }),
-    })
-    dbFormData = await res.json()
-    return { redirect: { destination: `/fill-info-step1?id=${dbFormData._id}`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
 }
 
 export default function Step1Page({ dbFormData }) {
+  const User = useSelector((state) => state.user);
   const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [saveState, setSaveState] = useState(false);
+  const [message, setMessage] = useState('');
+  const [resumeId, setResumeId] = useState(dbFormData._id || '');
 
   // 使用 useState 钩子初始化表单状态
   const [form, setForm] = useState(dbFormData.data || {
@@ -78,8 +71,29 @@ export default function Step1Page({ dbFormData }) {
     fileInputRef.current.click();
   };
 
-  const uploadFile = (file, additionalParams) => {
-    console.log(additionalParams);
+  const uploadFile = async (file, additionalParams) => {
+
+    if (additionalParams.improved_user_id === '') {
+      try {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phoneNumber: User.phoneNumber,
+          }),
+        });
+        const data = await res.json();
+        additionalParams.improved_user_id = data._id;
+        setResumeId(data._id);
+      } catch (error) {
+        console.error('Error creating new resume:', error);
+        setError(true);
+        return;
+      }
+    }
+
     const formData = new FormData();
     formData.append('pdfFile', file);
     for (const key in additionalParams) {
@@ -92,7 +106,12 @@ export default function Step1Page({ dbFormData }) {
     })
       .then(response => response.json())
       .then(data => {
+        console.log('Upload successful:', data);
         setLoading(true);
+        router.push({
+          pathname: '/fill-info-step1',
+          query: { id: currentResumeId },
+        }, undefined, { shallow: true })
       })
       .catch(error => {
         console.error('Upload error:', error);
@@ -109,12 +128,12 @@ export default function Step1Page({ dbFormData }) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ id: dbFormData._id }),
+          body: JSON.stringify({ id: resumeId }),
         });
 
         if (response.status === 200) {
           clearInterval(fetchStatusInterval);
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${dbFormData._id}/basicInformation`);
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${resumeId}/basicInformation`);
           const formData = await res.json();
           setForm(formData.data);
           console.log(formData);
@@ -136,9 +155,6 @@ export default function Step1Page({ dbFormData }) {
     };
   }, [loading, dbFormData._id]);
 
-
-
-
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -147,7 +163,7 @@ export default function Step1Page({ dbFormData }) {
         createdAt: new Date(),
         title: 'sample_title',
         position: 'sample_position',
-        improved_user_id: dbFormData._id,
+        improved_user_id: resumeId,
         // resume_history_id: 'sample_resume_history_id',
       }); // Replace this with your upload function
     }
@@ -162,11 +178,34 @@ export default function Step1Page({ dbFormData }) {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // 检查是否有必填项未填写
     if (!form.title || !form.名 || !form.姓 || !form.电话号码 || !form.邮箱地址 || !form.微信号) {
       setError(true);
       return;
+    }
+
+    let currentResumeId = resumeId;
+
+    if (currentResumeId === '') {
+      try {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phoneNumber: User.phoneNumber,
+          }),
+        });
+        const data = await res.json();
+        currentResumeId = data._id;
+        setResumeId(data._id);
+      } catch (error) {
+        console.error('Error creating new resume:', error);
+        setError(true);
+        return;
+      }
     }
 
     // 发送表单数据到后端
@@ -176,7 +215,7 @@ export default function Step1Page({ dbFormData }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: dbFormData._id,
+        id: currentResumeId,
         type: 'basicInformation',
         data: form,
       }),
@@ -188,36 +227,58 @@ export default function Step1Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step2?id=${dbFormData._id}`);
+    router.push(`/fill-info-step2?id=${currentResumeId}`);
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
+
+    let currentResumeId = resumeId;
+
+    if (currentResumeId === '') {
+      try {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phoneNumber: User.phoneNumber,
+          }),
+        });
+        const data = await res.json();
+        currentResumeId = data._id;
+        setResumeId(data._id);
+      } catch (error) {
+        console.error('Error creating new resume:', error);
+        setError(true);
+        return;
+      }
+    }
     // 发送表单数据到后端
-    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: dbFormData._id,
+        id: currentResumeId,
         type: 'basicInformation',
         data: form,
       }),
     })
-    .then(response => {
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return response.json();
-    })
-      .then((res)=> {
-        if (res.message && res.message.includes('User not found')) {
-          // 处理后端返回“找不到记录”的情况
-          console.error('No record found to update with ID:', dbFormData._id);
-        }
-      })
-      .catch(error => {
-        console.error('保存失败', error);
-      });
 
+    if (response.status !== 200) {
+      const data = await response.json();
+      setSaveState(true);
+      setMessage(data.error);
+    } else {
+      setSaveState(true);
+      setMessage('保存成功');
+      router.push({
+        pathname: '/fill-info-step1',
+        query: { id: currentResumeId },
+      }, undefined, { shallow: true })
+    }
   }
 
   return (
@@ -309,6 +370,20 @@ export default function Step1Page({ dbFormData }) {
           </div>
         </div>
       )
+      }
+      {
+        saveState && (
+          <div>
+            <div className='fixed inset-0 bg-black opacity-50 z-40' />
+            <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
+              <p className='text-base font-bold text-wrap text-center py-4 px-4'>
+                {message}
+              </p>
+              <div className='w-full border border-alpha-blue' />
+              <button className='py-2 px-4 text-base' onClick={() => setSaveState(false)}>了解</button>
+            </div>
+          </div>
+        )
       }
       <style jsx>{`
         .background{
