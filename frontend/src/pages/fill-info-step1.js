@@ -30,8 +30,8 @@ export default function Step1Page({ dbFormData }) {
     title: '',
     名: '',
     姓: '',
-    电话号码: '',
-    邮箱地址: '',
+    手机号码: '',
+    邮箱: '',
     微信号: ''
   });
 
@@ -85,6 +85,7 @@ export default function Step1Page({ dbFormData }) {
           }),
         });
         const data = await res.json();
+        console.log("Create new account", data);
         additionalParams.improved_user_id = data._id;
         setResumeId(data._id);
       } catch (error) {
@@ -108,10 +109,6 @@ export default function Step1Page({ dbFormData }) {
       .then(data => {
         console.log('Upload successful:', data);
         setLoading(true);
-        router.push({
-          pathname: '/fill-info-step1',
-          query: { id: currentResumeId },
-        }, undefined, { shallow: true })
       })
       .catch(error => {
         console.error('Upload error:', error);
@@ -136,8 +133,13 @@ export default function Step1Page({ dbFormData }) {
           const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${resumeId}/basicInformation`);
           const formData = await res.json();
           setForm(formData.data);
+          console.log("resume analysis complete");
           console.log(formData);
           setLoading(false);
+          router.push({
+            pathname: '/fill-info-step1',
+            query: { id: formData._id },
+          }, undefined, { shallow: true })
         } else if (response.status === 202) {
           console.log('Processing...');
         }
@@ -180,7 +182,7 @@ export default function Step1Page({ dbFormData }) {
 
   const handleSubmit = async () => {
     // 检查是否有必填项未填写
-    if (!form.title || !form.名 || !form.姓 || !form.电话号码 || !form.邮箱地址 || !form.微信号) {
+    if (!form.title || !form.名 || !form.姓 || !form.手机号码 || !form.邮箱 || !form.微信号) {
       setError(true);
       return;
     }
@@ -326,10 +328,10 @@ export default function Step1Page({ dbFormData }) {
               </div>
 
               <label>*手机号码</label>
-              <input type="tel" name="电话号码" placeholder="请输入手机号码" value={form.电话号码} onChange={handleChange} />
+              <input type="tel" name="手机号码" placeholder="请输入手机号码" value={form.手机号码} onChange={handleChange} />
 
               <label>*邮箱</label>
-              <input type="email" name="邮箱地址" placeholder="请输入邮箱地址" value={form.邮箱地址} onChange={handleChange} />
+              <input type="email" name="邮箱" placeholder="请输入邮箱地址" value={form.邮箱} onChange={handleChange} />
 
               {/* ... 新增 ... */}
               <label>*微信号</label>

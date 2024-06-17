@@ -17,6 +17,7 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 dashscope.api_key='sk-3c43423c9fee4af8928fd8bc647291ee'
 
 userId = sys.argv[1]
+print(userId, flush=True)
 
 # get database
 # load_dotenv()
@@ -24,15 +25,18 @@ mongodb_url = os.getenv('MONGODB_URL')
 client = MongoClient(mongodb_url)
 database_name = "airesumedb"
 db = client[database_name]
+print(f'PROGRESS: {5}', flush=True)
 
 # get original personal cv json
 # userId = '662db8610d04dcf0a4ba0351'
 cv_json = ut.get_cv_from_mongodb(db, userId)
-print(cv_json)
+# print(cv_json)
+print(f'PROGRESS: {7}', flush=True)
 
 # get job imformation
 job_name = '软件工程师'
 job_json = ut.get_job_info_from_mongodb(db, job_name)
+print(f'PROGRESS: {9}', flush=True)
 
 information = {
     '用户信息': cv_json,
@@ -52,9 +56,12 @@ time.sleep(1)
 
 # turn json cv into markdown
 first_cv_json, second_cv_json = ut.split_cv_into_twoparts(improved_cv_json)
+print(f'PROGRESS: {54}', flush=True)
 improved_cv_first_md = qwen.writeCV_first(first_cv_json)
+print(f'PROGRESS: {66}', flush=True)
 time.sleep(1)
 improved_cv_second_md = qwen.wirteCV_second(improved_cv_first_md, second_cv_json)
+print(f'PROGRESS: {78}', flush=True)
 time.sleep(1)
 
 improved_cv_first_md = re.sub(r'```markdown','',improved_cv_first_md)
@@ -65,6 +72,7 @@ improved_cv_second_md = re.sub(r'---\n\n','',improved_cv_second_md)
 improved_cv_second_md = re.sub(r'```','',improved_cv_second_md)
 
 improved_cv_md = improved_cv_first_md + '\n\n' +improved_cv_second_md
+print(f'PROGRESS: {80}', flush=True)
 
 # get resume template
 with open('./pyScripts/Resume_template.md', encoding='utf-8') as f:
@@ -74,6 +82,7 @@ with open('./pyScripts/Resume_template_null.md', encoding='utf-8') as f:
 
 # get standard cv
 md_simple = qwen.wirteCV_simple(template_null, template, improved_cv_md)
+print(f'PROGRESS: {95}', flush=True)
 
 md_simple = re.sub(r'```markdown\n','',md_simple)
 md_simple = re.sub(r'```','',md_simple)
@@ -97,4 +106,5 @@ feedback_cv = {
 }
 
 ut.send_cv_to_mongodb(db, feedback_cv)
+print(f'PROGRESS: {100}', flush=True)
 print('generate and send resume successfully!')

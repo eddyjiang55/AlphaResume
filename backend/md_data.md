@@ -2,116 +2,150 @@
 
 
 
+Ruiqing Yu
 
+217-974-0723leoyuruiqinggmailcomlinkedincominruiqingyu0237Leos Profolio
 
-myaddressyuanbinme 86 131-221-87xxx httpwwwyuanbinme
+Education
 
+University of Illinois Urbana-ChampaignChampaign IL
 
+Bachelor of Science Computer Science  StatisticsGPA 380Aug 2020 - May 2024
 
-2013 
 
-20163
 
-2009  2013
+Relevant Coursework  Data Structures Computer System System Programming Database Algorithm Web Development
 
+Cloud Development Machine Learning Algorithms  Models Statistical Learning NLP Distributed System Optimization
 
+University of Illinois Urbana-ChampaignChampaign IL
 
+Master of Computer ScienceAug 2024 - Dec 2025
 
+Technical Skills
 
-20153 20155
+Programming Languages  Python JavaScript TypeScript Java CC SQL HTMLCSS Dart Golang
 
+Framework  Nextjs Reactjs Vuejs Expressjs Flask Django Nodejs Flutter PyTorch TensorFlow TailwindCSS
 
+Databases  Tools  AWS S3EC2RDB Docker Redis MongoDB Redux Gunicorn Ngnix Git Celery NPM Vercel LLM
 
-xxx
+Experience
 
-xxx
+Full Stack Developer InternJan 2023 - Present
 
-8
+AristAIChampaign IL
 
-xxx
 
-20146
 
-Golang Linux
+Product site  httpswwwaristaiio
 
- httpsgithubcomcyfdecyfcow
 
-bug
 
-ChordURL
+Startup company developing an AI teaching assistant to improve students learning efficiency and reduce educators work
 
-xxx 
 
-L
 
-A
+Expanded our services to200customers by playing a key role in the startups growth and leading a motivated team
 
-T
 
-E
 
-X20155
+Reduced33website rendering time by implementing Server-side rendering inNextjs
 
-L
 
-A
 
-T
+Optimized interaction response time by80by utilizing Edge Runtime in production
 
-E
 
-X Python
 
-L
+Enhanced service infrastructure to simultaneously accommodatehundreds ofrequests boosted capacity and reliability
 
-A
 
-T
 
-E
+Increased deployment speed by20by establishing comprehensive CICD pipelines incorporating testing and enforcing code
 
-X httpsgithubcombillryanresume
+style linting
 
+Software Engineer InternMay 2023 - Aug 2023
 
+AlphalioChina
 
-UnicodeX
 
 
+Reduced38latency time by implementingRediscaching strategy in server enhancing user experience
 
-L
 
-A
 
-T
+Improved60application scalability by integratingCelerywithFlask enabling efficient asynchronous task processing
 
-E
 
-X
 
-FontAwesome 450
+Boosted multi-container app management efficiency by75throughDocker Composeimplementation
 
+Software Engineer InternJan 2023 - May 2023
 
+The Adaptive Cognition and Interaction Design ACTION LabChampaign IL
 
-IT
 
 
+Led a team of three people developing mobile applications usingFlutterandDart
 
- C  Python  C  Java
 
- Linux
 
- xxx
+Optimized app performance by leveraging stateless Dart widgets achieving a30reduction in memory usage and enhanced
 
+responsiveness
 
+Projects
 
- xxx20136
+OEASEhttpsgithubcomoeasenetJan 2024 - Present
 
-2015
 
 
+A new generation of high-performance club management systems and community networks for non-profit organizations
 
- httpblogyoursme
 
-GitHub httpsgithubcomusername
 
--TOEFL xxx
+Enhanced backend response and deployment efficiency usingGo Fiber
+
+
+
+Enhanced site speed by implementing code splitting and lazy loading inVuejs reducing initial load time by20
+
+AI Resume GeneratorhttpsgithubcomLeo-rq-yuAI
+
+R
+
+esume
+
+Dec 2023 - Present
+
+
+
+An AI-enhanced one-stop job application platform offering resume optimization mock interviews and one-click resume
+
+submission features
+
+
+
+Constructed a scalable server infrastructure usingExpressjs achieving improvements in request processing efficiency and
+
+reduced server response times
+
+
+
+Built an asynchronous task system inNodejsto ensure continuity in user experience
+
+ClassTranscribehttpsgithubcomclasstranscribe
+
+Aug 2023 - Present
+
+
+
+A new education video-based application developed at University of Illinois
+
+
+
+Reduced server processing and computational costs by80by embedding a large language model in the local server
+
+infrastructure
