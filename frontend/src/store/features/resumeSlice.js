@@ -15,13 +15,13 @@ export const resumeSlice = createSlice({
             state.cards.push(action.payload);
         },
         setResumeCards: (state, action) => {
-            state.cards = action.payload;
+            state.cards = action.payload ? action.payload : [];
         },
         setUserDetail: (state, action) => {
             state.userDetails = action.payload;
         },
         deleteResumeCard: (state, action) => {
-            state.cards = state.cards.filter(card => card.id !== action.payload);
+            state.cards = state.cards.filter(card => card !== action.payload);
         }
     }
 });

@@ -6,7 +6,7 @@ const { spawn } = require('child_process');
 const path = require('path');
 
 // 获取 Python 脚本的绝对路径
-const pythonScriptPath = path.resolve(__dirname, '../pyScripts/AI_asking.py');
+const pythonScriptPath = path.resolve(__dirname, '../pyScripts/AI_asking_new.py');
 
 router.post('/resume-chat', async (req, res) => {
     try {

@@ -43,26 +43,6 @@ const SelectCommunicationMethod = (props) => {
           </div>
         </section>
       </div>
-      {/* <style jsx>
-        {`
-          @media (max-width: 1200px) {
-            .select-communication-method-link1 {
-              color: var(--dl-color-gray-white);
-            }
-            .select-communication-method-link2 {
-              color: var(--dl-color-gray-white);
-            }
-          }
-          @media (max-width: 767px) {
-            .select-communication-method-cards {
-              padding-top: var(--dl-space-space-threeunits);
-              padding-left: var(--dl-space-space-oneandhalfunits);
-              padding-right: var(--dl-space-space-oneandhalfunits);
-              padding-bottom: var(--dl-space-space-fourunits);
-            }
-          }
-        `}
-      </style> */}
     </>
   )
 }

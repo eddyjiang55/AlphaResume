@@ -98,6 +98,36 @@ const resolveDeflist = (html) => {
   return html;
 };
 
+const formatResume = (html) => {
+  html = resolveDeflist(html);
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  const sections = doc.querySelectorAll('h2');
+  let formattedHtml = '';
+
+  sections.forEach(section => {
+    const sectionTitleText = section.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+    const sectionDiv = document.createElement('div');
+    sectionDiv.classList.add('section');
+    sectionDiv.id = `${sectionTitleText}-section`;
+
+    const sectionTitle = section.outerHTML;
+    sectionDiv.innerHTML = sectionTitle;
+
+    let sibling = section.nextElementSibling;
+    while (sibling && sibling.tagName !== 'H2') {
+      sectionDiv.innerHTML += sibling.outerHTML;
+      sibling = sibling.nextElementSibling;
+    }
+
+    formattedHtml += sectionDiv.outerHTML;
+  });
+
+  return formattedHtml;
+};
+
 const resolveHeader = (html, frontmatter) => {
   let header = "";
 
@@ -133,7 +163,9 @@ export const renderMarkdown = (md) => {
   const { body, attributes } = frontmatter(preprocessedMd);
 
   let html = markdown.render(body);
-  html = resolveDeflist(html);
+  console.log(html);
+  html = formatResume(html);
+  console.log(html);
   html = resolveHeader(html, attributes);
 
   return html;

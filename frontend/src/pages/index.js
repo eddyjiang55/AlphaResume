@@ -1,42 +1,39 @@
-import React, { useState,useEffect } from 'react';
-import Navbar from '../components/navbar';
+import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import Navbar from '@/components/navbar';
 import { useDispatch, useSelector } from 'react-redux';
-import ResumeCard from '../components/resumeCard';
-import { setUserDetail, setResumeCards ,toggleResume,deleteResumeCard} from '../store/features/resumeSlice';
- 
+import Image from 'next/image';
+import { setResumeCards } from '@/store/features/resumeSlice';
+import Link from 'next/link';
+const CardsPart = dynamic(() => import('@/components/ResumeCards/ResumeCardPart'), {
+    ssr: false,
+    loading: () => <div className='max-w-7xl 2xl:max-w-[1380px] mx-auto w-full h-2/5 rounded-lg bg-gray-200 animate-pulse' />
+});
+
 
 const SplitBackgroundPage = () => {
 
     const dispatch = useDispatch();
-    const resumeData = useSelector((state) => state.resume.cards);
-    const userId = useSelector((state) => state.user.id);
-    const resumeVisible = useSelector((state) => state.resume.resumeVisible); 
-    const [title, setTitle] = useState(''); 
+    const User = useSelector((state) => state.user);
+    const ResumeCards = useSelector((state) => state.resume.cards);
+    console.log(User);
+    // const resumeVisible = useSelector((state) => state.resume.resumeVisible);
+    // const [title, setTitle] = useState('');
 
     useEffect(() => {
-        if (userId) {
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${userId}`)
-            .then(response => response.json())
-            .then(userData => {
-              dispatch(setUserDetail(userData));
-              dispatch(setResumeCards([userData])); 
-              dispatch(toggleResume(true));
-              setTitle(userData["基本信息"].title); 
-            })
-            .catch(error => {
-              console.error('Error fetching user detail:', error);
-            });
+        if (User.id) {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/${User.id}`)
+                .then(response => response.json())
+                .then(userData => {
+                    console.log(userData);
+                    dispatch(setResumeCards(userData.resumeIdList));
+                })
+                .catch(error => {
+                    console.error('Error fetching user detail:', error);
+                });
         }
-    },[userId, dispatch])
+    }, [])
 
-
-  const handleDelete = (id) => {
-    dispatch(deleteResumeCard(id));
-    if (resumeData.length === 1) {
-      dispatch(toggleResume(false));  
-    }
-  };
-    
     // const [resumeData, setResumeData] = useState( [{
     //     title: "字节后端开发岗简历0309", details: "创建时间:2024年3月1日"
     // },{
@@ -48,235 +45,85 @@ const SplitBackgroundPage = () => {
         setResumeData([...resumeData, newResume]);
     };
     return (
-        <>
-        <Navbar></Navbar>
-            <div className="split-background">
-                <div className="top-half"></div>
-                <div className="content-container">
-                    <div className="text-container">
+        <div className="flex flex-col w-full h-screen overflow-y-auto overflow-x-hidden bg-light-blue">
+            <Navbar></Navbar>
+            <div className="w-full h-3/5 relative py-20">
+                <div className="absolute top-0 left-0 bg-alpha-blue h-1/2 w-full"></div>
+                <div className="relative flex flex-col justify-center items-center gap-y-12 z-10 mx-auto">
+                    <div className="text-3xl text-light-blue">
                         开始创建你的专业定制简历
                     </div>
-                    <div className="rectangle-container">
-                        <div className="rectangle">
-                            <div className="inner-div">
-                                <div className="text-title">怎么写一个好简历</div>
-                                <div className='text-describe'>x个来自行业专家的专业简历书写模板及其相关知识点。</div>
-                            </div>
-                            <div className="inner-div">
-                                <div className="small">
-                                    <div className="row">
-                                        <div className="item1">
-                                            <img src="/img/check_mark.svg" width={50} height={50}></img>
-                                            <span>简历优点</span>
-                                        </div>
-                                        <div className="item1">
-                                            <img src="/img/check_mark.svg" width={50} height={50}></img>
-                                            <span>对岗位理解</span>
-                                        </div>
+                    <div className="grid grid-cols-2 gap-x-24 justify-items-center mx-auto">
+                        <div className="bg-white hover:bg-[#B2DDEE] rounded-lg p-10 shadow-lg">
+                            <div className="flex flex-col justify-center items-center gap-y-12 w-full">
+                                <h1 className="text-black text-[40px] font-bold 2xl:text-[48px]">怎么写一个好简历</h1>
+                                <p className='text-black font-normal text-lg 2xl:text-2xl'>x个来自行业专家的专业简历书写模板及其相关知识点。</p>
+                                <div className="grid grid-cols-2 gap-12 mx-auto">
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>简历优点</span>
                                     </div>
-                                    <div className="row">
-                                        <div className="item1">
-                                            <img src="/img/check_mark.svg"  width={50} height={50}></img>
-                                            <span>观念靠拢</span>
-                                        </div>
-                                        <div className="item1">
-                                            <img src="/img/check_mark.svg"  width={50} height={50}></img>
-                                            <span>易错点解析</span>
-                                        </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>对岗位理解</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>观念靠拢</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>易错点解析</span>
                                     </div>
                                 </div>
-                                <div className="actions">
-                                    <button className="action-button">查看知识文档</button>
-                                </div>
+                                <button className="text-2xl font-bold text-white py-4 px-8 bg-alpha-blue rounded-full">查看知识文档</button>
                             </div>
                         </div>
-                        <div className="rectangle right">
-                            <div className="inner-div">
-                                <div className="text-title">简历生成器</div>
-                                <div className='text-describe'>来自行业专家的专业简历书写模板及其相关知识点。</div>
-                            </div>
-                            <div className="inner-div">
-                                <div className="small">
-                                    <div className="row">
-                                        <div className="item1">
-                                            <img src="/img/check_mark.svg" width={50} height={50}></img>
-                                            <span><em>AI</em> 赋能</span>
-                                        </div>
-                                        <div className="item1">
-                                            <img src="/img/check_mark.svg" width={50} height={50}></img>
-                                            <span><em>ATS</em> 筛选</span>
-                                        </div>
+                        <div className="bg-white hover:bg-[#B2DDEE] rounded-lg p-10 shadow-lg">
+                            <div className="flex flex-col justify-center items-center gap-y-12 w-full">
+                                <h1 className="text-black text-[40px] font-bold 2xl:text-[48px]">简历生成器</h1>
+                                <p className='text-black font-normal text-lg 2xl:text-2xl'>来自行业专家的专业简历书写模板及其相关知识点。</p>
+                                <div className="grid grid-cols-2 gap-12 mx-auto">
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'><em>AI</em> 赋能</span>
                                     </div>
-                                    <div className="row">
-                                        <div className="item1">
-                                            <img src="/img/check_mark.svg"  width={50} height={50}></img>
-                                            <span>专家合作</span>
-                                        </div>
-                                        <div className="item1">
-                                            <img src="/img/check_mark.svg"  width={50} height={50}></img>
-                                            <span>快速生成</span>
-                                        </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'><em>ATS</em> 筛选</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>专家合作</span>
+                                    </div>
+                                    <div className="flex flex-row justify-center items-center gap-x-4">
+                                        <Image src="/img/check_mark.svg" alt='check-mark' width={50} height={50}></Image>
+                                        <span className='font-normal text-black text-base'>快速生成</span>
                                     </div>
                                 </div>
-                                <div className="actions">
-                                    <button className="action-button">
-                                        <a href='/start-resumeserve'>简历生成</a>
+                                <Link href='/start-resumeserve'>
+                                    <button className="text-2xl font-bold text-white py-4 px-8 bg-alpha-blue rounded-full">
+                                        简历生成
                                     </button>
-                                </div>
+                                </Link>
                             </div>
                         </div>
                     </div>
-                    <div className="text-container-lower">
-                        你的简历将会显示在这里<br/>
+                    <div className="text-2xl text-alpha-blue font-normal text-center">
+                        你的简历将会显示在这里<br />
                         开始创建吧！
                     </div>
                 </div>
-                <div className="bottom-half"></div>
-                <div className="resumeContainer">
-                {resumeVisible && resumeData.length > 0 && resumeData.map((data) => (
-            <ResumeCard key={data.id} resumeData={data} title={title} onDelete={handleDelete} />
-          ))}
-        </div>
             </div>
-
-
-            <style jsx>{`
-                .split-background {
-                    display: grid;
-                    grid-template-rows: auto auto 1fr;
-                    gap:20px;
-                    align-items: start; /* 对齐到容器的顶部 */
-                    justify-content: center; /* 水平居中 */
-                    min-height: 100vh;
-                    width: 100%;
-                    position: relative;
-                }
-                .top-half, .bottom-half {
-                    position: absolute;
-                    width: 100%;
-                    height: 50%; /* 设置为视窗高度的一半 */
-                    z-index: 0; /* 确保它们位于背景层 */
-                 
-                }
-                .top-half {
-                    background-color: #1D80A7;
-                    top: 0; /* 顶部对齐 */
-                }
-                
-                .bottom-half {
-                    background-color: #EDF8FD;
-                    bottom: 0; /* 底部对齐 */
-                }
-                
-                .content-container {
-                    z-index: 1;
-                    position: relative;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                }
-                .text-container {
-                    font-size: 32px;
-                    color: #EDF8FD;
-                    z-index: 2;
-                }
-                .text-container-lower {
-                    font-size: 24px;
-                    color: #1D80A7;
-                    text-align: center;
-                    z-index: 2;
-                }
-                .rectangle-container {
-                    grid-row: 2; 
-                    display: grid;
-                    grid-template-columns: repeat(2, 1fr); /* 两列布局 */
-                    gap: 100px; /* 列之间的间隔 */
-                    justify-content: center; /* 水平居中 */
-                    align-items: start; /* 对齐到顶部 */
-                    padding: 20px;
-                    box-sizing: border-box;
-                    width: 100%; /* 使用 100% 宽度 */
-                    z-index: 1;
-                    margin-bottom: 50px; 
-                }
-                .rectangle {
-                    width: 800px;
-                    height: 600px;
-                    background-color: white;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
-                }
-                .rectangle:hover{
-                    background-color:#B2DDEE;
-                }
-                .inner-div {
-                    align-items: left;
-                }
-                .text-title{
-                    font-size: 48px;
-                    font-weight: bold;
-                    padding: 50px;
-                }
-                .text-describe{
-                    font-size: 24px;
-                    padding-left: 70px;
-                }
-                .small{
-                    padding-top:30px;
-                    padding-bottom:30px;
-                    padding-left:70px;
-                }
-                .small .row {
-                    display: flex;
-                    justify-content: flex-start;
-                    padding:20px;
-                }
-                .small .item1 {
-                    display: flex;
-                    align-items: center;
-                    margin-right: 100px;
-                }
-                .small .item1 img {
-                    margin-right: 10px;
-                }
-                
-                .small .item1 span {
-                }
-                .actions {
-                    display: flex;
-                    gap: 10px;
-                    margin-left: 70px;
-                }
-                .action-button {
-                    font-size: 24px;
-                    font-weight: bold;
-                    padding: 8px 16px;
-                    background-color: #1D80A7;
-                    color: white;
-                    cursor: pointer;
-                    border-radius: 50px;
-                    padding-left: 30px;
-                    padding-right: 30px;
-                }
-                .resumeContainer{
-                    display: grid;
-                    grid-row: 3;
-                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 动态数量的列 */
-                    gap: 40px;
-                    align-items: start;
-                    justify-content: center;
-                    padding: 20px;
-                    box-sizing: border-box;
-                    width: 100%; /* 使用 100% 宽度 */
-                    z-index: 1;
-                    position: relative; /* 确保它相对于分割背景定位 */
-                }
-
-               
-            `}</style>
-        </>
+            <div className="w-full h-auto max-w-7xl 2xl:max-w-[1380px] mx-auto mb-16">
+                <CardsPart resumeIdList={ResumeCards} userPhoneNumber={User.phoneNumber} />
+                {/* <div className="grid gird-cols-4 gap-x-4 justify-start items-center">
+                {User.resumeIdList.map((data, index) => (
+                    <ResumeCard key={index} resumeId={data} onDelete={handleDelete} />
+                ))}
+            </div> */}
+            </div>
+        </div>
     );
 }
 

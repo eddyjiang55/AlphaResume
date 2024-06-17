@@ -87,11 +87,11 @@ router.post('/improved-users', async (req, res) => {
 // 根据ID查询用户
 router.get('/improved-users/:_id', async (req, res) => {
     try {
-        const user = await ImprovedUser.findById(req.params._id);
-        if (user) {
-            res.status(200).json(user);
+        const resumeRecord = await ImprovedUser.findById(req.params._id);
+        if (resumeRecord) {
+            res.status(200).json(resumeRecord);
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.status(404).json({ message: 'Resume record not found' });
         }
     } catch (error) {
         console.error(error);
@@ -103,18 +103,24 @@ router.get('/improved-users/:_id', async (req, res) => {
 router.get('/improved-users/:_id/:type', async (req, res) => {
     try {
         const { _id, type } = req.params;
-
         const chineseType = typeToChinese[type]; // 获得中文字段名
         if (!chineseType) {
             return res.status(400).json({ message: "Invalid type specified" });
         }
 
-        const user = await ImprovedUser.findById(_id);
-        if (user) {
-            const responseData = user.personal_data[chineseType] || null; // 如果指定类型不存在，返回 null
-            res.status(200).json({ data: responseData, _id: _id });
+        const resumeRecord = await ImprovedUser.findById(_id);
+        console.log(resumeRecord);
+        if (resumeRecord) {
+            try {
+                const responseData = resumeRecord.personal_data[chineseType] || null; // 如果指定类型不存在，返回 null
+                const updatedAt = resumeRecord.updatedAt;
+                res.status(200).json({ data: responseData, _id: _id, updateTime: updatedAt });
+            } catch (error) {
+                console.error(error);
+                res.status(200).json({ data: { title: "" }, _id: _id, updateTime: "" });
+            }
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.status(404).json({ message: 'Resume record not found' });
         }
     } catch (error) {
         console.error(error);
@@ -141,6 +147,7 @@ router.patch('/improved-users/:_id', async (req, res) => {
 // 删除用户，并从账户的 improvedUsers 列表中删除其 ID
 router.delete('/improved-users', async (req, res) => {
     const { phoneNumber, improvedUserId } = req.body;
+    console.log(phoneNumber, improvedUserId);
 
     if (!phoneNumber || !improvedUserId) {
         return res.status(400).json({ message: 'Phone number and improvedUserId are required' });
@@ -152,12 +159,9 @@ router.delete('/improved-users', async (req, res) => {
         if (!account) {
             return res.status(404).json({ message: 'Account not found' });
         }
-
+        console.log(account._id);
         // 从账户的 improvedUsers 列表中删除 improvedUserId
-        const updateResult = await Account.updateOne(
-            { _id: account._id },
-            { $pull: { improvedUsers: improvedUserId } }
-        );
+        const updateResult = await Account.deleteImprovedUser(account._id, improvedUserId);
 
         if (updateResult.modifiedCount === 0) {
             return res.status(404).json({ message: 'ImprovedUser ID not found in account' });
@@ -169,7 +173,7 @@ router.delete('/improved-users', async (req, res) => {
             return res.status(404).json({ message: 'ImprovedUser not found' });
         }
 
-        res.json({ message: 'ImprovedUser deleted successfully and removed from account' });
+        res.status(200).json({ message: 'ImprovedUser deleted successfully and removed from account' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Failed to delete improved user or update account', error: error.toString() });
@@ -181,22 +185,21 @@ router.delete('/improved-users', async (req, res) => {
 // 更新个人信息数据
 router.post('/save-data', async (req, res) => {
     const { id, type, data } = req.body;
-
+    console.log(data);
     try {
         // 根据type决定更新哪个部分
         let updatePath = {};
         switch (type) {
             case 'basicInformation':  // 新增的基本信息处理
                 updatePath['基本信息'] = data;
-
                 // 从基本信息中找到简历标题并更新到对应的 ResumeHistory 记录
-                const resumeTitle = data.find(item => item.key === '简历标题')?.value;
-                if (resumeTitle) {
-                    const improvedUser = await ImprovedUser.findById(id);
-                    if (improvedUser && improvedUser.resumeId) {
-                        await ResumeHistory.update(improvedUser.resumeId, { title: resumeTitle });
-                    }
-                }
+                // const resumeTitle = data.find(item => item.key === '简历标题')?.value;
+                // if (resumeTitle) {
+                //     const improvedUser = await ImprovedUser.findById(id);
+                //     if (improvedUser && improvedUser.resumeId) {
+                //         await ResumeHistory.update(improvedUser.resumeId, { title: resumeTitle });
+                //     }
+                // }
                 break;
             case 'personalEvaluation':
                 updatePath['个人评价'] = data;
@@ -227,13 +230,15 @@ router.post('/save-data', async (req, res) => {
         }
 
         // 更新数据库记录
+        console.log("before send to update")
+        console.log(updatePath)
         const result = await ImprovedUser.update(id, updatePath);
         if (result.modifiedCount === 0) {
             return res.status(404).json({ message: "No record found to update." });
         }
-        res.status(200).json({ message: "Data updated successfully" });
+        res.status(200).json({ resdueId: id, message: "保存成功！" });
     } catch (error) {
-        res.status(500).json({ message: "Failed to update data", error: error.toString() });
+        res.status(500).json({ resumeId: id, message: "保存失败！", error: error.toString() });
     }
 });
 
