@@ -26,7 +26,7 @@ export async function getServerSideProps(context) {
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }
   }
-  // Pass data to the page via props
+  //Pass data to the page via props
   return { props: { dbFormData } }
 }
 
@@ -169,15 +169,20 @@ export default function Step8Page({ dbFormData }) {
                     }}
                   />
                   <label>*熟练度</label>
-                  <input type="text"
-                    placeholder='请输入熟练度'
+                  <select
                     value={skillFormData[activeIndex].proficiency}
                     onChange={(e) => {
                       const newSkillFormData = [...skillFormData];
                       newSkillFormData[activeIndex].proficiency = e.target.value;
                       setSkillFormData(newSkillFormData);
                     }}
-                  />
+                  >
+                    <option value="" disabled hidden>请选择熟练度</option>
+                    <option value="熟练">熟练</option>
+                    <option value="高级">高级</option>
+                    <option value="基础">基础</option>
+                  </select>
+
                   <div className="w-full flex flex-row justify-end items-center mt-1">
                     <button
                       className="text-gray-500 hover:text-red-500"
@@ -323,7 +328,9 @@ export default function Step8Page({ dbFormData }) {
         input[type="title"],
         input[type="text"],
         input[type="tel"],
-        input[type="email"] {
+        input[type="email"],
+        select
+        {
           padding: 10px;
           margin-top: 5px;
           border: 1px solid #ccc;
