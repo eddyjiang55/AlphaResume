@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 import { setPhoneNumber, setId } from '../store/slices/userSlice';
 import bgImg from '../../public/img/background.jpg';
-import logo from '../../public/img/logo_y.jpg';
+// import logo from '../../public/img/logo_y.jpg';
 import { backIcon } from '../lib/iconLab';
 
 const LoginPage = () => {
@@ -131,8 +131,7 @@ const LoginPage = () => {
         </div>
       </div>
       <div className="flex flex-col justify-center items-center w-1/2 bg-white">
-        <Image src={logo} alt="Logo" style={{
-          width: '190px',
+        <Image src="/img/logo_y.jpg" alt="Logo" width='190' height='135' style={{
           height: 'auto',
         }} />
         <div className='flex flex-col justify-center text-center p-24 gap-8 text-lg'>
