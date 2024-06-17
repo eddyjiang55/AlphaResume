@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 import { setPhoneNumber, setId } from '../store/slices/userSlice';
 import bgImg from '../../public/img/background.jpg';
-import logo from '../../public/img/Logo_y.jpg';
+import logo from '../../public/img/logo_y.jpg';
 import { backIcon } from '../lib/iconLab';
 
 const LoginPage = () => {
