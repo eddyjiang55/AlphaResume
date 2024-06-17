@@ -131,7 +131,7 @@ const LoginPage = () => {
         </div>
       </div>
       <div className="flex flex-col justify-center items-center w-1/2 bg-white">
-        <Image src="/img/logo_y.jpg" alt="Logo" width='190' height='135' style={{
+        <Image src="/img/Logo_y.jpg" alt="Logo" width='190' height='135' style={{
           height: 'auto',
         }} />
         <div className='flex flex-col justify-center text-center p-24 gap-8 text-lg'>
