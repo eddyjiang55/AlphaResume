@@ -177,16 +177,27 @@ export default function Step10Page({ dbFormData }) {
                       setLanguageFormData(newLanguageFormData);
                     }}
                   />
+
+
                   <label>*熟练度</label>
-                  <input type="text"
-                    placeholder='请输入熟练度'
+                  <select
                     value={languageFormData[activeIndex].proficiency}
                     onChange={(e) => {
                       const newLanguageFormData = [...languageFormData];
                       newLanguageFormData[activeIndex].proficiency = e.target.value;
                       setLanguageFormData(newLanguageFormData);
                     }}
-                  />
+                  >
+                    <option value="" disabled hidden>请选择熟练度</option>
+                    <option value="基础">基础</option>
+                    <option value="中级">中级</option>
+                    <option value="熟练">熟练</option>
+                    <option value="流利">流利</option>
+                    <option value="母语">母语</option>
+                  </select>
+
+
+
                   <div className="w-full flex flex-row justify-between items-center gap-x-16">
                     <div className="w-full flex flex-col justify-start items-stretch">
                       <label>证书/资格认证</label>
@@ -370,7 +381,8 @@ export default function Step10Page({ dbFormData }) {
         input[type="title"],
         input[type="text"],
         input[type="tel"],
-        input[type="email"] {
+        input[type="email"],
+        select{
           padding: 10px;
           margin-top: 5px;
           border: 1px solid #ccc;
