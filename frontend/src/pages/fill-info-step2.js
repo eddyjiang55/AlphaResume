@@ -23,9 +23,11 @@ export default function Step2Page({ dbFormData }) {
   const router = useRouter();
 
   const [formData, setFormData] = useState(dbFormData.data || '');
+  const [saveState, setSaveState] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const handleSave = () => {
-    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+  const handleSave = async () => {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
@@ -36,13 +38,14 @@ export default function Step2Page({ dbFormData }) {
         'Content-Type': 'application/json',
       },
     })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Save successful:', data);
-      })
-      .catch(error => {
-        console.error('Save error:', error);
-      });
+    if (response.status !== 200) {
+      const data = await response.json();
+      setSaveState(true);
+      setMessage(data.error);
+    } else {
+      setSaveState(true);
+      setMessage('保存成功');
+    }
   }
 
   const handleSubmit = () => {
@@ -109,6 +112,20 @@ export default function Step2Page({ dbFormData }) {
           </div>
         </div>
       </div>
+      {
+        saveState && (
+          <div>
+            <div className='fixed inset-0 bg-black opacity-50 z-40' />
+            <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
+              <p className='text-base font-bold text-wrap text-center py-4 px-4'>
+                {message}
+              </p>
+              <div className='w-full border border-alpha-blue' />
+              <button className='py-2 px-4 text-base' onClick={() => setSaveState(false)}>了解</button>
+            </div>
+          </div>
+        )
+      }
       <style jsx>{`
       .background {
         background-color: #EDF8FD;

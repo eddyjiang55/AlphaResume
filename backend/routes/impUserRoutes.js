@@ -244,6 +244,7 @@ router.post('/save-data', async (req, res) => {
 
 router.post('/improved-users/generate-resume', async (req, res) => {
     const { id } = req.body;
+    console.log('Generating resume for user:', id);
     const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id],
         {
             env: {
@@ -251,13 +252,22 @@ router.post('/improved-users/generate-resume', async (req, res) => {
             }
         }
     );
-    processResult[id] = { status: 'running' };
+    console.log('Python process spawned:', pythonProcess.pid);
+    processResult[id] = { status: 'running', progress: 0 };
     pythonProcess.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
+        const output = data.toString();
+        console.log(`stdout: ${output}`);
+
+        // Check if the output contains a progress message
+        const progressMatch = output.match(/PROGRESS: (\d+)/);
+        if (progressMatch) {
+            const progressValue = parseInt(progressMatch[1], 10);
+            processResult[id].progress = progressValue;
+        }
     });
 
     pythonProcess.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
+        console.log(`stderr: ${data}`);
     });
 
     pythonProcess.on('close', (code) => {
@@ -275,7 +285,7 @@ router.post('/improved-users/resume-result', (req, res) => {
         return res.status(404).json({ message: 'No result found' });
     }
     if (result.status === 'running') {
-        return res.status(202).json({ message: 'Result is still running' });
+        return res.status(202).json({ message: 'Result is still running', progress: result.progress });
     }
     if (result.status === 'done') {
         return res.status(200).json({ message: 'Result is ready' });

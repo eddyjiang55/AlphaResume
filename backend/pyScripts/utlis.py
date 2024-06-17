@@ -22,8 +22,8 @@ def get_job_info_from_mongodb(db, job_name): # job's id
 
 def get_improved_cv_json(information, cv_key_order, notarget_list, target_list, keywords_target_list, job_keywords):
     improved_cv_json = {}
+    num = 9
     for key in cv_key_order:
-        print(key)
         if key in notarget_list:
             improved_cv_json[key] = information['用户信息'][key]
         if key in target_list:
@@ -32,6 +32,8 @@ def get_improved_cv_json(information, cv_key_order, notarget_list, target_list, 
         if key in keywords_target_list:
             improved_cv_json[key] = qwen.QAKeywords(key,job_keywords,information)
             time.sleep(1)
+        num += 5
+        print(f'PROGRESS: {num}', flush=True)
     return improved_cv_json
 
 def split_cv_into_twoparts(improved_cv_json):
