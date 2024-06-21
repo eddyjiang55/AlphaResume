@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { processTimeStr, fetchPartData } from '../utils/fetchResumePartData';
+import { step6Tips } from '../lib/tips';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -514,11 +515,25 @@ export default function Step7Page({ dbFormData }) {
         </div>
         <div className='w-1/2 bg-light-blue h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch '>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
-          <p className='text-black text-base font-normal'>
-            Tips（未完善）
-            If you are mid-level or in a managerial role, your educational credentials will hold less weight than your work history. If you are a new graduate, however, crafting your first shiny new resume can pose some particular challenges.
-            We've got you covered in our post The New Grad's Map to Resume Writing.
-          </p>
+          <div className='flex flex-col gap-y-4'>
+            {step6Tips.map((topic, index) => (
+              <div className='text-black ' key={index}>
+                <h2 className="font-bold text-xl">{topic.title}</h2>
+                {topic.subtopics.map((subtopic, subIndex) => (
+                  <ol className='list-decimal list-inside' key={subIndex}>
+                    {subtopic.title && <li className='font-bold text-lg'>{subtopic.title}</li>}
+                    <ul className='list-disc list-inside'>
+                      {subtopic.bulletPoints.map((point, pointIndex) => (
+                        <li key={pointIndex}>
+                          <span className='text-base'><b className='font-bold text-base'>{point.topic}:</b> {point.content}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </ol>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       {error && <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2'>

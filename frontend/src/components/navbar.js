@@ -37,6 +37,7 @@ const Navbar = () => {
                 <div className="flex flex-row justify-between items-center gap-x-24" ref={ref}>
                     {navigationItems.map((item, index) => (
                         <div key={index} className="inline-block relative">
+                            <Link href='/'>
                             <div className={`w-full flex items-center text-lg text-alpha-blue p-2 border-b-2 ${openDropdown === index ? "border-alpha-blue" : "border-transparent"}`}
                                 onMouseEnter={() => setOpenDropdown(index)}
                             >
@@ -53,6 +54,7 @@ const Navbar = () => {
                                     </svg>
                                 )}
                             </div>
+                            </Link>
                             {openDropdown === index && (
                                 <div className="absolute w-auto min-w-[460px] left-0 bg-white text-black mt-6 p-1 z-50 rounded-lg border-[#b2ddee] border-2 shadow-inner">
                                     {item.links.map((link, linkIndex) => (
