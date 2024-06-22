@@ -18,7 +18,7 @@ class ImprovedUser {
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.resumeId = "";
-        this.complteness = 0;
+        this.completeness = 0;
     }
 
     async save() {
@@ -28,7 +28,7 @@ class ImprovedUser {
             _id: this._id,
             personal_data: this.personal_data,
             resumeId: this.resumeId,
-            complteness: this.complteness,
+            completeness: this.completeness,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt
         });
@@ -37,14 +37,14 @@ class ImprovedUser {
 
     static async findById(_id) {
         const db = await connect();
-        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUser'
+        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUsers'
         const resumeRecord = await collection.findOne({ _id });
         return resumeRecord;
     }
 
     static async update(_id, updateData) {
         const db = await connect();
-        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUser'
+        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUsers'
         const setUpdateData = {};
         for (const key in updateData) {
             setUpdateData[`personal_data.${key}`] = updateData[key];
@@ -58,8 +58,15 @@ class ImprovedUser {
 
     static async deleteById(_id) {
         const db = await connect();
-        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUser'
+        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUsers'
         const result = await collection.deleteOne({ _id });
+        return result;
+    }
+
+    static async updateCompleteness(_id, completeness) {
+        const db = await connect();
+        const collection = db.collection('improvedUsers');
+        const result = await collection.updateOne({ _id }, { $set: { completeness, updatedAt: new Date() } });
         return result;
     }
 }
