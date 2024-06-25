@@ -73,7 +73,7 @@ def upload_score_to_mongodb(resume_id, score):
 
     client.close()
 
-def main(resume_id):
+
     personal_info, resume_record = get_resume_from_mongodb(resume_id)
 
     if personal_info:

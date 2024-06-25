@@ -122,5 +122,5 @@ app.get('/api/file/:id', (req, res) => {
 const port =  8080;
 // Start the server
 app.listen(port, () => {
-   console.log(`Server listening at http://localhost:${port}`);
+   console.log(`Server listening at${port}`);
 });
