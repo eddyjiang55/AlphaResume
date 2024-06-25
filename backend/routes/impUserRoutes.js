@@ -261,7 +261,7 @@ router.delete('/improved-users', async (req, res) => {
 // 更新个人信息数据
 router.post('/save-data', async (req, res) => {
     const { id, type, data } = req.body;
-    console.log(data);
+    console.log('Request body:', req.body);
     try {
         // 根据type决定更新哪个部分
         let updatePath = {};
@@ -298,8 +298,8 @@ router.post('/save-data', async (req, res) => {
         }
 
         // 更新数据库记录
-        console.log("before send to update")
-        console.log(updatePath)
+        // console.log("before send to update")
+        // console.log(updatePath)
         const result = await ImprovedUser.update(id, updatePath);
         if (result.modifiedCount === 0) {
             return res.status(404).json({ message: "No record found to update." });
@@ -312,7 +312,7 @@ router.post('/save-data', async (req, res) => {
             try {
                 const output = data.toString();
                 const jsonOutput = JSON.parse(output);
-                console.log('Parsed JSON output:', jsonOutput);
+                // console.log('Parsed JSON output:', jsonOutput);
                 res.status(200).json({ resumeId: id, message: "保存成功！", completeness: jsonOutput.completeness });
             } catch (error) {
                 console.error('Failed to parse JSON:', error);
