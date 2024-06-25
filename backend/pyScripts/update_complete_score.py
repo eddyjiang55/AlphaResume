@@ -20,7 +20,12 @@ def get_resume_from_mongodb(resume_id):
     client.close()
 
     if resume_record:
-        return resume_record['personal_data'], resume_record
+        try:
+            personal_data = resume_record['personal_data']
+            return personal_data, resume_record
+        except KeyError as e:
+            print(f"KeyError: {e}, no personal_data found in resume_record for resume_id: {resume_id}", file=sys.stderr)
+            return None, None
     else:
         print(f"No record found for resume_id: {resume_id}", file=sys.stderr)
         return None, None
@@ -52,10 +57,12 @@ def calculate_score(data, scoring):
     total_score = 0
     for key, value in data.items():
         if key in scoring:
-            total_score += get_score(value, scoring[key])
+            try:
+                total_score += get_score(value, scoring[key])
+            except Exception as e:
+                print(f"Error calculating score for key: {key}, value: {value}, error: {e}", file=sys.stderr)
 
     return total_score
-
 
 def upload_score_to_mongodb(resume_id, score):
     client = MongoClient(MONGODB_URL)
@@ -65,15 +72,21 @@ def upload_score_to_mongodb(resume_id, score):
     resume_record = improved_collection.find_one({"_id": resume_id})
 
     if resume_record:
-        improved_collection.update_one({"_id": resume_id}, {"$set": {"completePercent": score}})
-        print(f"Updated completePercent for resume_id: {resume_id}", file=sys.stderr)
+        try:
+            improved_collection.update_one({"_id": resume_id}, {"$set": {"completePercent": score}})
+            print(f"Updated completePercent for resume_id: {resume_id}", file=sys.stderr)
+        except Exception as e:
+            print(f"Error updating completePercent for resume_id: {resume_id}, error: {e}", file=sys.stderr)
     else:
-        improved_collection.insert_one({"_id": resume_id, "completePercent": score})
-        print(f"Inserted new record with completePercent for resume_id: {resume_id}", file=sys.stderr)
+        try:
+            improved_collection.insert_one({"_id": resume_id, "completePercent": score})
+            print(f"Inserted new record with completePercent for resume_id: {resume_id}", file=sys.stderr)
+        except Exception as e:
+            print(f"Error inserting new record for resume_id: {resume_id}, error: {e}", file=sys.stderr)
 
     client.close()
 
-
+def main(resume_id):
     personal_info, resume_record = get_resume_from_mongodb(resume_id)
 
     if personal_info:
@@ -81,8 +94,15 @@ def upload_score_to_mongodb(resume_id, score):
         script_dir = os.path.dirname(__file__)
         scoring_system_path = os.path.join(script_dir, "scoring_system.json")
         
-        with open(scoring_system_path, "r", encoding='utf-8') as f:
-            scoring_system = json.load(f)
+        try:
+            with open(scoring_system_path, "r", encoding='utf-8') as f:
+                scoring_system = json.load(f)
+        except json.JSONDecodeError as e:
+            print(f"JSONDecodeError: {e} while reading {scoring_system_path}", file=sys.stderr)
+            return
+        except Exception as e:
+            print(f"Error reading scoring_system.json: {e}", file=sys.stderr)
+            return
 
         total_score = calculate_score(personal_info, scoring_system)
         completeness = total_score / 424
