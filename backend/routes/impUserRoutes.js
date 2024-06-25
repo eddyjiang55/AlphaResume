@@ -261,11 +261,12 @@ router.delete('/improved-users', async (req, res) => {
 // 更新个人信息数据
 router.post('/save-data', async (req, res) => {
     const { id, type, data } = req.body;
+    console.log(data);
     try {
         // 根据type决定更新哪个部分
         let updatePath = {};
         switch (type) {
-            case 'basicInformation':  // 新增的基本信息处理
+            case 'basicInformation':
                 updatePath['基本信息'] = data;
                 break;
             case 'personalEvaluation':
@@ -281,7 +282,6 @@ router.post('/save-data', async (req, res) => {
                 updatePath['项目经历'] = data;
                 break;
             case 'awardsAndCertificates':
-                console.log(req.body);
                 updatePath['获奖与证书'] = data;
                 break;
             case 'skills':
@@ -298,47 +298,41 @@ router.post('/save-data', async (req, res) => {
         }
 
         // 更新数据库记录
-        // console.log("before send to update")
-        // console.log(updatePath)
+        console.log("before send to update")
+        console.log(updatePath)
         const result = await ImprovedUser.update(id, updatePath);
         if (result.modifiedCount === 0) {
             return res.status(404).json({ message: "No record found to update." });
         }
 
-        // 调用 Python 文件更新完整度
+        // 调用 Python 脚本更新完整度
         const pythonProcess = spawn('python3', ['./pyScripts/update_complete_score.py', id]);
 
-        let resultData = '';
-
         pythonProcess.stdout.on('data', (data) => {
-            resultData += data.toString();
+            try {
+                const output = data.toString();
+                const jsonOutput = JSON.parse(output);
+                console.log('Parsed JSON output:', jsonOutput);
+                res.status(200).json({ resumeId: id, message: "保存成功！", completeness: jsonOutput.completeness });
+            } catch (error) {
+                console.error('Failed to parse JSON:', error);
+                res.status(500).json({ resumeId: id, message: "保存失败！", error: error.toString() });
+            }
         });
 
         pythonProcess.stderr.on('data', (data) => {
             console.error(`stderr: ${data}`);
         });
 
-        pythonProcess.on('close', async (code) => {
+        pythonProcess.on('close', (code) => {
             console.log(`child process exited with code ${code}`);
-            try {
-                const output = JSON.parse(resultData);
-                const updatedCompleteness = output.completeness;
-
-                // 更新数据库中的完整度字段
-                await ImprovedUser.updateCompleteness(id, updatedCompleteness);
-
-                // 返回更新后的完整度
-                res.status(200).json({ resumeId: id, message: "保存成功！", completeness: updatedCompleteness });
-            } catch (error) {
-                console.error('Failed to parse JSON:', error);
-                res.status(500).json({ message: '保存成功，但更新完整度失败', error: error.toString() });
-            }
         });
 
     } catch (error) {
         res.status(500).json({ resumeId: id, message: "保存失败！", error: error.toString() });
     }
 });
+
 
 router.post('/improved-users/generate-resume', async (req, res) => {
     const { id } = req.body;
