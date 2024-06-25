@@ -261,7 +261,6 @@ router.delete('/improved-users', async (req, res) => {
 // 更新个人信息数据
 router.post('/save-data', async (req, res) => {
     const { id, type, data } = req.body;
-    console.log(data);
     try {
         // 根据type决定更新哪个部分
         let updatePath = {};
@@ -282,6 +281,7 @@ router.post('/save-data', async (req, res) => {
                 updatePath['项目经历'] = data;
                 break;
             case 'awardsAndCertificates':
+                console.log(req.body);
                 updatePath['获奖与证书'] = data;
                 break;
             case 'skills':
@@ -298,8 +298,8 @@ router.post('/save-data', async (req, res) => {
         }
 
         // 更新数据库记录
-        console.log("before send to update")
-        console.log(updatePath)
+        // console.log("before send to update")
+        // console.log(updatePath)
         const result = await ImprovedUser.update(id, updatePath);
         if (result.modifiedCount === 0) {
             return res.status(404).json({ message: "No record found to update." });
