@@ -45,6 +45,16 @@ class Account {
         return result;
     }
 
+    static async deleteAllImprovedUsers(accountId) {
+        const db = await connect();
+        const collection = db.collection('accounts');
+        const result = await collection.updateOne(
+            { _id: accountId }, // 直接使用UUID
+            { $set: { improvedUsers: [] } }
+        );
+        return result;
+    }
+
     static async findByPhoneNumber(phoneNumber) {
         const db = await connect();
         const collection = db.collection('accounts');

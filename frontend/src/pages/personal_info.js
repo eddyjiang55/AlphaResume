@@ -6,14 +6,14 @@ const Account = () => {
   return (
     <div>
       <Navbar />
-      <div className="account-settings">
-        <div className="sidebar">
+      <div className="flex h-[calc(100vh-6rem)] bg-light-blue">
+        <div className="w-52 bg-[#B2DDEE]">
           <ul className="sidebar-list">
             <li className="sidebar-item">账户设置</li>
             <li className="sidebar-item">我的会员</li>
           </ul>
         </div>
-        <div className="content">
+        <div className="flex-1 flex flex-col items-center">
           <h2 className="content-title">账户设置</h2>
           <div className="profile-pic-container">
             <div className="profile-pic">

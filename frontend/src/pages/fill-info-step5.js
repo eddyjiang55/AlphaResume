@@ -1,10 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { step5Tips } from '../lib/tips';
 import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
+import SaveToast from '../components/Toast/SaveToast';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -86,6 +87,12 @@ export default function Step5Page({ dbFormData }) {
   }
 
   const handleSave = async () => {
+    for (let i = 0; i < formData.length; i++) {
+      if (!formData[i].name || !formData[i].city || !formData[i].startDate || !formData[i].endDate || !formData[i].role || !formData[i].achievement || !formData[i].description || !formData[i].responsibility) {
+        setError(true);
+        return;
+      }
+    }
     const translatedData = formData.map((data) => {
       return {
         项目名称: data.name,
@@ -119,6 +126,15 @@ export default function Step5Page({ dbFormData }) {
       setMessage('保存成功');
     }
   }
+
+  useEffect(() => {
+    if (!saveState) return;
+    const timer = setTimeout(() => {
+      setSaveState(false);
+      setMessage('');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [saveState]);
 
   const handleSubmit = () => {
     for (let i = 0; i < formData.length; i++) {
@@ -420,16 +436,7 @@ export default function Step5Page({ dbFormData }) {
       </div>}
       {
         saveState && (
-          <div>
-            <div className='fixed inset-0 bg-black opacity-50 z-40' />
-            <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
-              <p className='text-base font-bold text-wrap text-center py-4 px-4'>
-                {message}
-              </p>
-              <div className='w-full border border-alpha-blue' />
-              <button className='py-2 px-4 text-base' onClick={() => setSaveState(false)}>了解</button>
-            </div>
-          </div>
+          <SaveToast message={message} />
         )
       }
       <style jsx>{`

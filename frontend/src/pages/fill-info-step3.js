@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/router';
 import Navbar from "../components/navbar";
 import ResumeNavbar from "../components/resume-navbar";
 import { step3Tips } from '../lib/tips';
 import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
+import SaveToast from '../components/Toast/SaveToast';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -91,43 +92,57 @@ export default function Step3Page({ dbFormData }) {
   };
 
   const handleSave = async () => {
-    if (formData.length > 0) {
-      const translatedData = formData.map((data) => {
-        return {
-          学历: data.degree,
-          学校名称: data.school,
-          城市: data.city,
-          国家: data.country,
-          起止时间: data.startDate + "-" + data.endDate,
-          院系: data.department,
-          专业: data.major,
-          GPA: data.gpa,
-          排名: data.rank,
-          获奖记录: data.awards,
-          主修课程: data.courses,
-        };
-      });
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'educationHistory',
-          data: translatedData,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      if (response.status !== 200) {
-        const data = await response.json();
-        setSaveState(true);
-        setMessage(data.error);
-      } else {
-        setSaveState(true);
-        setMessage('保存成功');
+    for (let i = 0; i < formData.length; i++) {
+      if (!formData[i].degree || !formData[i].school || !formData[i].startDate || !formData[i].endDate || !formData[i].department || !formData[i].major) {
+        setError(true);
+        return;
       }
     }
+
+    const translatedData = formData.map((data) => {
+      return {
+        学历: data.degree,
+        学校名称: data.school,
+        城市: data.city,
+        国家: data.country,
+        起止时间: data.startDate + "-" + data.endDate,
+        院系: data.department,
+        专业: data.major,
+        GPA: data.gpa,
+        排名: data.rank,
+        获奖记录: data.awards,
+        主修课程: data.courses,
+      };
+    });
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'educationHistory',
+        data: translatedData,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (response.status !== 200) {
+      const data = await response.json();
+      setSaveState(true);
+      setMessage(data.error);
+    } else {
+      setSaveState(true);
+      setMessage('保存成功');
+    }
   }
+
+  useEffect(() => {
+    if (!saveState) return;
+    const timer = setTimeout(() => {
+      setSaveState(false);
+      setMessage('');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [saveState]);
 
   const handleSubmit = () => {
     for (let i = 0; i < formData.length; i++) {
@@ -471,16 +486,7 @@ export default function Step3Page({ dbFormData }) {
       </div>}
       {
         saveState && (
-          <div>
-            <div className='fixed inset-0 bg-black opacity-50 z-40' />
-            <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
-              <p className='text-base font-bold text-wrap text-center py-4 px-4'>
-                {message}
-              </p>
-              <div className='w-full border border-alpha-blue' />
-              <button className='py-2 px-4 text-base' onClick={() => setSaveState(false)}>了解</button>
-            </div>
-          </div>
+          <SaveToast message={message} />
         )
       }
       <style jsx>{`

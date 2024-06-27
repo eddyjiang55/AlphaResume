@@ -5,9 +5,21 @@ import "@/styles/globals.css";
 import React from "react";
 import { AuthProvider } from "@/components/AuthContext";
 import ReduxProvider from "@/store/provider";
+import AccountLayout from "./account/layout";
 
 // MyApp 组件
-export default function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps, router }) {
+  if (router.pathname.startsWith("/account")) {
+    return (
+      <ReduxProvider>
+        <AuthProvider>
+          <AccountLayout>
+            <Component {...pageProps} />
+          </AccountLayout>
+        </AuthProvider>
+      </ReduxProvider>
+    );
+  }
   return (
     <ReduxProvider>
       <AuthProvider> {/* 使用 AuthProvider 包装组件 */}

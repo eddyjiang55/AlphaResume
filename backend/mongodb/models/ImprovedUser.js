@@ -42,6 +42,13 @@ class ImprovedUser {
         return resumeRecord;
     }
 
+    static async getResumeId(_id) {
+        const db = await connect();
+        const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUser'
+        const resumeRecord = await collection.findOne({ _id });
+        return resumeRecord.resumeId;
+    }
+
     static async update(_id, updateData) {
         const db = await connect();
         const collection = db.collection('improvedUsers'); // 使用新的集合名称'improvedUsers'

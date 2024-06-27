@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
 import { processTimeStr, fetchPartData } from '../utils/fetchResumePartData';
+import SaveToast from '../components/Toast/SaveToast';
 import { step6Tips } from '../lib/tips';
 
 export async function getServerSideProps(context) {
@@ -12,8 +13,10 @@ export async function getServerSideProps(context) {
     // Fetch dbFormData from external API
     const preformattedData = await fetchPartData(context.query.id, 'researchPapersAndPatents');
     // console.log(preformattedData.data);
-    if (preformattedData.data) {
-      const displayPaperData = preformattedData.data.科研论文.map((data) => ({
+    let displayPaperData = [];
+    let displayPatentData = [];
+    if (preformattedData.data.科研论文) {
+      displayPaperData = preformattedData.data.科研论文.map((data) => ({
         title: data.论文标题,
         authors: data.作者顺序,
         journal: data["期刊/会议"],
@@ -22,16 +25,16 @@ export async function getServerSideProps(context) {
         description: data.研究描述,
         contribution: data.个人贡献,
       }));
-      const displayPatentData = preformattedData.data.知识产权.map((data) => ({
+    }
+    if (preformattedData.data.知识产权) {
+      displayPatentData = preformattedData.data.知识产权.map((data) => ({
         title: data.专利名称,
         number: data.专利号,
         date: processTimeStr(data["申请/授权日期"], "year"),
         description: data.描述,
       }));
-      dbFormData = { _id: preformattedData._id, data: { papers: displayPaperData, patents: displayPatentData } };
-    } else {
-      dbFormData = { _id: preformattedData._id, data: { papers: null, patents: null } };
     }
+    dbFormData = { _id: preformattedData._id, data: { papers: displayPaperData, patents: displayPatentData } };
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }
   }
@@ -102,6 +105,12 @@ export default function Step7Page({ dbFormData }) {
   };
 
   const handleSave = async () => {
+    for (const paper of paperFormData) {
+      if (!paper.title || !paper.authors || !paper.journal || !paper.date) {
+        setError(true);
+        return;
+      }
+    }
     const translatedPaperFormData = paperFormData.map((data) => ({
       论文标题: data.title,
       作者顺序: data.authors,
@@ -149,6 +158,15 @@ export default function Step7Page({ dbFormData }) {
       setMessage(`保存失败: ${data1.message} ${data2.message}`);
     }
   }
+
+  useEffect(() => {
+    if (!saveState) return;
+    const timer = setTimeout(() => {
+      setSaveState(false);
+      setMessage('');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [saveState]);
 
   const handleSubmit = () => {
     for (const paper of paperFormData) {
@@ -543,16 +561,7 @@ export default function Step7Page({ dbFormData }) {
       </div>}
       {
         saveState && (
-          <div>
-            <div className='fixed inset-0 bg-black opacity-50 z-40' />
-            <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
-              <p className='text-base font-bold text-wrap text-center py-4 px-4'>
-                {message}
-              </p>
-              <div className='w-full border border-alpha-blue' />
-              <button className='py-2 px-4 text-base' onClick={() => setSaveState(false)}>了解</button>
-            </div>
-          </div>
+          <SaveToast message={message} />
         )
       }
       <style jsx>{`
