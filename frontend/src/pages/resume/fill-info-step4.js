@@ -1,11 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from '../components/navbar';
-import ResumeNavbar from "../components/resume-navbar";
-import { step4Tips } from '../lib/tips';
-import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
-import SaveToast from '../components/Toast/SaveToast';
+import { step4Tips } from '@/lib/tips';
+import { extractDateRange, fetchPartData } from '@/utils/fetchResumePartData';
+import SaveToast from '@/components/Toast/SaveToast';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -32,7 +30,7 @@ export async function getServerSideProps(context) {
       dbFormData = { _id: preformattedData._id, data: null };
     }
   } else {
-    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+    return { redirect: { destination: `/resume/fill-info-step1`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
@@ -119,7 +117,7 @@ export default function step4Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step5?id=${dbFormData._id}`);
+    router.push(`/resume/fill-info-step5?id=${dbFormData._id}`);
   }
 
   const handleSave = async () => {
@@ -171,10 +169,8 @@ export default function step4Page({ dbFormData }) {
   }, [saveState]);
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden relative">
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
-      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+    <>
+      <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
             <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">职业经历</h2>
@@ -578,7 +574,7 @@ export default function step4Page({ dbFormData }) {
           color: white; /* 激活按钮的文本颜色 */
         }
       `}</style>
-    </div>
+    </>
   );
 }
 

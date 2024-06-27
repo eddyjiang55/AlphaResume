@@ -1,20 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
 // import { useRouter } from 'next/router'; // 导入 useRouter 钩子
-import Navbar from "../components/navbar";
-import ResumeNavbar from "../components/resume-navbar";
-import ResumeEditer from "../components/GenerateResumePage/editer";
-import ResumeRender from "../components/GenerateResumePage/renderer";
-import LoadingBar from "../components/GenerateResumePage/loadingBar";
+import ResumeEditer from "@/components/GenerateResumePage/editer";
+import ResumeRender from "@/components/GenerateResumePage/renderer";
+import LoadingBar from "@/components/GenerateResumePage/loadingBar";
 import dynamic from "next/dynamic";
 import { saveAs } from "file-saver";
-import html2pdf from "html2pdf.js";
 const Formatter = dynamic(
-  () => import("../components/GenerateResumePage/formatter"),
+  () => import("@/components/GenerateResumePage/formatter"),
   {
     ssr: false,
   }
 );
-import { renderMarkdown } from "../utils/markdown";
+import { renderMarkdown } from "@/utils/markdown";
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -37,7 +34,7 @@ export default function GeneratedResumePage({ dbFormData }) {
   const [htmlContent, setHtmlContent] = useState("");
 
   const exportMarkdown = useCallback(() => {
-    if (resumeTitle === "") {
+    if (dbFormData.resumeTitle === "") {
       return;
     }
     const blob = new Blob([markdownContent], {
@@ -45,15 +42,6 @@ export default function GeneratedResumePage({ dbFormData }) {
     });
     saveAs(blob, `${dbFormData.resumeTitle}.md`);
   }, [markdownContent, dbFormData.resumeTitle]);
-
-  const exportPDF = useCallback(() => {
-    if (resumeTitle === "") {
-      return;
-    }
-    const element = document.createElement("div");
-    element.innerHTML = htmlContent;
-    html2pdf().from(element).save(`${dbFormData.resumeTitle}.pdf`);
-  }, [htmlContent, dbFormData.resumeTitle]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,10 +123,8 @@ export default function GeneratedResumePage({ dbFormData }) {
   }, [markdownContent]);
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden bg-light-blue">
-      <Navbar />
-      <ResumeNavbar />
-      <div className="grid grid-cols-12 max-h-[calc(100%-250px)] h-full pb-2 overflow-y-auto gap-x-1">
+    <>
+      <div className="grid grid-cols-12 h-full pb-2 overflow-y-auto gap-x-1">
         <div
           id="edit zone"
           className="col-span-5 p-8 flex flex-col justify-center items-center"
@@ -195,10 +181,10 @@ export default function GeneratedResumePage({ dbFormData }) {
         >
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">格式调节</h2>
           <div className="w-full rounded-lg bg-white shadow-lg flex-1 p-4">
-            <Formatter exportMarkdown={exportMarkdown} exportPDF={exportPDF} />
+            <Formatter exportMarkdown={exportMarkdown} htmlContent={htmlContent} resumeTitle={dbFormData.resumeTitle} />
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

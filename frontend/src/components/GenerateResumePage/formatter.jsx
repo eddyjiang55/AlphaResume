@@ -1,11 +1,21 @@
 import { useState } from "react";
+import html2pdf from "html2pdf.js";
 
-const ResumeFormatter = ({ exportMarkdown, exportPDF }) => {
+const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
   const [paperSize, setPaperSize] = useState("A4");
   const [themeColor, setThemeColor] = useState("#000000");
   const [language, setLanguage] = useState("中文");
   const [font, setFont] = useState("微软雅黑");
   const [fontSize, setFontSize] = useState(16);
+
+  const exportPDF =  () => {
+    if (resumeTitle === "") {
+      return;
+    }
+    const element = document.createElement("div");
+    element.innerHTML = htmlContent;
+    html2pdf().from(element).save(`${resumeTitle}.pdf`);
+  }
 
   return (
     <>

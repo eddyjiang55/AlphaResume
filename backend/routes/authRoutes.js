@@ -5,6 +5,7 @@ const Account = require('../mongodb/models/Account');
 const VerificationCode = require('../mongodb/models/VerificationCode');
 const improvedUser = require('../mongodb/models/ImprovedUser');
 const resumeHistory = require('../mongodb/models/ResumeHistory');
+const { ObjectId } = require('mongodb');
 
 // 假设你有一个用于发送验证码的路由
 // authRoutes.js
@@ -70,16 +71,17 @@ router.get('/account/:id', async (req, res) => {
     }
 });
 
-router.delete('/account/clearHistory/:id', async (req, res) => {
+router.delete('/account/clear-history/:id', async (req, res) => {
     const { id } = req.params;
+    console.log('id:', id);
     try {
-        const account = await Account.findById(id);
-        const improvedUsers = account.improvedUsers;
-        for (const improvedUserId of improvedUsers) {
-            const resumeId = await improvedUser.getResumeId(improvedUserId);
-            await resumeHistory.deleteById(resumeId);
-            await improvedUser.deleteById(improvedUserId);
-        }
+        // const account = await Account.findById(id);
+        // const improvedUsers = account.improvedUsers;
+        // for (const improvedUserId of improvedUsers) {
+        //     const resumeId = await improvedUser.getResumeId(improvedUserId);
+        //     await resumeHistory.deleteById(resumeId);
+        //     await improvedUser.deleteById(improvedUserId);
+        // }
         const deleteResult = await Account.deleteAllImprovedUsers(id);
         if (deleteResult.modifiedCount === 0) {
             return res.status(404).json({ message: '未找到历史记录' });

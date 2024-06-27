@@ -22,9 +22,12 @@ export const resumeSlice = createSlice({
         },
         deleteResumeCard: (state, action) => {
             state.cards = state.cards.filter(card => card !== action.payload);
+        },
+        deleteAllResumeCards: (state) => {
+            state.cards = [];
         }
     }
 });
 
-export const { toggleResume, addResumeCard, setResumeCards, setUserDetail, deleteResumeCard } = resumeSlice.actions;
+export const { toggleResume, addResumeCard, setResumeCards, setUserDetail, deleteResumeCard, deleteAllResumeCards } = resumeSlice.actions;
 export const resumeReducer = resumeSlice.reducer;

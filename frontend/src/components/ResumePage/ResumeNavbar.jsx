@@ -1,16 +1,16 @@
 import { useRouter } from "next/router"; // 导入 useRouter 钩子
 
 const steps = [
-  { name: "基础信息", path: "/fill-info-step1" },
-  { name: "个人评价", path: "/fill-info-step2" },
-  { name: "教育经历", path: "/fill-info-step3" },
-  { name: "职业经历", path: "/fill-info-step4" },
-  { name: "项目经历", path: "/fill-info-step5" },
-  { name: "获奖与证书", path: "/fill-info-step6" },
-  { name: "科研论文与知识产权", path: "/fill-info-step7" },
-  { name: "技能", path: "/fill-info-step8" },
-  { name: "语言", path: "/fill-info-step9" },
-  { name: "结束", path: "/fill-info-step10" },
+  { name: "基础信息", path: "/resume/fill-info-step1" },
+  { name: "个人评价", path: "/resume/fill-info-step2" },
+  { name: "教育经历", path: "/resume/fill-info-step3" },
+  { name: "职业经历", path: "/resume/fill-info-step4" },
+  { name: "项目经历", path: "/resume/fill-info-step5" },
+  { name: "获奖与证书", path: "/resume/fill-info-step6" },
+  { name: "科研论文与知识产权", path: "/resume/fill-info-step7" },
+  { name: "技能", path: "/resume/fill-info-step8" },
+  { name: "语言", path: "/resume/fill-info-step9" },
+  { name: "结束", path: "/resume/fill-info-step10" },
 ];
 
 const ResumeNavbar = () => {
