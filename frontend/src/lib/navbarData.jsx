@@ -87,7 +87,7 @@ export const navigationItems = [
     links: [
       {
         title: "简历教程",
-        description: "x个来自行业专家的专业简历书写模板及其相关知识点。",
+        description: "多个来自行业专家的专业简历书写模板及其相关知识点。",
         url: "/resume-tips",
         icon: bookIcon,
       },

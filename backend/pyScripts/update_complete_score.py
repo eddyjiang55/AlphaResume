@@ -1,39 +1,29 @@
 from pymongo import MongoClient
-import requests
-from markdownify import markdownify as md
-import os
 import json
-from http import HTTPStatus
 import dashscope
-import time
 import re
-dashscope.api_key='sk-3c43423c9fee4af8928fd8bc647291ee'
+import os
+import sys
 
-def get_chat_from_mongodb():
-    uri = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mongodb.net/?retryWrites=true&w=majority&appName=AIResume"
-    # Create a new client and connect to the server
-    client = MongoClient(uri)
-    database_name = "airesumedb"
-    collection_name = "resumeChats"
+dashscope.api_key = 'sk-3c43423c9fee4af8928fd8bc647291ee'
 
-    db = client[database_name]
-    collection = db[collection_name]
+MONGODB_URL = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mongodb.net/?retryWrites=true&w=majority&appName=AIResume"
+DB_NAME = "airesumedb"
+IMPROVED_COLLECTION_NAME = "improvedUsers"
 
-    # 假设你已经知道如何定位到特定用户的聊天记录，这里用一个示例查询
-    user_account = "+8613387543505"
+def get_resume_from_mongodb(resume_id):
+    client = MongoClient(MONGODB_URL)
+    db = client[DB_NAME]
+    improved_collection = db[IMPROVED_COLLECTION_NAME]
 
-    # 查询特定用户的聊天记录
-    chat_record = collection.find_one({"userAccount": user_account})
+    resume_record = improved_collection.find_one({"_id": resume_id})
+    client.close()
 
-    chat_messages = chat_record['personal_info']
-
-    return chat_messages
-
-chat_json = get_chat_from_mongodb()
-
-with open("scoring_system.json", "r", encoding='Utf-8') as f:
-    scoring_system = json.load(f)
-
+    if resume_record:
+        return resume_record['personal_data'], resume_record
+    else:
+        print(f"No record found for resume_id: {resume_id}", file=sys.stderr)
+        return None, None
 
 def calculate_score(data, scoring):
     total_score = 0
@@ -61,35 +51,41 @@ def calculate_score(data, scoring):
 
     return total_score
 
+def upload_score_to_mongodb(resume_id, score):
+    client = MongoClient(MONGODB_URL)
+    db = client[DB_NAME]
+    improved_collection = db[IMPROVED_COLLECTION_NAME]
 
-# 调用函数计算总分
-total_score = calculate_score(chat_json, scoring_system)
-complete_percent = total_score / 424
+    resume_record = improved_collection.find_one({"_id": resume_id})
 
-
-def upload_score_to_mongodb(score):
-    uri = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mongodb.net/?retryWrites=true&w=majority&appName=AIResume"
-    # Create a new client and connect to the server
-    client = MongoClient(uri)
-    database_name = "airesumedb"
-    collection_name = "resumeChats"
-
-    db = client[database_name]
-    collection = db[collection_name]
-
-    # 假设你已经知道如何定位到特定用户的聊天记录，这里用一个示例查询
-    user_account = "+8613387543505"
-
-    # 查询特定用户的聊天记录
-    chat_record = collection.find_one({"userAccount": user_account})
-
-    chat_record['completePercent'] = score
-
-    # 更新数据
-    collection.update_one({"userAccount": user_account}, {"$set": chat_record})
+    if resume_record:
+        improved_collection.update_one({"_id": resume_id}, {"$set": {"completePercent": score}})
+        print(f"Updated completePercent for resume_id: {resume_id}", file=sys.stderr)
+    else:
+        improved_collection.insert_one({"_id": resume_id, "completePercent": score})
+        print(f"Inserted new record with completePercent for resume_id: {resume_id}", file=sys.stderr)
 
     client.close()
 
-upload_score_to_mongodb(complete_percent)
+def main(resume_id):
+    personal_info, resume_record = get_resume_from_mongodb(resume_id)
 
+    if personal_info:
+        # 使用相对路径读取 scoring_system.json 文件
+        script_dir = os.path.dirname(__file__)
+        scoring_system_path = os.path.join(script_dir, "scoring_system.json")
+        
+        with open(scoring_system_path, "r", encoding='utf-8') as f:
+            scoring_system = json.load(f)
 
+        total_score = calculate_score(personal_info, scoring_system)
+        complete_percent = total_score / 424
+        print(json.dumps({"completePercent": complete_percent}))  # 输出 JSON 格式的结果
+        upload_score_to_mongodb(resume_id, complete_percent)
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python update_complete_score.py <resume_id>", file=sys.stderr)
+        sys.exit(1)
+    resume_id = sys.argv[1]
+    main(resume_id)

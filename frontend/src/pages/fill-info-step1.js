@@ -316,7 +316,7 @@ export default function Step1Page({ dbFormData }) {
               />
               <button className={`flex flex-row items-center px-12 border border-solid border-alpha-blue rounded cursor-pointer transition-colors duration-100 ${isDragging ? 'bg-gray-300' : 'bg-white'}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick}>
                 <img src="/img/upload.svg" alt="Icon" className="button-icon" /> {/* 图片图标 */}
-                拖曳文件到此处上传
+                拖拽文件到此处上传
               </button>
             </div>
           </div>

@@ -490,3 +490,198 @@ export const step6Tips = [
     ]
   }
 ];
+
+export const step8Tips = [
+  {
+    title: "为什么技能重要 ?",
+    subtopics: [
+      {
+        title: "", // Directly under main topic, no subtopic title
+        bulletPoints: [
+          {
+            topic: "技能匹配",
+            content: "招聘者通常会寻找具备特定技能集的候选人，以确保他们能够胜任工作。"
+          },
+          {
+            topic: "竞争优势",
+            content: "在众多求职者中，具有高度相关且发展良好的技能集的候选人更容易脱颖而出。"
+          },
+          {
+            topic: "即刻贡献",
+            content: "展示你具备的技能可以让招聘者看到你能够立即融入工作并开始贡献。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: "有哪些注意事项?",
+    subtopics: [
+      {
+        title: "", // Directly under main topic
+        bulletPoints: [
+          {
+            topic: "相关性优先",
+            content: "优先列出与目标职位最相关的技能，确保你的技能列表与职位描述相匹配。"
+          },
+          {
+            topic: "具体明确",
+            content: "提供具体的技能名称，避免过于泛泛的描述。"
+          },
+          {
+            topic: "证明技能",
+            content: "尽可能在职业经历或项目经验中提供实际应用这些技能的例证。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: "需要包括哪些内容要素?",
+    subtopics: [
+      {
+        title: "",
+        bulletPoints: [
+          {
+            topic: "技能名称",
+            content: "简洁明了地列出技能或技术。"
+          }
+        ]
+      },
+      {
+        title: "",
+        bulletPoints: [
+          {
+            topic: "熟练度",
+            content: "如果适用，可以提供你的技能水平，如“熟练”、“高级”。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: "示例：（算法类）",
+    subtopics: [
+      {
+        title: "",
+        bulletPoints: [
+          {
+            topic: "技能",
+            content: "Python（熟练）、Java（高级）、C++（基础）"
+          }
+        ]
+      }
+    ]
+  }
+];
+
+export const step9Tips = [
+  {
+    title: "为什么语言重要 ?",
+    subtopics: [
+      {
+        title: "", // Directly under main topic, no subtopic title
+        bulletPoints: [
+          {
+            topic: "沟通能力",
+            content: "良好的语言技能使你能够有效地与同事、客户或合作伙伴沟通，无论是口头还是书面。"
+          },
+          {
+            topic: "市场竞争力",
+            content: "多语言能力在某些行业或职位（如国际贸易、外交、多国公司）中尤为重要，可大大增加你的市场竞争力。"
+          },
+          {
+            topic: "文化敏感度",
+            content: "掌握多种语言常伴随着对不同文化的理解和尊重，这在全球化日益增强的今天变得越来越重要。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: "有哪些注意事项?",
+    subtopics: [
+      {
+        title: "", // Directly under main topic
+        bulletPoints: [
+          {
+            topic: "诚实",
+            content: "诚实地评估和描述你的语言能力水平，过高或过低的估计都可能在工作中导致问题。"
+          },
+          {
+            topic: "具体级别",
+            content: "使用通用的语言水平描述（如基础、中级、熟练、流利、母语），以便招聘者了解你的能力。"
+          },
+          {
+            topic: "相关性",
+            content: "强调与目标职位相关的语言能力，尤其是那些对工作性质特别重要的语言。。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: "需要包括哪些内容要素?",
+    subtopics: [
+      {
+        title: "",
+        bulletPoints: [
+          {
+            topic: "语言",
+            content: "你能使用的语言。"
+          }
+        ]
+      },
+      {
+        title: "",
+        bulletPoints: [
+          {
+            topic: "掌握程度",
+            content: "描述你的语言技能水平，可以使用标准框架或通用描述（基础、中级、熟练、流利、母语）。"
+          }
+        ]
+      },
+      {
+        title: "",
+        bulletPoints: [
+          {
+            topic: "证书/评估/成绩",
+            content: "如果有，可以提及任何官方的语言能力证书或评估成绩。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: "示例：（算法类）",
+    subtopics: [
+      {
+        title: "语言能力",
+        bulletPoints: [
+          {
+            topic: "中文",
+            content: "母语"
+          }
+        ]
+      },
+      {
+        title: "",
+        bulletPoints: [
+          {
+            topic: "英语",
+            content: "流利（TOEFL 110分）"
+          }
+        ]
+      },
+      {
+        title: "",
+        bulletPoints: [
+          {
+            topic: "法语",
+            content: "中级（DELF B2）"
+          }
+        ]
+      }
+    ]
+  }
+];

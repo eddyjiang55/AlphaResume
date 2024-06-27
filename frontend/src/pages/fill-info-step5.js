@@ -156,6 +156,7 @@ export default function Step5Page({ dbFormData }) {
         项目职责: data.responsibility
       }
     });
+    console.log(translatedData);
     fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
