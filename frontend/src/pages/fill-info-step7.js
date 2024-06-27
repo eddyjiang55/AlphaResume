@@ -13,8 +13,10 @@ export async function getServerSideProps(context) {
     // Fetch dbFormData from external API
     const preformattedData = await fetchPartData(context.query.id, 'researchPapersAndPatents');
     // console.log(preformattedData.data);
-    if (preformattedData.data) {
-      const displayPaperData = preformattedData.data.科研论文.map((data) => ({
+    let displayPaperData = [];
+    let displayPatentData = [];
+    if (preformattedData.data.科研论文) {
+      displayPaperData = preformattedData.data.科研论文.map((data) => ({
         title: data.论文标题,
         authors: data.作者顺序,
         journal: data["期刊/会议"],
@@ -23,16 +25,16 @@ export async function getServerSideProps(context) {
         description: data.研究描述,
         contribution: data.个人贡献,
       }));
-      const displayPatentData = preformattedData.data.知识产权.map((data) => ({
+    }
+    if (preformattedData.data.知识产权) {
+      displayPatentData = preformattedData.data.知识产权.map((data) => ({
         title: data.专利名称,
         number: data.专利号,
         date: processTimeStr(data["申请/授权日期"], "year"),
         description: data.描述,
       }));
-      dbFormData = { _id: preformattedData._id, data: { papers: displayPaperData, patents: displayPatentData } };
-    } else {
-      dbFormData = { _id: preformattedData._id, data: { papers: null, patents: null } };
     }
+    dbFormData = { _id: preformattedData._id, data: { papers: displayPaperData, patents: displayPatentData } };
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }
   }

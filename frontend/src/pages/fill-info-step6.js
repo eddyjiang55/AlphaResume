@@ -12,9 +12,11 @@ export async function getServerSideProps(context) {
   if (context.query.id) {
     // Fetch dbFormData from external API
     const preformattedData = await fetchPartData(context.query.id, 'awardsAndCertificates');
+    let displayAwardData = [];
+    let displayCertificateData = [];
     // console.log(preformattedData.data.获奖);
-    if (preformattedData.data) {
-      const displayAwardData = preformattedData.data.获奖.map((data) => {
+    if (preformattedData.data.获奖) {
+      displayAwardData = preformattedData.data.获奖.map((data) => {
         return {
           awardName: data.奖项名称,
           awardTime: processTimeStr(data.获奖时间, "year"),
@@ -24,7 +26,9 @@ export async function getServerSideProps(context) {
           awardDescription: data.描述,
         };
       });
-      const displayCertificateData = preformattedData.data.证书.map((data) => {
+    }
+    if (preformattedData.data.证书) {
+      displayCertificateData = preformattedData.data.证书.map((data) => {
         return {
           certificateName: data.证书名称,
           certificateTime: processTimeStr(data.取得时间, "year"),
@@ -32,10 +36,8 @@ export async function getServerSideProps(context) {
           certificateDescription: data.证书详情,
         };
       });
-      dbFormData = { _id: preformattedData._id, data: { awards: displayAwardData, certificates: displayCertificateData } };
-    } else {
-      dbFormData = { _id: preformattedData._id, data: { awards: null, certificates: null } };
     }
+    dbFormData = { _id: preformattedData._id, data: { awards: displayAwardData, certificates: displayCertificateData } };
   } else {
     return { redirect: { destination: `/fill-info-step1`, permanent: false } }
   }
