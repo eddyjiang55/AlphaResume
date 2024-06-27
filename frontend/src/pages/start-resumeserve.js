@@ -46,7 +46,7 @@ const SplitBackgroundPage = () => {
                         }} />
                         <span className='font-bold text-2xl text-black whitespace-nowrap'>我们将助您快速构建简历</span>
                     </div>
-                    <button className='font-bold text-2xl text-white hover:text-black rounded-full bg-alpha-blue hover:bg-[#B2DDEE] px-12 py-3 transition-all duration-100' type="button" onClick={() => handleAuth('/fill-info-step1')}>开始填写</button>
+                    <button className='font-bold text-2xl text-white hover:text-black rounded-full bg-alpha-blue hover:bg-[#B2DDEE] px-12 py-3 transition-all duration-100' type="button" onClick={() => handleAuth('/resume/fill-info-step1')}>开始填写</button>
                 </div>
                 <p className='text-alpha-blue text-left font-bold text-xl'>方式二：</p>
                 <div className='w-full rounded-xl bg-white shadow-xl p-12 flex flex-row justify-evenly items-center gap-x-5'>
