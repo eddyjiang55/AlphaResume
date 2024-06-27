@@ -17,8 +17,9 @@ const ResumeNavbar = () => {
   const router = useRouter(); // 使用 useRouter 钩子
   return (
     <div className="w-full flex flex-row justify-around items-center py-4 px-auto bg-[#B2DDEE] gap-x-6">
-      {steps.map((step) => (
+      {steps.map((step, index) => (
         <div
+          key={index}
           className={`rounded-xl px-6 py-4 transition-colors duration-150 first:ml-6 last:mr-6 ${
             router.pathname === step.path
               ? "bg-alpha-blue text-white font-bold"

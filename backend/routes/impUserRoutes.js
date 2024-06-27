@@ -166,6 +166,11 @@ router.delete('/improved-users', async (req, res) => {
         if (updateResult.modifiedCount === 0) {
             return res.status(404).json({ message: 'ImprovedUser ID not found in account' });
         }
+        const improvedUser = await ImprovedUser.findById(improvedUserId);
+        const deleteResumeHistoryResult = await ResumeHistory.deleteById(improvedUser.resumeId);
+        if (deleteResumeHistoryResult.deletedCount === 0) {
+            return res.status(404).json({ message: 'ResumeHistory not found' });
+        }
 
         // 删除 improvedUser
         const deleteResult = await ImprovedUser.deleteById(improvedUserId);
