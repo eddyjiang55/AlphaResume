@@ -30,7 +30,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="w-full h-24 flex flex-row justify-between items-center bg-white px-16">
+            <nav className="w-full h-32 flex flex-row justify-between items-center bg-white px-16">
                 <div className="shrink-0">
                     <Link href='/'><Image src="/img/Logo_x.jpg" alt="Logo" width={190} height={100} priority /></Link>
                 </div>

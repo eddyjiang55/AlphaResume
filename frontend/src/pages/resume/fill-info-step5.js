@@ -1,125 +1,115 @@
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from "../components/navbar";
-import ResumeNavbar from "../components/resume-navbar";
-import { step3Tips } from '../lib/tips';
-import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
-import SaveToast from '../components/Toast/SaveToast';
+import { step5Tips } from '@/lib/tips';
+import { extractDateRange, fetchPartData } from '@/utils/fetchResumePartData';
+import SaveToast from '@/components/Toast/SaveToast';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const preformattedData = await fetchPartData(context.query.id, 'educationHistory');
-    // console.log(preformattedData);
+    const preformattedData = await fetchPartData(context.query.id, 'projectExperience');
+    // console.log(preformattedData)
     if (preformattedData.data) {
       const displayData = preformattedData.data.map((data) => {
         const [formattedStart, formattedEnd] = extractDateRange(data.起止时间);
         return {
-          degree: data.学历,
-          school: data.学校名称,
-          city: data.城市,
-          country: data.国家,
+          name: data['项目名称'],
+          city: data['城市'],
+          country: data['国家'],
           startDate: formattedStart,
           endDate: formattedEnd,
-          department: data.院系,
-          major: data.专业,
-          gpa: data.GPA,
-          rank: data.排名,
-          awards: data.获奖记录,
-          courses: data.主修课程,
-        };
+          role: data['项目角色'],
+          link: data['项目链接'],
+          achievement: data['项目成就'],
+          description: data['项目描述'],
+          responsibility: data['项目职责']
+        }
       });
-      dbFormData = { data: displayData, _id: preformattedData._id };
+      dbFormData = { _id: preformattedData._id, data: displayData };
     } else {
-      dbFormData = { data: null, _id: preformattedData._id };
+      dbFormData = { _id: preformattedData._id, data: null };
     }
   } else {
-    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+    return { redirect: { destination: `/resume/fill-info-step1`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
 }
 
-export default function Step3Page({ dbFormData }) {
+export default function Step5Page({ dbFormData }) {
   const router = useRouter();
   const [error, setError] = useState(false);
   const [formData, setFormData] = useState(dbFormData.data || []);
   const [saveState, setSaveState] = useState(false);
   const [message, setMessage] = useState('');
-  const [activeIndex, setActiveIndex] = useState(dbFormData.data && dbFormData.data.length > 0 ? 0 : -1); // 当前显示的教育经历索引
+  const [activeIndex, setActiveIndex] = useState(dbFormData.data && dbFormData.data.length > 0 ? 0 : -1);
 
-  const AddEducation = () => {
+  const AddProject = () => {
     if (formData.length >= 5) {
-      alert("最多添加5个教育经历");
-      return
-    }; // 最多添加5个教育经历（不包括初始表单项）
+      alert('最多只能添加5个项目经历');
+      return;
+    };
     setFormData([
       ...formData,
       {
-        school: "",
-        city: "",
-        country: "",
-        startDate: "",
-        endDate: "",
-        department: "",
-        degree: "",
-        major: "",
-        gpa: "",
-        rank: "",
-        awards: "",
-        courses: "",
-      },
+        name: '',
+        city: '',
+        country: '',
+        startDate: '',
+        endDate: '',
+        role: '',
+        link: '',
+        achievement: '',
+        description: '',
+        responsibility: ''
+      }
     ]);
     setActiveIndex((prevIndex) => prevIndex + 1);
-  };
+  }
 
-  const RemoveEducation = (index) => {
+  const RemoveProject = (index) => {
     if (formData.length <= 1) {
-      setFormData([]); // 删除所有经历后，重置为初始表单项
+      setFormData([]);
       setActiveIndex(-1);
       return;
-    }
-    const newFormData = formData.filter((_, i) => i !== index);
-    setFormData(newFormData);
-    // 删除的是当前显示的经历，需要更新 activeIndex
-    if (index === activeIndex) {
-      const newActiveIndex = activeIndex === 0 ? 0 : activeIndex - 1;
-      setActiveIndex(newActiveIndex);
+    };
+    setFormData(formData.filter((_, i) => i !== index));
+    if (activeIndex === index) {
+      const newIndex = index === 0 ? 0 : index - 1;
+      setActiveIndex(newIndex);
     } else if (activeIndex > index) {
-      setActiveIndex(activeIndex - 1);
+      setActiveIndex((prevIndex) => prevIndex - 1);
     }
-  };
+  }
 
   const handleSave = async () => {
     for (let i = 0; i < formData.length; i++) {
-      if (!formData[i].degree || !formData[i].school || !formData[i].startDate || !formData[i].endDate || !formData[i].department || !formData[i].major) {
+      if (!formData[i].name || !formData[i].city || !formData[i].startDate || !formData[i].endDate || !formData[i].role || !formData[i].achievement || !formData[i].description || !formData[i].responsibility) {
         setError(true);
         return;
       }
     }
-
     const translatedData = formData.map((data) => {
       return {
-        学历: data.degree,
-        学校名称: data.school,
+        项目名称: data.name,
         城市: data.city,
         国家: data.country,
-        起止时间: data.startDate + "-" + data.endDate,
-        院系: data.department,
-        专业: data.major,
-        GPA: data.gpa,
-        排名: data.rank,
-        获奖记录: data.awards,
-        主修课程: data.courses,
-      };
+        起止时间: `${data.startDate} 至 ${data.endDate}`,
+        项目角色: data.role,
+        项目链接: data.link,
+        项目成就: data.achievement,
+        项目描述: data.description,
+        项目职责: data.responsibility
+      }
     });
     const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
-        type: 'educationHistory',
-        data: translatedData,
+        type: 'projectExperience',
+        data: translatedData
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -146,32 +136,31 @@ export default function Step3Page({ dbFormData }) {
 
   const handleSubmit = () => {
     for (let i = 0; i < formData.length; i++) {
-      if (!formData[i].degree || !formData[i].school || !formData[i].startDate || !formData[i].endDate || !formData[i].department || !formData[i].major) {
+      if (!formData[i].name || !formData[i].city || !formData[i].startDate || !formData[i].endDate || !formData[i].role || !formData[i].achievement || !formData[i].description || !formData[i].responsibility) {
         setError(true);
         return;
       }
     }
     const translatedData = formData.map((data) => {
       return {
-        学历: data.degree,
-        学校名称: data.school,
+        项目名称: data.name,
         城市: data.city,
         国家: data.country,
-        起止时间: data.startDate + "-" + data.endDate,
-        院系: data.department,
-        专业: data.major,
-        GPA: data.gpa,
-        排名: data.rank,
-        获奖记录: data.awards,
-        主修课程: data.courses,
-      };
+        起止时间: `${data.startDate} 至 ${data.endDate}`,
+        项目角色: data.role,
+        项目链接: data.link,
+        项目成就: data.achievement,
+        项目描述: data.description,
+        项目职责: data.responsibility
+      }
     });
+    console.log(translatedData);
     fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
-        type: 'educationHistory',
-        data: translatedData,
+        type: 'projectExperience',
+        data: translatedData
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -184,81 +173,63 @@ export default function Step3Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step4?id=${dbFormData._id}`);
+    router.push(`/resume/fill-info-step6?id=${dbFormData._id}`);
   }
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden relative">
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
-      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+    <>
+      <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
-            <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">
-              教育经历
-            </h2>
-            {formData.length > 0 && <><div className="flex flex-row justify-start items-center text-alpha-blue mx-auto">
-              {formData.map((data, index) => (
-                <>
-                  <button
-                    key={index}
-                    className={`${activeIndex === index
-                      ? "underline underline-offset-2"
-                      : ""
-                      }`}
-                    onClick={() => setActiveIndex(index)}
-                  >
-                    教育经历 {index + 1}
-                  </button>
-                  {index !== formData.length - 1 && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="icon icon-tabler icon-tabler-chevron-right w-4 h-4"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+            <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">项目经历</h2>
+            {formData.length > 0 && <>
+              <div className="flex flex-row justify-start items-center text-alpha-blue mx-auto">
+                {formData.map((data, index) => (
+                  <>
+                    <button
+                      key={index}
+                      className={`${activeIndex === index
+                        ? "underline underline-offset-2"
+                        : ""
+                        }`}
+                      onClick={() => setActiveIndex(index)}
                     >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M9 6l6 6l-6 6" />
-                    </svg>
-                  )}{" "}
-                </>
-              ))}
-            </div>
+                      项目经历 {index + 1}
+                    </button>
+                    {index !== formData.length - 1 && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-chevron-right w-4 h-4"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M9 6l6 6l-6 6" />
+                      </svg>
+                    )}{" "}
+                  </>
+                ))}
+              </div>
+
               <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
-                <label>*学历</label>
-                <input
-                  type="text"
-                  placeholder="请输入学历水平"
-                  value={formData[activeIndex].degree}
+                <label>*项目名称</label>
+                <input type="text"
+                  placeholder="请输入项目名称"
+                  value={formData[activeIndex].name}
                   onChange={(e) => {
                     const newFormData = [...formData];
-                    newFormData[activeIndex].degree = e.target.value;
+                    newFormData[activeIndex].name = e.target.value;
                     setFormData(newFormData);
                   }}
                 />
-
-                <label>*学校名称</label>
-                <input
-                  type="text"
-                  placeholder="请输入学校名称"
-                  value={formData[activeIndex].school}
-                  onChange={(e) => {
-                    const newFormData = [...formData];
-                    newFormData[activeIndex].school = e.target.value;
-                    setFormData(newFormData);
-                  }}
-                />
-
                 <div className="w-full flex flex-row justify-between items-center gap-x-16">
                   <div className="w-full flex flex-col justify-start items-stretch">
-                    <label>城市</label>
-                    <input
-                      type="text"
-                      placeholder="请输入城市"
+                    <label>*城市</label>
+                    <input type="text" placeholder="请输入城市"
                       value={formData[activeIndex].city}
                       onChange={(e) => {
                         const newFormData = [...formData];
@@ -269,9 +240,7 @@ export default function Step3Page({ dbFormData }) {
                   </div>
                   <div className="w-full flex flex-col justify-start items-stretch">
                     <label>国家</label>
-                    <input
-                      type="text"
-                      placeholder="请输入国家"
+                    <input type="text" placeholder="请输入国家"
                       value={formData[activeIndex].country}
                       onChange={(e) => {
                         const newFormData = [...formData];
@@ -321,91 +290,68 @@ export default function Step3Page({ dbFormData }) {
                     }}
                   />
                 </div>
-                <label>*院系</label>
-                <input
-                  type="text"
-                  placeholder="请输入院系"
-                  value={formData[activeIndex].department}
+                <label>*项目角色</label>
+                <input type="text"
+                  placeholder="请输入项目角色"
+                  value={formData[activeIndex].role}
                   onChange={(e) => {
                     const newFormData = [...formData];
-                    newFormData[activeIndex].department = e.target.value;
+                    newFormData[activeIndex].role = e.target.value;
                     setFormData(newFormData);
                   }}
                 />
-
-                <label>*专业</label>
-                <input
-                  type="text"
-                  placeholder="请输入专业"
-                  value={formData[activeIndex].major}
+                <label>项目链接</label>
+                <input type="text"
+                  placeholder="请输入项目链接"
+                  value={formData[activeIndex].link}
                   onChange={(e) => {
                     const newFormData = [...formData];
-                    newFormData[activeIndex].major = e.target.value;
+                    newFormData[activeIndex].link = e.target.value;
                     setFormData(newFormData);
                   }}
                 />
-
-                <div className="w-full flex flex-row justify-between items-stretch gap-x-16">
-                  <div className="w-full flex flex-col justify-start items-stretch">
-                    <label>GPA</label>
-                    <input
-                      type="text"
-                      placeholder="请输入GPA"
-                      value={formData[activeIndex].gpa}
-                      onChange={(e) => {
-                        const newFormData = [...formData];
-                        newFormData[activeIndex].gpa = e.target.value;
-                        setFormData(newFormData);
-                      }}
-                    />
-                  </div>
-                  <div className="w-full flex flex-col justify-start items-stretch">
-                    <label>排名</label>
-                    <input
-                      type="text"
-                      placeholder="请输入排名"
-                      value={formData[activeIndex].rank}
-                      onChange={(e) => {
-                        const newFormData = [...formData];
-                        newFormData[activeIndex].rank = e.target.value;
-                        setFormData(newFormData);
-                      }}
-                    />
-                  </div>
-                </div>
-                <label>获奖记录</label>
-                <textarea
-                  type="text"
+                <label>*项目成就</label>
+                <textarea type="text"
                   rows={3}
-                  placeholder="请输入获奖记录"
-                  value={formData[activeIndex].awards}
+                  placeholder="请输入项目成就"
+                  value={formData[activeIndex].achievement}
                   onChange={(e) => {
                     const newFormData = [...formData];
-                    newFormData[activeIndex].awards = e.target.value;
+                    newFormData[activeIndex].achievement = e.target.value;
                     setFormData(newFormData);
                   }}
                 />
 
-                <label>主修课程</label>
-                <textarea
-                  type="text"
+                <label>*项目描述</label>
+                <textarea type="text"
                   rows={3}
-                  placeholder="请输入主修课程"
-                  value={formData[activeIndex].courses}
+                  placeholder="请输入项目描述"
+                  value={formData[activeIndex].description}
                   onChange={(e) => {
                     const newFormData = [...formData];
-                    newFormData[activeIndex].courses = e.target.value;
+                    newFormData[activeIndex].description = e.target.value;
                     setFormData(newFormData);
                   }}
                 />
 
+                <label>*项目职责</label>
+                <textarea type="text"
+                  rows={3}
+                  placeholder="请输入项目职责"
+                  value={formData[activeIndex].responsibility}
+                  onChange={(e) => {
+                    const newFormData = [...formData];
+                    newFormData[activeIndex].responsibility = e.target.value;
+                    setFormData(newFormData);
+                  }}
+                />
                 {/* ... 其他表单元素 ... */}
                 <div className="w-full flex flex-row justify-end items-center mt-1">
                   <button
                     className="text-gray-500 hover:text-red-500"
                     title="删除这段经历"
                     type="button"
-                    onClick={() => RemoveEducation(activeIndex)}
+                    onClick={() => RemoveProject(activeIndex)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -430,7 +376,7 @@ export default function Step3Page({ dbFormData }) {
             </>}
             <button
               className="rounded-full border-4 border-alpha-blue px-4 py-2 flex flex-row justify-center items-center gap-y-2 w-40 mx-auto text-alpha-blue font-bold transition-colors duration-100 hover:bg-alpha-blue hover:text-white whitespace-nowrap"
-              onClick={AddEducation}
+              onClick={AddProject}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -446,7 +392,7 @@ export default function Step3Page({ dbFormData }) {
                 <path d="M12 5l0 14" />
                 <path d="M5 12l14 0" />
               </svg>
-              增加教育经历
+              增加项目经历
             </button>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
@@ -459,7 +405,7 @@ export default function Step3Page({ dbFormData }) {
         <div className=' w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20 overflow-y-auto'>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
           <div className='flex flex-col gap-y-4'>
-            {step3Tips.map((topic, index) => (
+            {step5Tips.map((topic, index) => (
               <div className='text-black ' key={index}>
                 <h2 className="font-bold text-xl">{topic.title}</h2>
                 {topic.subtopics.map((subtopic, subIndex) => (
@@ -490,9 +436,7 @@ export default function Step3Page({ dbFormData }) {
         )
       }
       <style jsx>{`
-            p {
-              margin: 20px 0; /* 调整段落的上下外边距 */
-            }
+      
       .background {
         background-color: #EDF8FD;
         min-height: 100vh;
@@ -564,6 +508,12 @@ export default function Step3Page({ dbFormData }) {
         input[type="email"] {
           padding: 10px;
           margin-top: 5px;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+        }
+        input[type="long"] {
+          padding: 20px 10px;
+          margin-top: 50px;
           border: 1px solid #ccc;
           border-radius: 10px;
         }
@@ -658,6 +608,9 @@ export default function Step3Page({ dbFormData }) {
           color: white; /* 激活按钮的文本颜色 */
         }
       `}</style>
-    </div>
+    </>
   );
 }
+
+
+

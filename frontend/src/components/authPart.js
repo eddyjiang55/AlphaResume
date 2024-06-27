@@ -22,16 +22,16 @@ const AuthPart = () => {
             onMouseLeave={() => setIsDropdownVisible(false)}
           >
             <span className="mr-2">Beta123</span>
-            <Link href='/personal_info'>
+            <Link href='/account/settings'>
               <Image src="/img/user-avatar.jpg" alt="User Avatar" width={40} height={40} className="rounded-full cursor-pointer" />
             </Link>
             {isDropdownVisible && (
-            <div className="dropdown absolute right-0 top-full w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50"> {/* 调整mt值以确保菜单在头像下方 */}
-              <ul>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">设置</li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={handleLogout}>登出</li>
-              </ul>
-            </div>
+              <div className="dropdown absolute right-0 top-full w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50"> {/* 调整mt值以确保菜单在头像下方 */}
+                <ul>
+                  <Link href='/account/settings'><li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">设置</li></Link>
+                  <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={handleLogout}>登出</li>
+                </ul>
+              </div>
             )}
           </div>
         </>

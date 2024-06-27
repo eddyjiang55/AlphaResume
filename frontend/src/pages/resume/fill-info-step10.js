@@ -1,8 +1,6 @@
-import React, { useState } from 'react'; // Import useState here
+import { useState } from 'react'; // Import useState here
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
-import Navbar from '../components/navbar';
-import ResumeNavbar from "../components/resume-navbar";
 
 export async function getServerSideProps(context) {
   let dbFormData = { _id: context.query.id };
@@ -53,7 +51,7 @@ export default function Step10Page({ dbFormData }) {
       })
     });
     if (response.status === 200) {
-      router.push('/generated-resume?id=' + dbFormData._id);
+      router.push('/resume/generated-resume?id=' + dbFormData._id);
     } else {
       alert('Failed to generate resume');
     }
@@ -62,10 +60,8 @@ export default function Step10Page({ dbFormData }) {
   }
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden">
-      <Navbar />
-      <ResumeNavbar />
-      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+    <>
+      <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">意向岗位</h2>
           <form className='w-full flex justify-center'>
@@ -306,7 +302,7 @@ export default function Step10Page({ dbFormData }) {
         
         
       `}</style>
-    </div >
+    </>
   );
 };
 

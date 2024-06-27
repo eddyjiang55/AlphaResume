@@ -1,5 +1,3 @@
-import React from 'react';
-import Navbar from '../components/navbar';
 import Link from 'next/link';
 import Image from 'next/image';
 import { backIcon } from '../lib/iconLab';
@@ -20,8 +18,7 @@ const SplitBackgroundPage = () => {
         }
     };
     return (
-        <div className='flex flex-col w-full h-screen bg-light-blue'>
-            <Navbar />
+        <div className='flex flex-col w-full h-[calc(100vh-8rem)] bg-light-blue'>
             <Link href='/'>
                 <div className='flex items-center pl-8 pt-5 text-alpha-blue'>
                     <div className="w-8 h-8">{backIcon}</div>

@@ -64,7 +64,7 @@ function ResumeBox({ resumeId, userPhoneNumber, deletefromCards }) {
 
   const handleClick = () => {
     // 使用写死的 ID 进行路由跳转
-    router.push(`/fill-info-step1?id=${resumeId}`);
+    router.push(`/resume/fill-info-step1?id=${resumeId}`);
   };
 
   const handleDelete = () => {
@@ -94,29 +94,8 @@ function ResumeBox({ resumeId, userPhoneNumber, deletefromCards }) {
       });
   };
 
-  const handleDownloadPdf = (resumeHistoryId) => {
-    const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/download-pdf/${resumeHistoryId}`;
-
-    fetch(downloadUrl)
-      .then((response) => {
-        if (!response.ok) throw new Error("Network response was not ok.");
-        return response.blob();
-      })
-      .then((blob) => {
-        // Create a local URL for the blob object
-        const url = window.URL.createObjectURL(blob);
-        // Create a new anchor element
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "resume.pdf"; // Set the filename
-        document.body.appendChild(a);
-        a.click();
-
-        // Cleanup
-        a.remove();
-        window.URL.revokeObjectURL(url);
-      })
-      .catch((error) => console.error("Download error:", error));
+  const handleDownloadPdf = () => {
+    router.push(`/resume/generated-resume?id=${resumeId}`);
   };
 
   if (loading) return <ResumeCardLoading />;
@@ -132,16 +111,14 @@ function ResumeBox({ resumeId, userPhoneNumber, deletefromCards }) {
             上次修改：{formatDateToLocalTime(data.updateTime)}
           </div>
           <div className="flex flex-row justify-center items-center gap-x-12">
-            <Link href={`/fill-info-step1?id=${resumeId}`}>
+            <Link href={`/resume/fill-info-step1?id=${resumeId}`}>
               <button className="py-2 px-6 text-white text-base 2xl:text-lg font-bold bg-alpha-blue rounded-full">
                 编辑
               </button>
             </Link>
             <button
               className="py-2 px-6 text-white text-base 2xl:text-lg font-bold bg-alpha-blue rounded-full"
-              onClick={() => {
-                handleDownloadPdf("87c1fbdc-a883-48ce-9864-0cc2b1e34138");
-              }}
+              onClick={handleDownloadPdf}
             >
               下载PDF
             </button>

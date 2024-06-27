@@ -1,11 +1,8 @@
-
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from '../components/navbar';
-import ResumeNavbar from "../components/resume-navbar";
-import { processTimeStr, fetchPartData } from '../utils/fetchResumePartData';
-import SaveToast from '../components/Toast/SaveToast';
-import { step6Tips } from '../lib/tips';
+import { processTimeStr, fetchPartData } from '@/utils/fetchResumePartData';
+import SaveToast from '@/components/Toast/SaveToast';
+import { step6Tips } from '@/lib/tips';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -15,7 +12,7 @@ export async function getServerSideProps(context) {
     // console.log(preformattedData.data);
     let displayPaperData = [];
     let displayPatentData = [];
-    if (preformattedData.data.科研论文) {
+    if (preformattedData.data && preformattedData.data.科研论文) {
       displayPaperData = preformattedData.data.科研论文.map((data) => ({
         title: data.论文标题,
         authors: data.作者顺序,
@@ -26,7 +23,7 @@ export async function getServerSideProps(context) {
         contribution: data.个人贡献,
       }));
     }
-    if (preformattedData.data.知识产权) {
+    if (preformattedData.data && preformattedData.data.知识产权) {
       displayPatentData = preformattedData.data.知识产权.map((data) => ({
         title: data.专利名称,
         number: data.专利号,
@@ -36,7 +33,7 @@ export async function getServerSideProps(context) {
     }
     dbFormData = { _id: preformattedData._id, data: { papers: displayPaperData, patents: displayPatentData } };
   } else {
-    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+    return { redirect: { destination: `/resume/fill-info-step1`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
@@ -232,14 +229,12 @@ export default function Step7Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step8?id=${dbFormData._id}`);
+    router.push(`/resume/fill-info-step8?id=${dbFormData._id}`);
   }
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden">
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
-      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+    <>
+      <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
             <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">科研论文与知识产权</h2>
@@ -756,7 +751,7 @@ export default function Step7Page({ dbFormData }) {
           height: 50px; // 调整图标大小
         }
       `}</style>
-    </div>
+    </>
   );
 }
 
