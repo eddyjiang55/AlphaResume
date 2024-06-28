@@ -1,64 +1,67 @@
-import { saveAs } from "file-saver";
+import { useState } from "react";
 import html2pdf from "html2pdf.js";
 
-const ResumeFormatter = ({ markdownContent, htmlContent }) => {
-  const exportMarkdown = () => {
-    const blob = new Blob([markdownContent], {
-      type: "text/markdown;charset=utf-8",
-    });
-    saveAs(blob, "document.md");
-  };
+const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
+  const [paperSize, setPaperSize] = useState("A4");
+  const [themeColor, setThemeColor] = useState("#000000");
+  const [language, setLanguage] = useState("中文");
+  const [font, setFont] = useState("微软雅黑");
+  const [fontSize, setFontSize] = useState(16);
 
-  // Function to export PDF
-  const exportPDF = () => {
+  const exportPDF =  () => {
+    if (resumeTitle === "") {
+      return;
+    }
     const element = document.createElement("div");
     element.innerHTML = htmlContent;
-    html2pdf().from(element).save("document.pdf");
-  };
+    html2pdf().from(element).save(`${resumeTitle}.pdf`);
+  }
 
   return (
     <>
-      <div class="mb-4 flex flex-col items-center">
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      <div className="mb-4 flex flex-col items-center">
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           导入 Markdown
         </button>
       </div>
-      <div class="mb-4 flex flex-col items-center">
+      <div className="mb-4 flex flex-col items-center">
         <button
-          class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-40"
+          className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-40"
           onClick={exportPDF}
         >
           导出为 PDF
         </button>
       </div>
-      <div class="mb-4 flex flex-col items-center">
+      <div className="mb-4 flex flex-col items-center">
         <button
-          class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-40"
+          className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-40"
           onClick={exportMarkdown}
         >
           导出为 Markdown
         </button>
       </div>
-      <div class="mb-4">
+      <div className="mb-4">
         <label
-          class="block text-gray-700 text-sm font-bold mb-2"
-          for="paper-size"
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="paper-size"
         >
           纸张尺寸
         </label>
         <select
           id="paper-size"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          value={paperSize}
+          onChange={(e) => setPaperSize(e.target.value)}
         >
           <option>A4</option>
           <option>A3</option>
           <option>Letter</option>
         </select>
       </div>
-      <div class="mb-4">
+      <div className="mb-4">
         <label
-          class="block text-gray-700 text-sm font-bold mb-2"
-          for="theme-color"
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="theme-color"
         >
           主题色
         </label>
@@ -66,44 +69,49 @@ const ResumeFormatter = ({ markdownContent, htmlContent }) => {
           type="color"
           id="theme-color"
           name="theme-color"
-          value="#000000"
-          class="w-full h-10 rounded"
+          value={themeColor}
+          onChange={(e) => setThemeColor(e.target.value)}
+          className="w-full h-10 rounded"
         ></input>
       </div>
-      <div class="mb-4">
+      <div className="mb-4">
         <label
-          class="block text-gray-700 text-sm font-bold mb-2"
-          for="font-chinese"
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="font-chinese"
         >
           语言
         </label>
         <select
           id="font-chinese"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
         >
           <option>中文</option>
           <option>English</option>
         </select>
       </div>
-      <div class="mb-4">
+      <div className="mb-4">
         <label
-          class="block text-gray-700 text-sm font-bold mb-2"
-          for="font-english"
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="font-english"
         >
           字体
         </label>
         <select
           id="font-english"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          value={font}
+          onChange={(e) => setFont(e.target.value)}
         >
           <option>微软雅黑</option>
           <option>仿宋</option>
         </select>
       </div>
-      <div class="mb-4">
+      <div className="mb-4">
         <label
-          class="block text-gray-700 text-sm font-bold mb-2"
-          for="font-size"
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="font-size"
         >
           字号: <span id="font-size-value">16</span>
         </label>
@@ -113,8 +121,13 @@ const ResumeFormatter = ({ markdownContent, htmlContent }) => {
           name="font-size"
           min="12"
           max="20"
-          value="16"
-          class="w-full"
+          value={fontSize}
+          onChange={(e) => {
+            setFontSize(e.target.value);
+            document.getElementById("font-size-value").innerText =
+              e.target.value;
+          }}
+          className="w-full"
         ></input>
       </div>
     </>

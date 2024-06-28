@@ -5,15 +5,22 @@ const ImprovedUser = require('../mongodb/models/ImprovedUser.js');
 const { spawn } = require('child_process');
 const path = require('path');
 
+function getFormattedDate() {
+    const date = new Date();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${month}.${day}`;
+}
+
 // 获取 Python 脚本的绝对路径
 const pythonScriptPath = path.resolve(__dirname, '../pyScripts/AI_asking_new.py');
 
 router.post('/resume-chat', async (req, res) => {
     try {
         const { userAccount, messages } = req.body;
-
+        const currentDate = getFormattedDate();
         const newUser = new ImprovedUser(
-            { 姓: "", 名: "", 电话号码: "", 邮箱地址: "", 微信号: "" },
+            { 姓: "", 名: "", 手机号码: "", 邮箱: "", 微信号: "", title: `${currentDate}聊天记录` },
             "",
             [{
                 "学历": "",

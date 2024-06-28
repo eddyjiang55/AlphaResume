@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
-import Navbar from '../components/navbar';
-import ResumeNavbar from "../components/resume-navbar";
+// import Navbar from '../components/navbar';
+// import ResumeNavbar from "../components/resume-navbar";
 
 const Step11Page = () => {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
@@ -10,8 +10,8 @@ const Step11Page = () => {
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
-      <Navbar />
-      <ResumeNavbar />
+      {/* <Navbar />
+      <ResumeNavbar /> */}
       <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">分区修改</h2>

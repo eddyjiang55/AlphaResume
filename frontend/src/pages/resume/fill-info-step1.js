@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from '../components/navbar';
-import ResumeNavbar from '../components/resume-navbar';
 import { useSelector } from 'react-redux';
+import SaveToast from '@/components/Toast/SaveToast';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -137,7 +136,7 @@ export default function Step1Page({ dbFormData }) {
           console.log(formData);
           setLoading(false);
           router.push({
-            pathname: '/fill-info-step1',
+            pathname: '/resume/fill-info-step1',
             query: { id: formData._id },
           }, undefined, { shallow: true })
         } else if (response.status === 202) {
@@ -229,10 +228,15 @@ export default function Step1Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step2?id=${currentResumeId}`);
+    router.push(`/resume/fill-info-step2?id=${currentResumeId}`);
   }
 
   const handleSave = async () => {
+
+    if (!form.title || !form.名 || !form.姓 || !form.手机号码 || !form.邮箱 || !form.微信号) {
+      setError(true);
+      return;
+    }
 
     let currentResumeId = resumeId;
 
@@ -277,16 +281,23 @@ export default function Step1Page({ dbFormData }) {
       setSaveState(true);
       setMessage('保存成功');
       router.push({
-        pathname: '/fill-info-step1',
+        pathname: '/resume/fill-info-step1',
         query: { id: currentResumeId },
       }, undefined, { shallow: true })
     }
   }
 
+  useEffect(() => {
+    if (!saveState) return;
+    const timer = setTimeout(() => {
+      setSaveState(false);
+      setMessage('');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [saveState]);
+
   return (
-    <div className='bg-[#EDF8FD] w-full h-screen flex flex-col relative'>
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
+    <>
       <div className="flex-grow w-full max-w-[960px] mx-auto flex flex-col justify-between">
         <div>
           <div className="w-full mt-8">
@@ -375,16 +386,7 @@ export default function Step1Page({ dbFormData }) {
       }
       {
         saveState && (
-          <div>
-            <div className='fixed inset-0 bg-black opacity-50 z-40' />
-            <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
-              <p className='text-base font-bold text-wrap text-center py-4 px-4'>
-                {message}
-              </p>
-              <div className='w-full border border-alpha-blue' />
-              <button className='py-2 px-4 text-base' onClick={() => setSaveState(false)}>了解</button>
-            </div>
-          </div>
+          <SaveToast message={message} />
         )
       }
       <style jsx>{`
@@ -512,7 +514,7 @@ export default function Step1Page({ dbFormData }) {
           height: 50px; // 调整图标大小
         }
       `}</style>
-    </div >
+    </ >
   );
 }
 

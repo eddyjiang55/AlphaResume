@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import Navbar from '@/components/navbar';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import { setResumeCards } from '@/store/features/resumeSlice';
@@ -32,8 +31,7 @@ const SplitBackgroundPage = () => {
     }, [User.id, dispatch]);
 
     return (
-        <div className="flex flex-col w-full h-screen overflow-y-auto overflow-x-hidden bg-light-blue">
-            <Navbar />
+        <div className="flex flex-col w-full h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden bg-light-blue">
             <div className="relative flex-grow py-20">
                 <div className="absolute inset-0 bg-alpha-blue h-1/2 w-full"></div>
                 <div className="relative flex flex-col justify-center items-center gap-y-12 z-10 mx-auto px-4">

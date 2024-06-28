@@ -1,23 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 // import { useRouter } from 'next/router'; // 导入 useRouter 钩子
-import Navbar from "../components/navbar";
-import ResumeNavbar from "../components/resume-navbar";
-import ResumeEditer from "../components/GenerateResumePage/editer";
-import ResumeRender from "../components/GenerateResumePage/renderer";
-import LoadingBar from "../components/GenerateResumePage/loadingBar";
+import ResumeEditer from "@/components/GenerateResumePage/editer";
+import ResumeRender from "@/components/GenerateResumePage/renderer";
+import LoadingBar from "@/components/GenerateResumePage/loadingBar";
 import dynamic from "next/dynamic";
+import { saveAs } from "file-saver";
 const Formatter = dynamic(
-  () => import("../components/GenerateResumePage/formatter"),
+  () => import("@/components/GenerateResumePage/formatter"),
   {
     ssr: false,
   }
 );
-import { renderMarkdown } from "../utils/markdown";
+import { renderMarkdown } from "@/utils/markdown";
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
-    dbFormData = { _id: context.query.id };
+    const res = await fetch(
+      process.env.NEXT_PUBLIC_API_URL +
+        `/api/improved-users/${context.query.id}/basicInformation`
+    );
+    const data = await res.json();
+    dbFormData = { _id: context.query.id, resumeTitle: data.data.title };
   }
   // let dbFormData = { _id: '123' };
   return { props: { dbFormData } };
@@ -28,6 +32,16 @@ export default function GeneratedResumePage({ dbFormData }) {
   const [progress, setProgress] = useState(0);
   const [markdownContent, setMarkdownContent] = useState("");
   const [htmlContent, setHtmlContent] = useState("");
+
+  const exportMarkdown = useCallback(() => {
+    if (dbFormData.resumeTitle === "") {
+      return;
+    }
+    const blob = new Blob([markdownContent], {
+      type: "text/markdown;charset=utf-8",
+    });
+    saveAs(blob, `${dbFormData.resumeTitle}.md`);
+  }, [markdownContent, dbFormData.resumeTitle]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,17 +116,15 @@ export default function GeneratedResumePage({ dbFormData }) {
 
   useEffect(() => {
     if (markdownContent) {
-      console.log(markdownContent);
+      // console.log(markdownContent);
       const htmlContent = renderMarkdown(markdownContent);
       setHtmlContent(htmlContent);
     }
   }, [markdownContent]);
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden bg-light-blue">
-      <Navbar />
-      <ResumeNavbar />
-      <div className="grid grid-cols-12 max-h-[calc(100%-250px)] h-full pb-2 overflow-y-auto gap-x-1">
+    <>
+      <div className="grid grid-cols-12 h-full pb-2 overflow-y-auto gap-x-1">
         <div
           id="edit zone"
           className="col-span-5 p-8 flex flex-col justify-center items-center"
@@ -121,11 +133,11 @@ export default function GeneratedResumePage({ dbFormData }) {
           <div className="w-full rounded-lg bg-white shadow-lg flex-1">
             {loading ? (
               <div className="h-full flex flex-col justify-center mx-8">
-                <div class="flex justify-between mb-1">
-                  <span class="text-lg font-medium text-alpha-blue dark:text-white">
+                <div className="flex justify-between mb-1">
+                  <span className="text-lg font-medium text-alpha-blue dark:text-white">
                     Resume Generating...
                   </span>
-                  <span class="text-base font-medium text-alpha-blue dark:text-white">
+                  <span className="text-base font-medium text-alpha-blue dark:text-white">
                     {progress}%
                   </span>
                 </div>
@@ -147,11 +159,11 @@ export default function GeneratedResumePage({ dbFormData }) {
           <div className="w-full rounded-lg bg-white shadow-lg flex-1">
             {loading ? (
               <div className="h-full flex flex-col justify-center mx-8">
-                <div class="flex justify-between mb-1">
-                  <span class="text-lg font-medium text-alpha-blue dark:text-white">
+                <div className="flex justify-between mb-1">
+                  <span className="text-lg font-medium text-alpha-blue dark:text-white">
                     Resume Generating...
                   </span>
-                  <span class="text-base font-medium text-alpha-blue dark:text-white">
+                  <span className="text-base font-medium text-alpha-blue dark:text-white">
                     {progress}%
                   </span>
                 </div>
@@ -167,15 +179,12 @@ export default function GeneratedResumePage({ dbFormData }) {
           id="format zone"
           className="p-8 flex flex-col justify-center items-center w-72"
         >
-          <h2 class="text-alpha-blue font-bold text-4xl mb-8">格式调节</h2>
-          <div class="w-full rounded-lg bg-white shadow-lg flex-1 p-4">
-            <Formatter
-              markdownContent={markdownContent}
-              htmlContent={htmlContent}
-            />
+          <h2 className="text-alpha-blue font-bold text-4xl mb-8">格式调节</h2>
+          <div className="w-full rounded-lg bg-white shadow-lg flex-1 p-4">
+            <Formatter exportMarkdown={exportMarkdown} htmlContent={htmlContent} resumeTitle={dbFormData.resumeTitle} />
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

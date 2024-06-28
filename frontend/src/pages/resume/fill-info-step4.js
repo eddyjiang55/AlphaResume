@@ -1,162 +1,110 @@
-import React, { useState } from "react";
+
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from "../components/navbar";
-import ResumeNavbar from "../components/resume-navbar";
-import { step3Tips } from '../lib/tips';
-import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
+import { step4Tips } from '@/lib/tips';
+import { extractDateRange, fetchPartData } from '@/utils/fetchResumePartData';
+import SaveToast from '@/components/Toast/SaveToast';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const preformattedData = await fetchPartData(context.query.id, 'educationHistory');
+    const preformattedData = await fetchPartData(context.query.id, 'professionalExperience');
     // console.log(preformattedData);
     if (preformattedData.data) {
       const displayData = preformattedData.data.map((data) => {
         const [formattedStart, formattedEnd] = extractDateRange(data.起止时间);
         return {
-          degree: data.学历,
-          school: data.学校名称,
+          company: data.公司名称,
           city: data.城市,
           country: data.国家,
           startDate: formattedStart,
           endDate: formattedEnd,
-          department: data.院系,
-          major: data.专业,
-          gpa: data.GPA,
-          rank: data.排名,
-          awards: data.获奖记录,
-          courses: data.主修课程,
+          department: data.部门,
+          position: data.职位,
+          description: data["职责/业绩描述"],
         };
       });
-      dbFormData = { data: displayData, _id: preformattedData._id };
+      dbFormData = { _id: preformattedData._id, data: displayData };
     } else {
-      dbFormData = { data: null, _id: preformattedData._id };
+      dbFormData = { _id: preformattedData._id, data: null };
     }
   } else {
-    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+    return { redirect: { destination: `/resume/fill-info-step1`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
 }
 
-export default function Step3Page({ dbFormData }) {
+export default function step4Page({ dbFormData }) {
   const router = useRouter();
   const [error, setError] = useState(false);
   const [formData, setFormData] = useState(dbFormData.data || []);
   const [saveState, setSaveState] = useState(false);
   const [message, setMessage] = useState('');
-  const [activeIndex, setActiveIndex] = useState(dbFormData.data && dbFormData.data.length > 0 ? 0 : -1); // 当前显示的教育经历索引
+  const [activeIndex, setActiveIndex] = useState(dbFormData.data && dbFormData.data.length > 0 ? 0 : -1);
 
-  const AddEducation = () => {
+  const AddJob = () => {
     if (formData.length >= 5) {
-      alert("最多添加5个教育经历");
+      alert("最多只能添加5个实习经历");
       return
-    }; // 最多添加5个教育经历（不包括初始表单项）
+    };
     setFormData([
       ...formData,
       {
-        school: "",
+        company: "",
         city: "",
         country: "",
         startDate: "",
         endDate: "",
         department: "",
-        degree: "",
-        major: "",
-        gpa: "",
-        rank: "",
-        awards: "",
-        courses: "",
+        position: "",
+        description: "",
       },
     ]);
     setActiveIndex((prevIndex) => prevIndex + 1);
   };
 
-  const RemoveEducation = (index) => {
+  const RemoveJob = (index) => {
     if (formData.length <= 1) {
-      setFormData([]); // 删除所有经历后，重置为初始表单项
+      setFormData([]);
       setActiveIndex(-1);
       return;
     }
     const newFormData = formData.filter((_, i) => i !== index);
     setFormData(newFormData);
-    // 删除的是当前显示的经历，需要更新 activeIndex
     if (index === activeIndex) {
       const newActiveIndex = activeIndex === 0 ? 0 : activeIndex - 1;
       setActiveIndex(newActiveIndex);
     } else if (activeIndex > index) {
-      setActiveIndex(activeIndex - 1);
-    }
-  };
-
-  const handleSave = async () => {
-    if (formData.length > 0) {
-      const translatedData = formData.map((data) => {
-        return {
-          学历: data.degree,
-          学校名称: data.school,
-          城市: data.city,
-          国家: data.country,
-          起止时间: data.startDate + "-" + data.endDate,
-          院系: data.department,
-          专业: data.major,
-          GPA: data.gpa,
-          排名: data.rank,
-          获奖记录: data.awards,
-          主修课程: data.courses,
-        };
-      });
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: dbFormData._id,
-          type: 'educationHistory',
-          data: translatedData,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      if (response.status !== 200) {
-        const data = await response.json();
-        setSaveState(true);
-        setMessage(data.error);
-      } else {
-        setSaveState(true);
-        setMessage('保存成功');
-      }
+      setActiveIndex((prevIndex) => prevIndex - 1);
     }
   }
 
   const handleSubmit = () => {
     for (let i = 0; i < formData.length; i++) {
-      if (!formData[i].degree || !formData[i].school || !formData[i].startDate || !formData[i].endDate || !formData[i].department || !formData[i].major) {
+      if (formData[i].company === "" || formData[i].city === "" || formData[i].startDate === "" || formData[i].endDate === "" || formData[i].position === "" || formData[i].description === "") {
         setError(true);
         return;
       }
     }
     const translatedData = formData.map((data) => {
       return {
-        学历: data.degree,
-        学校名称: data.school,
+        公司名称: data.company,
         城市: data.city,
         国家: data.country,
         起止时间: data.startDate + "-" + data.endDate,
-        院系: data.department,
-        专业: data.major,
-        GPA: data.gpa,
-        排名: data.rank,
-        获奖记录: data.awards,
-        主修课程: data.courses,
+        部门: data.department,
+        职位: data.position,
+        "职责/业绩描述": data.description,
       };
     });
     fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
-        type: 'educationHistory',
-        data: translatedData,
+        type: 'professionalExperience',
+        data: translatedData
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -169,81 +117,110 @@ export default function Step3Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step4?id=${dbFormData._id}`);
+    router.push(`/resume/fill-info-step5?id=${dbFormData._id}`);
   }
 
+  const handleSave = async () => {
+    for (let i = 0; i < formData.length; i++) {
+      if (formData[i].company === "" || formData[i].city === "" || formData[i].startDate === "" || formData[i].endDate === "" || formData[i].position === "" || formData[i].description === "") {
+        setError(true);
+        return;
+      }
+    }
+    const translatedData = formData.map((data) => {
+      return {
+        公司名称: data.company,
+        城市: data.city,
+        国家: data.country,
+        起始时间: data.startDate + "-" + data.endDate,
+        部门: data.department,
+        职位: data.position,
+        "职责/业绩描述": data.description,
+      };
+    });
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: dbFormData._id,
+        type: 'professionalExperience',
+        data: translatedData
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (response.status !== 200) {
+      const data = await response.json();
+      setSaveState(true);
+      setMessage(data.error);
+    } else {
+      setSaveState(true);
+      setMessage('保存成功');
+    }
+  }
+
+  useEffect(() => {
+    if (!saveState) return;
+    const timer = setTimeout(() => {
+      setSaveState(false);
+      setMessage('');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [saveState]);
+
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden relative">
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
-      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+    <>
+      <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
-            <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">
-              教育经历
-            </h2>
-            {formData.length > 0 && <><div className="flex flex-row justify-start items-center text-alpha-blue mx-auto">
-              {formData.map((data, index) => (
-                <>
-                  <button
-                    key={index}
-                    className={`${activeIndex === index
-                      ? "underline underline-offset-2"
-                      : ""
-                      }`}
-                    onClick={() => setActiveIndex(index)}
-                  >
-                    教育经历 {index + 1}
-                  </button>
-                  {index !== formData.length - 1 && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="icon icon-tabler icon-tabler-chevron-right w-4 h-4"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+            <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">职业经历</h2>
+            {formData.length > 0 && <>
+              <div className="flex flex-row justify-start items-center text-alpha-blue mx-auto">
+                {formData.map((data, index) => (
+                  <>
+                    <button
+                      key={index}
+                      className={`${activeIndex === index
+                        ? "underline underline-offset-2"
+                        : ""
+                        }`}
+                      onClick={() => setActiveIndex(index)}
                     >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M9 6l6 6l-6 6" />
-                    </svg>
-                  )}{" "}
-                </>
-              ))}
-            </div>
+                      实习经历 {index + 1}
+                    </button>
+                    {index !== formData.length - 1 && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-chevron-right w-4 h-4"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M9 6l6 6l-6 6" />
+                      </svg>
+                    )}{" "}
+                  </>
+                ))}
+              </div>
               <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
-                <label>*学历</label>
-                <input
-                  type="text"
-                  placeholder="请输入学历水平"
-                  value={formData[activeIndex].degree}
+                <label>*公司名称</label>
+                <input type="text"
+                  placeholder="请输入公司名称"
+                  value={formData[activeIndex].company}
                   onChange={(e) => {
                     const newFormData = [...formData];
-                    newFormData[activeIndex].degree = e.target.value;
+                    newFormData[activeIndex].company = e.target.value;
                     setFormData(newFormData);
                   }}
                 />
-
-                <label>*学校名称</label>
-                <input
-                  type="text"
-                  placeholder="请输入学校名称"
-                  value={formData[activeIndex].school}
-                  onChange={(e) => {
-                    const newFormData = [...formData];
-                    newFormData[activeIndex].school = e.target.value;
-                    setFormData(newFormData);
-                  }}
-                />
-
                 <div className="w-full flex flex-row justify-between items-center gap-x-16">
                   <div className="w-full flex flex-col justify-start items-stretch">
-                    <label>城市</label>
-                    <input
-                      type="text"
-                      placeholder="请输入城市"
+                    <label>*城市</label>
+                    <input type="text" placeholder="请输入城市"
                       value={formData[activeIndex].city}
                       onChange={(e) => {
                         const newFormData = [...formData];
@@ -254,9 +231,7 @@ export default function Step3Page({ dbFormData }) {
                   </div>
                   <div className="w-full flex flex-col justify-start items-stretch">
                     <label>国家</label>
-                    <input
-                      type="text"
-                      placeholder="请输入国家"
+                    <input type="text" placeholder="请输入国家"
                       value={formData[activeIndex].country}
                       onChange={(e) => {
                         const newFormData = [...formData];
@@ -306,10 +281,17 @@ export default function Step3Page({ dbFormData }) {
                     }}
                   />
                 </div>
-                <label>*院系</label>
-                <input
-                  type="text"
-                  placeholder="请输入院系"
+                <label>*职位</label>
+                <input type="text" placeholder="请输入实习职位"
+                  value={formData[activeIndex].position}
+                  onChange={(e) => {
+                    const newFormData = [...formData];
+                    newFormData[activeIndex].position = e.target.value;
+                    setFormData(newFormData);
+                  }}
+                />
+                <label>部门</label>
+                <input type="text" placeholder="请输入实习部门"
                   value={formData[activeIndex].department}
                   onChange={(e) => {
                     const newFormData = [...formData];
@@ -317,80 +299,25 @@ export default function Step3Page({ dbFormData }) {
                     setFormData(newFormData);
                   }}
                 />
-
-                <label>*专业</label>
-                <input
-                  type="text"
-                  placeholder="请输入专业"
-                  value={formData[activeIndex].major}
-                  onChange={(e) => {
-                    const newFormData = [...formData];
-                    newFormData[activeIndex].major = e.target.value;
-                    setFormData(newFormData);
-                  }}
-                />
-
-                <div className="w-full flex flex-row justify-between items-stretch gap-x-16">
-                  <div className="w-full flex flex-col justify-start items-stretch">
-                    <label>GPA</label>
-                    <input
-                      type="text"
-                      placeholder="请输入GPA"
-                      value={formData[activeIndex].gpa}
-                      onChange={(e) => {
-                        const newFormData = [...formData];
-                        newFormData[activeIndex].gpa = e.target.value;
-                        setFormData(newFormData);
-                      }}
-                    />
-                  </div>
-                  <div className="w-full flex flex-col justify-start items-stretch">
-                    <label>排名</label>
-                    <input
-                      type="text"
-                      placeholder="请输入排名"
-                      value={formData[activeIndex].rank}
-                      onChange={(e) => {
-                        const newFormData = [...formData];
-                        newFormData[activeIndex].rank = e.target.value;
-                        setFormData(newFormData);
-                      }}
-                    />
-                  </div>
-                </div>
-                <label>获奖记录</label>
+                <label>*职责/业务描述</label>
                 <textarea
                   type="text"
+                  placeholder="请输入实习经历描述"
                   rows={3}
-                  placeholder="请输入获奖记录"
-                  value={formData[activeIndex].awards}
+                  value={formData[activeIndex].description}
                   onChange={(e) => {
                     const newFormData = [...formData];
-                    newFormData[activeIndex].awards = e.target.value;
+                    newFormData[activeIndex].description = e.target.value;
                     setFormData(newFormData);
                   }}
                 />
-
-                <label>主修课程</label>
-                <textarea
-                  type="text"
-                  rows={3}
-                  placeholder="请输入主修课程"
-                  value={formData[activeIndex].courses}
-                  onChange={(e) => {
-                    const newFormData = [...formData];
-                    newFormData[activeIndex].courses = e.target.value;
-                    setFormData(newFormData);
-                  }}
-                />
-
                 {/* ... 其他表单元素 ... */}
                 <div className="w-full flex flex-row justify-end items-center mt-1">
                   <button
                     className="text-gray-500 hover:text-red-500"
                     title="删除这段经历"
                     type="button"
-                    onClick={() => RemoveEducation(activeIndex)}
+                    onClick={() => RemoveJob(activeIndex)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -415,7 +342,7 @@ export default function Step3Page({ dbFormData }) {
             </>}
             <button
               className="rounded-full border-4 border-alpha-blue px-4 py-2 flex flex-row justify-center items-center gap-y-2 w-40 mx-auto text-alpha-blue font-bold transition-colors duration-100 hover:bg-alpha-blue hover:text-white whitespace-nowrap"
-              onClick={AddEducation}
+              onClick={AddJob}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -431,7 +358,7 @@ export default function Step3Page({ dbFormData }) {
                 <path d="M12 5l0 14" />
                 <path d="M5 12l14 0" />
               </svg>
-              增加教育经历
+              增加实习经历
             </button>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
@@ -444,7 +371,7 @@ export default function Step3Page({ dbFormData }) {
         <div className=' w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20 overflow-y-auto'>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
           <div className='flex flex-col gap-y-4'>
-            {step3Tips.map((topic, index) => (
+            {step4Tips.map((topic, index) => (
               <div className='text-black ' key={index}>
                 <h2 className="font-bold text-xl">{topic.title}</h2>
                 {topic.subtopics.map((subtopic, subIndex) => (
@@ -471,22 +398,11 @@ export default function Step3Page({ dbFormData }) {
       </div>}
       {
         saveState && (
-          <div>
-            <div className='fixed inset-0 bg-black opacity-50 z-40' />
-            <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
-              <p className='text-base font-bold text-wrap text-center py-4 px-4'>
-                {message}
-              </p>
-              <div className='w-full border border-alpha-blue' />
-              <button className='py-2 px-4 text-base' onClick={() => setSaveState(false)}>了解</button>
-            </div>
-          </div>
+          <SaveToast message={message} />
         )
       }
       <style jsx>{`
-            p {
-              margin: 20px 0; /* 调整段落的上下外边距 */
-            }
+      
       .background {
         background-color: #EDF8FD;
         min-height: 100vh;
@@ -557,6 +473,12 @@ export default function Step3Page({ dbFormData }) {
         input[type="tel"],
         input[type="email"] {
           padding: 10px;
+          margin-top: 5px;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+        }
+        input[type="long"] {
+          padding: 10px 200px;
           margin-top: 5px;
           border: 1px solid #ccc;
           border-radius: 10px;
@@ -652,6 +574,9 @@ export default function Step3Page({ dbFormData }) {
           color: white; /* 激活按钮的文本颜色 */
         }
       `}</style>
-    </div>
+    </>
   );
 }
+
+
+

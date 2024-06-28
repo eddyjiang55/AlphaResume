@@ -246,8 +246,7 @@ export default function AIChat({ dbFormData }) {
   };
 
   return (
-    <div className="bg-[#EDF8FD] w-full h-screen overflow-hidden">
-      <Navbar />
+    <div className="bg-light-blue w-full h-[calc(100vh-8rem)] overflow-hidden">
       <div className="w-full max-w-[960px] mx-auto flex flex-col justify-center items-stretch gap-y-4 p-4 relative">
         <h1 className="font-semibold text-2xl text-alpha-blue text-center py-2">
           简历信息收集
