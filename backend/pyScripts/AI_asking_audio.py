@@ -120,6 +120,10 @@ initial_question_list = [
 ]
 
 
+# 判断是否是有效的UUID格式
+def is_valid_uuid(uuid_string):
+    uuid_regex = re.compile(r'^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$')
+    return bool(uuid_regex.match(uuid_string))
 
 
 def get_chat_from_mongodb(chat_id, resume_id):
@@ -136,13 +140,13 @@ def get_chat_from_mongodb(chat_id, resume_id):
     # 获取最后一条消息. 格式是mock_qa.json里的格式
     last_message = chat_messages[-1]
 
-    section_id = chat_record['sectionID']
+    section_id = chat_record['sectionId']
 
     print(last_message)
 
     last_answer = last_message['answer']
     # check if it is an id, ie, no chinese characters
-    if not re.search(u'[\u4e00-\u9fff]', last_answer):
+    if is_valid_uuid(last_answer):
         audio_id = last_answer
         audio_record = collection_2.find_one({"_id": audio_id})
         audio_data = audio_record['audio'] # which is a .wav file
@@ -160,8 +164,8 @@ def get_chat_from_mongodb(chat_id, resume_id):
 
 
 def check_if_initial(json_data, section_id):
-    dict_data = json.loads(json_data)
-    section_data = dict_data[dict_data.keys()[section_id]]
+    #dict_data = json.loads(json_data)
+    section_data = json_data[list(json_data.keys())[section_id]]
     if isinstance(section_data, dict):
         if all(value != "" for value in section_data.values()):
             return True
@@ -184,7 +188,7 @@ def ask_new_question(updated_json, priority_json, section_id):
     prompt += f"请你从头开始遍历优先级列表，并查看json中对应的值是否是空值。找到第一个对应值为空的键，然后提出一个针对性的问题，让求职者填写这个空缺值。"
     prompt += f"你只需要返回问题本身，不需要任何其他内容，比如解释。"
     prompt += f"以下是json文件内容：{updated_json}"
-    prompt += f"以下是优先级顺序：{priority_json[priority_json.keys()[section_id]]}"
+    prompt += f"以下是优先级顺序：{priority_json[list(priority_json.keys())[section_id]]}"
 
     response = dashscope.Generation.call(
         model=dashscope.Generation.Models.qwen_max,
@@ -213,12 +217,12 @@ def process_asking(json_data, section_id):
         # update the section_id in the chat record
         collection.update_one(
             {"_id": chatId},
-            {"$set": {"sectionID": section_id}}
+            {"$set": {"sectionId": section_id}}
         )
         return initial_question_list[section_id]
     else:
         # not the initial question, get the json chat data from json
-        relevant_section = json_data[json_data.keys()[section_id]]
+        relevant_section = json_data[list(json_data.keys())[section_id]]
         new_question = ask_new_question(relevant_section, priority[keys_list[section_id]], section_id)
         return new_question
 
@@ -226,7 +230,7 @@ def process_asking(json_data, section_id):
 def update_json(original_json, last_chat):
     prompt = (f"我有一段对话和一个有一部分填空的json文件。请你判断这段对话中包含的信息能填入json文件的哪里,然后更新这个json。''"
               f"如果对话的回答中希望跳过某一个部分，或者说明并无这部分的信息，请在这个部分的值中填入'无'，而不是空字符串。"
-              f"你需要返回一个完整的json文件。以下是对话内容：{last_chat}")
+              f"你需要返回一个完整的json文件。不需要加任何注释。以下是对话内容：{last_chat}")
     prompt += f"以下是json文件内容：{original_json}"
 
     response = dashscope.Generation.call(
@@ -260,8 +264,8 @@ def extract_json(data_str):
             # 尝试解析 JSON，确保它是有效的
             json_data = json.loads(json_str)
             return json_data
-        except json.JSONDecodeError:
-            print("找到的字符串不是有效的 JSON。")
+        except json.JSONDecodeError as e:
+            print("找到的字符串不是有效的 JSON。",e)
             return None
     else:
         print("没有找到符合 JSON 格式的内容。")
