@@ -184,11 +184,11 @@ def check_if_initial(json_data, section_id):
 def ask_new_question(updated_json, priority_json, section_id):
     prompt = f"你是一个面试官，现在我给你一个字典，是一个求职者的部分个人信息文档。里面有一些键的值是空的。"
     prompt += f'这一部分的主题是{keys_list[section_id]}。'
-    prompt += f"我还有一个优先级列表，包含了这一部分里所需必填项的信息。"
-    prompt += f"请你从头开始遍历优先级列表，并查看json中对应的值是否是空值。找到第一个对应值为空的键，然后提出一个针对性的问题，让求职者填写这个空缺值。"
+    #prompt += f"我还有一个优先级列表，包含了这一部分里所需必填项的信息。"
+    prompt += f"请你从头开始遍历json，并查看json中对应的值是否是空值。找到第一个对应值为空的键，然后提出一个针对性的问题，让求职者填写这个空缺值。"
     prompt += f"你只需要返回问题本身，不需要任何其他内容，比如解释。"
     prompt += f"以下是json文件内容：{updated_json}"
-    prompt += f"以下是优先级顺序：{priority_json[list(priority_json.keys())[section_id]]}"
+    #prompt += f"以下是优先级顺序：{priority_json[list(priority_json.keys())[section_id]]}"
 
     response = dashscope.Generation.call(
         model=dashscope.Generation.Models.qwen_max,
@@ -326,5 +326,4 @@ new_query = process_asking(json_update, section_id)
 update_mongodb(chatId, new_query, resumeId, json_update)
 close_mongodb()
 print(new_query)
-
 
