@@ -2,11 +2,12 @@ const { connect } = require('../dbconfig');
 const { v4: uuidv4 } = require('uuid'); // 引入UUID生成器
 
 class ResumeChat {
-    constructor(userAccount, messages, resumeId,  id = null) {
+    constructor(userAccount, messages, resumeId, id = null) {
         this._id = id || uuidv4(); // 使用 uuid 生成唯一标识符
         this.userAccount = userAccount;
         this.messages = messages; // 假设 messages 为一问一答数组
         this.resumeId = resumeId
+        this.sectionId = 0;
     }
 
     async save() {
