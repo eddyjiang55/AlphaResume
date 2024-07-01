@@ -13,6 +13,10 @@ export async function getServerSideProps(context) {
     if (preformattedData.data) {
       const displayData = preformattedData.data.map((data) => {
         const [formattedStart, formattedEnd] = extractDateRange(data.起止时间);
+        let tillPresent = false;
+        if (formattedEnd === "至今") {
+          tillPresent = true;
+        }
         return {
           degree: data.学历,
           school: data.学校名称,
@@ -20,6 +24,7 @@ export async function getServerSideProps(context) {
           country: data.国家,
           startDate: formattedStart,
           endDate: formattedEnd,
+          tillPresent: tillPresent,
           department: data.院系,
           major: data.专业,
           gpa: data.GPA,
@@ -195,7 +200,7 @@ export default function Step3Page({ dbFormData }) {
             </h2>
             {formData.length > 0 && <><div className="flex flex-row justify-start items-center text-alpha-blue mx-auto">
               {formData.map((data, index) => (
-                <>
+                <section className='flex flex-row justify-start items-center gap-x-2' key={index}>
                   <button
                     key={index}
                     className={`${activeIndex === index
@@ -221,7 +226,7 @@ export default function Step3Page({ dbFormData }) {
                       <path d="M9 6l6 6l-6 6" />
                     </svg>
                   )}{" "}
-                </>
+                </section>
               ))}
             </div>
               <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
@@ -277,45 +282,65 @@ export default function Step3Page({ dbFormData }) {
                     />
                   </div>
                 </div>
-                <label>*起止时间</label>
-                <div className="w-full p-2.5 mt-1.5 rounded-xl border border-[#ccc] flex flex-row justify-between items-center gap-x-6">
-                  <input
-                    className="flex-grow"
-                    type="month"
-                    max="3000-12"
-                    value={formData[activeIndex].startDate}
-                    onChange={(e) => {
-                      const newFormData = [...formData];
-                      newFormData[activeIndex].startDate = e.target.value;
-                      setFormData(newFormData);
-                    }}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="icon icon-tabler icon-tabler-arrow-narrow-right w-6 h-6"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="#000000"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M5 12l14 0" />
-                    <path d="M15 16l4 -4" />
-                    <path d="M15 8l4 4" />
-                  </svg>
-                  <input
-                    className="flex-grow"
-                    type="month"
-                    max="3000-12"
-                    value={formData[activeIndex].endDate}
-                    onChange={(e) => {
-                      const newFormData = [...formData];
-                      newFormData[activeIndex].endDate = e.target.value;
-                      setFormData(newFormData);
-                    }}
-                  />
+                <div className="w-full flex flex-row justify-between items-center gap-x-16">
+                  <div className="w-4/5 flex flex-col justify-start items-stretch">
+                    <label>*起止时间</label>
+                    <div className="w-full p-2.5 mt-1.5 rounded-xl border border-[#ccc] flex flex-row justify-between items-center gap-x-6">
+                      <input
+                        className="flex-grow"
+                        type="month"
+                        max="3000-12"
+                        value={formData[activeIndex].startDate}
+                        onChange={(e) => {
+                          const newFormData = [...formData];
+                          newFormData[activeIndex].startDate = e.target.value;
+                          setFormData(newFormData);
+                        }}
+                      />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-arrow-narrow-right w-6 h-6"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="#000000"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M5 12l14 0" />
+                        <path d="M15 16l4 -4" />
+                        <path d="M15 8l4 4" />
+                      </svg>
+                      <input
+                        className="flex-grow"
+                        type="month"
+                        max="3000-12"
+                        disabled={formData[activeIndex].tillPresent}
+                        value={formData[activeIndex].endDate}
+                        onChange={(e) => {
+                          const newFormData = [...formData];
+                          newFormData[activeIndex].endDate = e.target.value;
+                          setFormData(newFormData);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="w-1/5 flex flex-col justify-start items-center">
+                    <label>仍然在读</label>
+                    <div className="w-full p-2.5 mt-1.5 flex flex-row justify-center items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData[activeIndex].tillPresent}
+                        onChange={(e) => {
+                          const newFormData = [...formData];
+                          newFormData[activeIndex].tillPresent = e.target.checked;
+                          newFormData[activeIndex].endDate = e.target.checked ? "至今" : "";
+                          setFormData(newFormData);
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
                 <label>*院系</label>
                 <input

@@ -108,6 +108,7 @@ const formatResume = (html) => {
   let formattedHtml = '';
 
   sections.forEach(section => {
+    section.classList.add('theme-title');
     const sectionTitleText = section.textContent.trim().toLowerCase().replace(/\s+/g, '-');
     const sectionDiv = document.createElement('div');
     sectionDiv.classList.add('section');
@@ -115,7 +116,7 @@ const formatResume = (html) => {
 
     const sectionTitle = section.outerHTML;
     sectionDiv.innerHTML = sectionTitle;
-
+    // console.log(sectionDiv);
     let sibling = section.nextElementSibling;
     while (sibling && sibling.tagName !== 'H2') {
       sectionDiv.innerHTML += sibling.outerHTML;
@@ -131,7 +132,7 @@ const formatResume = (html) => {
 const resolveHeader = (html, frontmatter) => {
   let header = "";
 
-  if (frontmatter.name) header += `<h1>${frontmatter.name}</h1>\n`;
+  if (frontmatter.name) header += `<h1 class='theme-title'>${frontmatter.name}</h1>\n`;
 
   if (frontmatter.header) {
     const n = frontmatter.header.length;
@@ -163,9 +164,9 @@ export const renderMarkdown = (md) => {
   const { body, attributes } = frontmatter(preprocessedMd);
 
   let html = markdown.render(body);
-  console.log(html);
+  // console.log(html);
   html = formatResume(html);
-  console.log(html);
+  // console.log(html);
   html = resolveHeader(html, attributes);
 
   return html;
