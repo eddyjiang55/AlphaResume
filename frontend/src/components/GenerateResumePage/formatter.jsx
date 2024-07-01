@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import html2pdf from "html2pdf.js";
 
 const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
@@ -8,14 +8,25 @@ const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
   const [font, setFont] = useState("微软雅黑");
   const [fontSize, setFontSize] = useState(16);
 
-  const exportPDF =  () => {
+  useEffect(() => {
+    // change theme-title's font color
+    console.log(themeColor);
+    document.documentElement.style.setProperty("--theme-color", themeColor);
+  }, [themeColor]);
+
+  useEffect(() => {
+    // change font size
+    document.documentElement.style.setProperty("--base-font-size", `${fontSize}px`);
+  }, [fontSize]);
+
+  const exportPDF = () => {
     if (resumeTitle === "") {
       return;
     }
     const element = document.createElement("div");
     element.innerHTML = htmlContent;
     html2pdf().from(element).save(`${resumeTitle}.pdf`);
-  }
+  };
 
   return (
     <>

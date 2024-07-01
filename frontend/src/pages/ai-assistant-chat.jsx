@@ -1,11 +1,12 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Navbar from "../components/navbar";
 import ChatSegment from "../components/chat";
 // import ChatChoice from "../components/chat-choice";
 // import { blockData } from "../lib/quesLib";
 import { useSelector } from "react-redux";
+import useSpeechRecognition from "../utils/useSpeechRecognition";
 
 const avatar = (
   <svg
@@ -57,6 +58,19 @@ export default function AIChat({ dbFormData }) {
   const [loading, setLoading] = useState(false);
   const [showLeaveBtn, setShowLeaveBtn] = useState(false);
   const [chatId, setChatId] = useState(dbFormData._id);
+
+  const handleResult = useCallback((result) => {
+    console.log("Speech recognition result:", result);
+  }, []);
+
+  const handleError = useCallback((error) => {
+    console.error("Speech recognition error:", error);
+  }, []);
+
+  const { handleRecognition, isListening } = useSpeechRecognition({
+    onResult: handleResult,
+    onError: handleError,
+  });
   // const [currentBlockId, setCurrentBlockId] = useState(null);
   // const [currentQuestionId, setCurrentQuestionId] = useState(null);
   const chatContainerRef = useRef(null);
@@ -66,7 +80,7 @@ export default function AIChat({ dbFormData }) {
       setChatHistory([
         {
           sender: "bot",
-          text: "[xxx]你好，我是你的简历规划师[xxx]，在帮助你制作一份[应届生求职]简历之前，我需要了解你的一些个人基本信息和过往学习实习经历，对话可以随时开始或暂停，你的资料会被妥善保存，仅用于简历制作。\n 此次交流仅作为初步信息搜集，如有遗漏不用担心，你可以随时告诉我们，我们将为你修改并补充。\n首先，可以告诉我你的中文姓名和英文名吗？",
+          text: "你好，我是你的简历规划师，在帮助你制作一份求职简历之前，我需要了解你的一些个人基本信息和过往学习实习经历，对话可以随时开始或暂停，你的资料会被妥善保存，仅用于简历制作。\n 此次交流仅作为初步信息搜集，如有遗漏不用担心，你可以随时告诉我们，我们将为你修改并补充。\n首先，可以告诉我你的中文姓名和英文名吗？",
           id: 1,
         },
       ]);
@@ -278,49 +292,78 @@ export default function AIChat({ dbFormData }) {
         </div>
       </div>
       <div className="fixed inset-x-0 bottom-0 flex justify-center items-center flex-row gap-x-4 w-full">
-        <div className="flex justify-center items-center flex-row w-full max-w-[864px] p-2 mx-auto mt-2 mb-6 border border-solid border-alpha-blue rounded-lg bg-white shadow-lg">
-          <input
-            type="text"
-            className="w-full p-1 focus:outline-none"
-            placeholder={loading ? "请稍等……" : "请输入您的回答"}
-            ref={textInputRef}
-            onKeyUp={handleKeyUp}
-            onKeyDown={handleKeyDown}
-            disabled={loading}
-          />
-          {loading ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="icon icon-tabler icon-tabler-dots animate-pulse w-6 h-6 text-gray-400 hover:cursor-wait"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+        <div className="flex justify-center items-start flex-row w-full max-w-[864px] gap-x-6 mt-2 mb-6 h-full">
+          <div className="flex justify-center items-center flex-row w-full p-2 mx-auto border border-solid border-alpha-blue rounded-lg bg-white shadow-lg text-black h-12">
+            <input
+              type="text"
+              className="w-full p-1 focus:outline-none"
+              placeholder={loading ? "请稍等……" : isListening ? "请说话……" : "请输入您的回答"}
+              ref={textInputRef}
+              onKeyUp={handleKeyUp}
+              onKeyDown={handleKeyDown}
+              disabled={loading}
+            />
+            {isListening ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="icon icon-tabler icon-tabler-microphone-off w-6 h-6 mx-2 cursor-pointer"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                onClick={handleRecognition}
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M3 3l18 18" />
+                <path d="M9 5a3 3 0 0 1 6 0v5a3 3 0 0 1 -.13 .874m-2 2a3 3 0 0 1 -3.87 -2.872v-1" />
+                <path d="M5 10a7 7 0 0 0 10.846 5.85m2 -2a6.967 6.967 0 0 0 1.152 -3.85" />
+                <path d="M8 21l8 0" />
+                <path d="M12 17l0 4" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="icon icon-tabler icon-tabler-microphone w-6 h-6 mx-2 cursor-pointer"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                onClick={handleRecognition}
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" />
+                <path d="M5 10a7 7 0 0 0 14 0" />
+                <path d="M8 21l8 0" />
+                <path d="M12 17l0 4" />
+              </svg>
+            )}
+          </div>
+          <div className="h-12 w-12 flex justify-center items-center">
+            <button
+              className="h-full w-full border border-alpha-blue shadow-md bg-white text-black p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
             >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-              <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-              <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="icon icon-tabler icon-tabler-send-2 w-6 h-6 text-black hover:cursor-pointer"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              onClick={sendMessage}
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M4.698 4.034l16.302 7.966l-16.302 7.966a.503 .503 0 0 1 -.546 -.124a.555 .555 0 0 1 -.12 -.568l2.468 -7.274l-2.468 -7.274a.555 .555 0 0 1 .12 -.568a.503 .503 0 0 1 .546 -.124z" />
-              <path d="M6.5 12h14.5" />
-            </svg>
-          )}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="icon icon-tabler icon-tabler-send-2 w-6 h-6"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                onClick={sendMessage}
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M4.698 4.034l16.302 7.966l-16.302 7.966a.503 .503 0 0 1 -.546 -.124a.555 .555 0 0 1 -.12 -.568l2.468 -7.274l-2.468 -7.274a.555 .555 0 0 1 .12 -.568a.503 .503 0 0 1 .546 -.124z" />
+                <path d="M6.5 12h14.5" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
