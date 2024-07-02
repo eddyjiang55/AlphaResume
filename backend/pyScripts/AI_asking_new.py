@@ -2,7 +2,24 @@ import json
 from http import HTTPStatus
 import dashscope
 import time
-dashscope.api_key='sk-3c43423c9fee4af8928fd8bc647291ee'
+import base64
+import hashlib
+import hmac
+import json
+import os
+import time
+import requests
+import urllib
+import audio_to_text
+
+
+
+lfasr_host = 'https://raasr.xfyun.cn/v2/api'
+# 请求的接口名
+api_upload = '/upload'
+api_get_result = '/getResult'
+
+dashscope.api_key = 'sk-3c43423c9fee4af8928fd8bc647291ee'
 import re
 from pymongo import MongoClient
 import sys
@@ -14,10 +31,12 @@ MONGODB_URL = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mong
 DB_NAME = "airesumedb"
 COLLECTION_NAME = "resumeChats"
 COLLECTION_NAME_1 = "improvedUsers"
+COLLECTION_NAME_2 = "resumeAudios"
 client = MongoClient(MONGODB_URL)
 db = client[DB_NAME]
 collection = db[COLLECTION_NAME]
 collection_1 = db[COLLECTION_NAME_1]
+collection_2 = db[COLLECTION_NAME_2]
 
 priority = {
     "基础信息": {
@@ -78,13 +97,11 @@ priority = {
 
 chatId = sys.argv[1]
 resumeId = sys.argv[2]
-#需要判断是哪一个section
-section_id= sys.argv[3]
 
 
-#chatId = 'a4e6762c-b26d-4619-92dd-2bd660adae5f'
-#resumeId = 'a4e6762c-b26d-4619-92dd-2bd660adae5f'
-#section_id = 1
+# chatId = 'a4e6762c-b26d-4619-92dd-2bd660adae5f'
+# resumeId = 'a4e6762c-b26d-4619-92dd-2bd660adae5f'
+# section_id = 1
 
 
 keys_list = list(priority.keys())
@@ -103,6 +120,12 @@ initial_question_list = [
 ]
 
 
+# 判断是否是有效的UUID格式
+def is_valid_uuid(uuid_string):
+    uuid_regex = re.compile(r'^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$')
+    return bool(uuid_regex.match(uuid_string))
+
+
 def get_chat_from_mongodb(chat_id, resume_id):
     # 假设你已经知道如何定位到特定用户的聊天记录，这里用一个示例查询
 
@@ -116,43 +139,67 @@ def get_chat_from_mongodb(chat_id, resume_id):
 
     # 获取最后一条消息. 格式是mock_qa.json里的格式
     last_message = chat_messages[-1]
+
+    section_id = chat_record['sectionId']
+
     print(last_message)
 
-    return last_message, standard_json
+    last_answer = last_message['answer']
+    # check if it is an id, ie, no chinese characters
+    if is_valid_uuid(last_answer):
+        audio_id = last_answer
+        audio_record = collection_2.find_one({"_id": audio_id})
+        audio_data = audio_record['audio'] # which is a .wav file
+        # convert the audio to text
+        api = audio_to_text.RequestApi(appid="80922260",
+                     secret_key="84268ea312aee377ace0b8468633bd0a",
+                     upload_file_path=r"test1-1.wav")        # needs to be adjusted
+        result = api.get_result()
+        last_message['answer'] = result
+
+
+
+    return last_message, standard_json, section_id
+
 
 
 def check_if_initial(json_data, section_id):
-    dict_data = json.loads(json_data)
-    section_data = dict_data[dict_data.keys()[section_id]]
+    #dict_data = json.loads(json_data)
+    section_data = json_data[list(json_data.keys())[section_id]]
     if isinstance(section_data, dict):
-        if all(value == "" for value in section_data.values()):
+        if all(value != "" for value in section_data.values()):
             return True
         return False
     elif isinstance(section_data, list):
+        check_point = 0
         for item in section_data:
-            if all(value == "" for value in item.values()):
-                return True
+            # if some of the items are not empty, return False
+            if any(value == "" for value in item.values()):
+                check_point += 1
+        if check_point == 0:
+            return True
         return False
 
-def ask_new_question(updated_json, priority_json, section_id):
-    prompt = f"你是一个面试官，现在我给你一个字典，是一个求职者的部分个人信息文档。里面有一些键的值是空的。"
-    prompt += f'这一部分的主题是{keys_list[section_id]}。'
-    prompt += f"我还有一个优先级列表，包含了这一部分里所需必填项的信息。"
-    prompt += f"请你从头开始遍历优先级列表，并查看json中对应的值是否是空值。找到第一个对应值为空的键，然后提出一个针对性的问题，让求职者填写这个空缺值。"
+
+def ask_new_question(updated_json, priority_json, section_id, current_key):
+    prompt = f"你是一个面试官，正在询问求职者的个人信息。"
+    prompt += f'现在你正在询问的是有关{keys_list[section_id]}的内容。'
+    #prompt += f"我还有一个优先级列表，包含了这一部分里所需必填项的信息。"
+    prompt += f"目前，你发现这个求职者的当前栏目下的{current_key}是空的。请你提出一个问题，让求职者填写这个空缺值。"
     prompt += f"你只需要返回问题本身，不需要任何其他内容，比如解释。"
-    prompt += f"以下是json文件内容：{updated_json}"
-    prompt += f"以下是优先级顺序：{priority_json[priority_json.keys()[section_id]]}"
+    #prompt += f"以下是json文件内容：{updated_json}"
+    #prompt += f"以下是优先级顺序：{priority_json[list(priority_json.keys())[section_id]]}"
 
     response = dashscope.Generation.call(
         model=dashscope.Generation.Models.qwen_max,
-        prompt= prompt,
-        seed = 1234,
-        top_p = 0.2,
-        result_format = 'text',
-        enable_search = False,
-        max_tokens = 2000,
-        temperature = 0.1,
-        repetition_penalty = 1.0
+        prompt=prompt,
+        seed=1234,
+        top_p=0.2,
+        result_format='text',
+        enable_search=False,
+        max_tokens=2000,
+        temperature=0.1,
+        repetition_penalty=1.0
     )
 
     if response.status_code == HTTPStatus.OK:
@@ -163,33 +210,54 @@ def ask_new_question(updated_json, priority_json, section_id):
         print(response.message)  # The error message.
 
 
-def process_asking(json_data, section_id):
+def find_first_diff(standard_json, updated_json, section_id):
+    section_standard = standard_json[list(standard_json.keys())[section_id]]
+    section_updated = updated_json[list(updated_json.keys())[section_id]]
+    for key in section_standard:
+        if section_standard[key] != section_updated[key]:
+            return key
+    # if no difference is found, return the first key that has null value
+    for key in section_standard:
+        if section_standard[key] == "":
+            return key
+
+
+def process_asking(json_data, section_id, standard_json):
     bool_check = check_if_initial(json_data, section_id)
-    if bool_check:
+    if bool_check: # if the section is already filled
+        section_id += 1
+        # update the section_id in the chat record
+        collection.update_one(
+            {"_id": chatId},
+            {"$set": {"sectionId": section_id}}
+        )
         return initial_question_list[section_id]
     else:
         # not the initial question, get the json chat data from json
-        relevant_section = json_data[json_data.keys()[section_id]]
-        new_question = ask_new_question(relevant_section, priority[keys_list[section_id]], section_id)
+        current_key = find_first_diff(standard_json, json_data, section_id)
+        relevant_section = json_data[list(json_data.keys())[section_id]]
+        print(relevant_section)
+        new_question = ask_new_question(relevant_section, priority[keys_list[section_id]], section_id, current_key)
         return new_question
 
 
 
-
-def update_json(original_json, last_chat, section_id):
-    prompt = f"我有一段对话和一个有一部分填空的json文件。请你判断这段对话中包含的信息能填入json文件的哪里,然后更新这个json。你需要返回一个完整的json文件。以下是对话内容：{last_chat}"
-    prompt += f"以下是json文件内容：{original_json[original_json.keys()[section_id]]}"
+def update_json(original_json, last_chat):
+    prompt = (f"我有一段对话和一个有一部分填空的json文件。请你判断这段对话中包含的信息能填入json文件的哪里,然后更新这个json。''"
+              f"如果对话的回答中希望跳过某一个部分，或者说明并无这部分的信息，请在这个部分的值中填入'无'，而不是空字符串。"
+              f"你需要返回一个完整的json文件。不需要加任何注释。以下是对话内容：{last_chat}")
+    prompt += f"以下是json文件内容：{original_json}"
 
     response = dashscope.Generation.call(
         model=dashscope.Generation.Models.qwen_max,
-        prompt= prompt,
-        seed = 1234,
-        top_p = 0.2,
-        result_format = 'text',
-        enable_search = False,
-        max_tokens = 2000,
-        temperature = 0.1,
-        repetition_penalty = 1.0
+        prompt=prompt,
+        seed=1234,
+        top_p=0.2,
+        result_format='text',
+        enable_search=False,
+        max_tokens=2000,
+        temperature=0.1,
+        repetition_penalty=1.0
     )
 
     if response.status_code == HTTPStatus.OK:
@@ -199,6 +267,7 @@ def update_json(original_json, last_chat, section_id):
     else:
         print(response.code)  # The error code.
         print(response.message)  # The error message.
+
 
 def extract_json(data_str):
     # 使用正则表达式找到最外层的大括号
@@ -210,15 +279,15 @@ def extract_json(data_str):
             # 尝试解析 JSON，确保它是有效的
             json_data = json.loads(json_str)
             return json_data
-        except json.JSONDecodeError:
-            print("找到的字符串不是有效的 JSON。")
+        except json.JSONDecodeError as e:
+            print("找到的字符串不是有效的 JSON。",e)
             return None
     else:
         print("没有找到符合 JSON 格式的内容。")
         return None
 
-def update_mongodb(chat_id, new_question, resume_id, updated_json):
 
+def update_mongodb(chat_id, new_question, resume_id, updated_json):
     chat_record = collection.find_one({"_id": chat_id})
     resume_record = collection_1.find_one({"_id": resume_id})
 
@@ -238,7 +307,7 @@ def update_mongodb(chat_id, new_question, resume_id, updated_json):
         print(json.dumps({"status": "success", "id": messages_length + 1, "message": new_message}))
     else:
         print(json.dumps({"status": "error", "message": "Chat record not found"}))
-        
+
     if resume_record:
         collection_1.update_one(
             {"_id": resume_id},
@@ -249,18 +318,26 @@ def update_mongodb(chat_id, new_question, resume_id, updated_json):
         print(json.dumps({"status": "error", "message": "Resume record not found"}))
 
 
-        
+
+
+
+
+
 def close_mongodb():
     client.close()
 
-last_message, standard_json = get_chat_from_mongodb(chatId, resumeId)
-json_update = update_json(standard_json, last_message, section_id)
-json_update = re.sub(r"```json",'',json_update)
-json_update = re.sub(r"```",'',json_update)
+
+
+
+
+last_message, standard_json, section_id = get_chat_from_mongodb(chatId, resumeId)
+json_update = update_json(standard_json, last_message)
+json_update = re.sub(r"```json", '', json_update)
+json_update = re.sub(r"```", '', json_update)
 # json_update dtype: str
 # 只保留str最外层的两个{}之内的内容，删除其他内容
 json_update = extract_json(json_update)
-new_query = process_asking(json_update, section_id)
+new_query = process_asking(json_update, section_id, standard_json)
 update_mongodb(chatId, new_query, resumeId, json_update)
 close_mongodb()
 print(new_query)
