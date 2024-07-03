@@ -107,6 +107,7 @@ resumeId = sys.argv[2]
 keys_list = list(priority.keys())
 initial_question_list = [
     "您能提供一下您的基本信息吗？包括姓名、联系电话、电子邮件和微信号。",
+    "您可以编写一段您的个人评价吗？包括您的优势、工作态度和职业目标等。",
     "您可以按照学历从高到低列举一下您的教育背景吗？包括就读的学校、专业、学历和学习时间段。",
     "您有过哪些实习或工作的经历？如果有，请按照时间顺序提供公司名称、城市、职位、部门、起止时间以及主要职责。",
     "您参与过哪些重要的项目？如果有，请按照时间顺序描述项目名称、城市、您的角色、起止时间、项目描述、成就和主要职责。",
@@ -179,6 +180,10 @@ def check_if_initial(json_data, section_id):
         if check_point == 0:
             return True
         return False
+    else:
+        if section_data != "":
+            return True
+    return False
 
 
 def ask_new_question(updated_json, priority_json, section_id, current_key):
@@ -203,27 +208,46 @@ def ask_new_question(updated_json, priority_json, section_id, current_key):
     )
 
     if response.status_code == HTTPStatus.OK:
-        print(response.usage)  # The usage information
+        #print(response.usage)  # The usage information
         return response.output['text']  # The output text
     else:
-        print(response.code)  # The error code.
-        print(response.message)  # The error message.
+        pass
+        #print(response.code)  # The error code.
+        #print(response.message)  # The error message.
 
 
 def find_first_diff(standard_json, updated_json, section_id):
+    #standard_json = json.loads(standard_json)
+    #updated_json = json.loads(updated_json)
+    print(type(standard_json))
+    print(list(standard_json.keys())[section_id])
     section_standard = standard_json[list(standard_json.keys())[section_id]]
     section_updated = updated_json[list(updated_json.keys())[section_id]]
-    for key in section_standard:
-        if section_standard[key] != section_updated[key]:
-            return key
-    # if no difference is found, return the first key that has null value
-    for key in section_standard:
-        if section_standard[key] == "":
-            return key
-
+    print(type(section_standard))
+    print(standard_json)
+    print(updated_json)
+    if isinstance(section_standard, dict):
+        for key in section_standard:
+            if section_standard[key] == section_updated[key]:
+                return key
+        # if all the keys are the same, return the first key that is nan
+        for key in section_updated:
+            if section_updated[key] == "":
+                return key
+    elif isinstance(section_standard, list):
+        for i in range(len(section_standard)):
+            for key in section_standard[i]:
+                if section_standard[i][key] == section_updated[i][key]:
+                    return key
+        # if all the keys are the same, return the first key that is nan
+        for item in section_updated:
+            for key in item:
+                if item[key] == "":
+                    return key
 
 def process_asking(json_data, section_id, standard_json):
     bool_check = check_if_initial(json_data, section_id)
+    print(bool_check)
     if bool_check: # if the section is already filled
         section_id += 1
         # update the section_id in the chat record
@@ -235,17 +259,19 @@ def process_asking(json_data, section_id, standard_json):
     else:
         # not the initial question, get the json chat data from json
         current_key = find_first_diff(standard_json, json_data, section_id)
+        print(current_key)
+        print(section_id)
         relevant_section = json_data[list(json_data.keys())[section_id]]
         print(relevant_section)
         new_question = ask_new_question(relevant_section, priority[keys_list[section_id]], section_id, current_key)
         return new_question
 
 
-
 def update_json(original_json, last_chat):
     prompt = (f"我有一段对话和一个有一部分填空的json文件。请你判断这段对话中包含的信息能填入json文件的哪里,然后更新这个json。''"
-              f"如果对话的回答中希望跳过某一个部分，或者说明并无这部分的信息，请在这个部分的值中填入'无'，而不是空字符串。"
-              f"你需要返回一个完整的json文件。不需要加任何注释。以下是对话内容：{last_chat}")
+            f"如果对话的回答中希望跳过某一个部分，或者特别说明并无这部分的信息，请在这个部分的值中填入'无'，而不是空字符串。"
+            f"请注意，如果问题中没有提到的键，和回答中没有特别说明并无这部分信息的键，请不要擅自填充无，而是保持为空。"
+            f"你需要返回一个完整的json文件。不需要加任何注释。以下是对话内容：{last_chat}")
     prompt += f"以下是json文件内容：{original_json}"
 
     response = dashscope.Generation.call(
@@ -262,11 +288,12 @@ def update_json(original_json, last_chat):
 
     if response.status_code == HTTPStatus.OK:
         # print(response.usage)  # The usage information
-        print(response.output['text'])
+        #print(response.output['text'])
         return response.output['text']  # The output text
     else:
-        print(response.code)  # The error code.
-        print(response.message)  # The error message.
+        pass
+        #print(response.code)  # The error code.
+        #print(response.message)  # The error message.
 
 
 def extract_json(data_str):
@@ -304,18 +331,20 @@ def update_mongodb(chat_id, new_question, resume_id, updated_json):
             {"$push": {"messages": new_message}}
         )
 
-        print(json.dumps({"status": "success", "id": messages_length + 1, "message": new_message}))
+        #print(json.dumps({"status": "success", "id": messages_length + 1, "message": new_message}))
     else:
-        print(json.dumps({"status": "error", "message": "Chat record not found"}))
+        pass
+        #print(json.dumps({"status": "error", "message": "Chat record not found"}))
 
     if resume_record:
         collection_1.update_one(
             {"_id": resume_id},
             {"$set": {"personal_data": updated_json}}
         )
-        print(json.dumps({"status": "success", "message": "Resume record updated"}))
+        #print(json.dumps({"status": "success", "message": "Resume record updated"}))
     else:
-        print(json.dumps({"status": "error", "message": "Resume record not found"}))
+        pass
+        #print(json.dumps({"status": "error", "message": "Resume record not found"}))
 
 
 
