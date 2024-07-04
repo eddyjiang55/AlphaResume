@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const JobInformation = require('../mongodb/models/JobInformation'); // 确保路径正确
+const { spawn } = require('child_process');
+const path = require('path');
 
 // 添加新的职位信息
 router.post('/job-information', async (req, res) => {
     try {
-        // 修改为新的字段
         const { 岗位名称, 岗位描述, 岗位要求, 岗位关键词, 工作内容关键词, id } = req.body;
         const jobInfo = new JobInformation(岗位名称, 岗位描述, 岗位要求, 岗位关键词, 工作内容关键词, id);
         const insertedId = await jobInfo.save();
@@ -74,6 +75,37 @@ router.get('/job-information/keyword/:keyword', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: '根据关键词查询职位信息时出错', error: error.toString() });
+    }
+});
+
+// 根据岗位字符串计算相似性并返回匹配结果
+router.post('/job-information/match', async (req, res) => {
+    try {
+        const { jobString } = req.body;
+        const pythonProcess = spawn('python3', [path.join(__dirname, '../calculate_similarity.py'), jobString]);
+
+        pythonProcess.stdout.on('data', (data) => {
+            const result = JSON.parse(data.toString());
+            const { bestMatch, similarity } = result;
+            const threshold = 0.8; // 设置相似度阈值
+            const matched = similarity >= threshold;
+            
+            const response = {
+                job_information: bestMatch.job_information,
+                resume_guidance: bestMatch.resume_guidance,
+                matched: matched
+            };
+            res.status(200).json(response);
+        });
+
+        pythonProcess.stderr.on('data', (data) => {
+            console.error('stderr:', data.toString());
+            res.status(500).json({ message: 'Error occurred during similarity calculation' });
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error occurred during matching', error: error.toString() });
     }
 });
 

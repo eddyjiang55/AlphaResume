@@ -104,7 +104,7 @@ router.post('/resume-chat', async (req, res) => {
         const _id = await resumeChat.save();
 
         // 调用 Python 文件
-        const pythonProcess = spawn('python3', [pythonScriptPath, _id, resume_id]);
+        const pythonProcess = spawn('python3', [pythonScriptPath, _id, resume_id,0]);
 
         pythonProcess.stdout.on('data', (data) => {
             console.log(data.toString());
@@ -139,8 +139,9 @@ router.put('/resume-chat/:_id', async (req, res) => {
         const { quesId, answer } = req.body; // Assume the new message is sent in the request body
         await ResumeChat.addAnswer(_id, quesId, answer);
 
+        const sectionId = chatRecord.sectionId;
         // 调用 Python 文件
-        const pythonProcess = spawn('python3', [pythonScriptPath, _id, resumeId]);
+        const pythonProcess = spawn('python3', [pythonScriptPath, _id, resumeId,sectionId]);
 
         pythonProcess.stdout.on('data', (data) => {
             console.log(data.toString());

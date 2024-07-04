@@ -1,10 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from '../components/navbar';
-import ResumeNavbar from '../components/resume-navbar';
-import { step2Tips } from '../lib/tips';
-import SaveToast from '../components/Toast/SaveToast';
+import { step2Tips } from '@/lib/tips';
+import SaveToast from '@/components/Toast/SaveToast';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -13,7 +11,7 @@ export async function getServerSideProps(context) {
     const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${context.query.id}/personalEvaluation`)
     dbFormData = await res.json()
   } else {
-    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+    return { redirect: { destination: `/resume/fill-info-step1`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
@@ -77,14 +75,12 @@ export default function Step2Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step3?id=${dbFormData._id}`);
+    router.push(`/resume/fill-info-step3?id=${dbFormData._id}`);
   }
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden">
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
-      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+    <>
+      <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-16 w-full max-w-[75%] mx-auto">
             <h2 className='text-alpha-blue font-bold text-4xl text-center mx-auto'>请书写您的个人评价</h2>
@@ -296,7 +292,7 @@ export default function Step2Page({ dbFormData }) {
           color: white; /* 激活按钮的文本颜色 */
         }
       `}</style>
-    </div>
+    </>
   );
 }
 

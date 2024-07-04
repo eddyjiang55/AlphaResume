@@ -15,6 +15,7 @@ const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
 
   useEffect(() => {
     // Change theme-title's font color
+    console.log(themeColor);
     document.documentElement.style.setProperty("--theme-color", themeColor);
   }, [themeColor]);
 

@@ -1,9 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from '../components/navbar';
-import ResumeNavbar from '../components/resume-navbar';
 import { useSelector } from 'react-redux';
-import SaveToast from '../components/Toast/SaveToast';
+import SaveToast from '@/components/Toast/SaveToast';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -138,7 +136,7 @@ export default function Step1Page({ dbFormData }) {
           console.log(formData);
           setLoading(false);
           router.push({
-            pathname: '/fill-info-step1',
+            pathname: '/resume/fill-info-step1',
             query: { id: formData._id },
           }, undefined, { shallow: true })
         } else if (response.status === 202) {
@@ -230,7 +228,7 @@ export default function Step1Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step2?id=${currentResumeId}`);
+    router.push(`/resume/fill-info-step2?id=${currentResumeId}`);
   }
 
   const handleSave = async () => {
@@ -283,7 +281,7 @@ export default function Step1Page({ dbFormData }) {
       setSaveState(true);
       setMessage('保存成功');
       router.push({
-        pathname: '/fill-info-step1',
+        pathname: '/resume/fill-info-step1',
         query: { id: currentResumeId },
       }, undefined, { shallow: true })
     }
@@ -299,9 +297,7 @@ export default function Step1Page({ dbFormData }) {
   }, [saveState]);
 
   return (
-    <div className='bg-[#EDF8FD] w-full h-screen flex flex-col relative'>
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
+    <>
       <div className="flex-grow w-full max-w-[960px] mx-auto flex flex-col justify-between">
         <div>
           <div className="w-full mt-8">
@@ -518,7 +514,7 @@ export default function Step1Page({ dbFormData }) {
           height: 50px; // 调整图标大小
         }
       `}</style>
-    </div >
+    </ >
   );
 }
 

@@ -1,11 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from '../components/navbar';
-import ResumeNavbar from "../components/resume-navbar";
-import { step6Tips } from '../lib/tips';
-import { processTimeStr, fetchPartData } from '../utils/fetchResumePartData';
-import SaveToast from '../components/Toast/SaveToast';
+import { step6Tips } from '@/lib/tips';
+import { processTimeStr, fetchPartData } from '@/utils/fetchResumePartData';
+import SaveToast from '@/components/Toast/SaveToast';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -14,8 +12,8 @@ export async function getServerSideProps(context) {
     const preformattedData = await fetchPartData(context.query.id, 'awardsAndCertificates');
     let displayAwardData = [];
     let displayCertificateData = [];
-    // console.log(preformattedData.data.获奖);
-    if (preformattedData.data.获奖) {
+    // console.log(preformattedData.data);
+    if (preformattedData.data && preformattedData.data.获奖) {
       displayAwardData = preformattedData.data.获奖.map((data) => {
         return {
           awardName: data.奖项名称,
@@ -27,7 +25,7 @@ export async function getServerSideProps(context) {
         };
       });
     }
-    if (preformattedData.data.证书) {
+    if (preformattedData.data && preformattedData.data.证书) {
       displayCertificateData = preformattedData.data.证书.map((data) => {
         return {
           certificateName: data.证书名称,
@@ -39,7 +37,7 @@ export async function getServerSideProps(context) {
     }
     dbFormData = { _id: preformattedData._id, data: { awards: displayAwardData, certificates: displayCertificateData } };
   } else {
-    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+    return { redirect: { destination: `/resume/fill-info-step1`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
@@ -253,14 +251,12 @@ export default function Step6Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step7?id=${dbFormData._id}`);
+    router.push(`/resume/fill-info-step7?id=${dbFormData._id}`);
   }
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden">
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
-      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+    <>
+      <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
             <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">获奖与证书</h2>
@@ -766,7 +762,7 @@ export default function Step6Page({ dbFormData }) {
           height: 50px; // 调整图标大小
         }
       `}</style>
-    </div >
+    </>
   );
 }
 
