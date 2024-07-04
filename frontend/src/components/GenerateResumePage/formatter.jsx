@@ -1,11 +1,55 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import html2pdf from "html2pdf.js";
 
-const ResumeFormatter = ({ exportMarkdown, exportPDF }) => {
+const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
   const [paperSize, setPaperSize] = useState("A4");
   const [themeColor, setThemeColor] = useState("#000000");
   const [language, setLanguage] = useState("中文");
   const [font, setFont] = useState("微软雅黑");
   const [fontSize, setFontSize] = useState(16);
+
+  const fontOptions = {
+    zh: ["微软雅黑", "仿宋", "宋体", "黑体"],
+    en: ["Arial", "Times New Roman", "Courier New", "Georgia"],
+  };
+
+  useEffect(() => {
+    // Change theme-title's font color
+    document.documentElement.style.setProperty("--theme-color", themeColor);
+  }, [themeColor]);
+
+  useEffect(() => {
+    // Change font size
+    document.documentElement.style.setProperty("--base-font-size", `${fontSize}px`);
+  }, [fontSize]);
+
+  useEffect(() => {
+    // Change language
+    const root = document.documentElement;
+    if (language === "中文") {
+      root.setAttribute("lang", "zh");
+      setFont(fontOptions.zh[0]);
+    } else {
+      root.setAttribute("lang", "en");
+      setFont(fontOptions.en[0]);
+    }
+  }, [language]);
+
+  useEffect(() => {
+    // Change font family for export section
+    const exportContainer = document.querySelector(".markdown-body");
+    if (exportContainer) {
+      exportContainer.style.fontFamily = font;
+    }
+  }, [font]);
+
+  const exportPDF = () => {
+    if (resumeTitle === "") {
+      return;
+    }
+    const exportContainer = document.querySelector(".markdown-body");
+    html2pdf().from(exportContainer).save(`${resumeTitle}.pdf`);
+  };
 
   return (
     <>
@@ -94,8 +138,17 @@ const ResumeFormatter = ({ exportMarkdown, exportPDF }) => {
           value={font}
           onChange={(e) => setFont(e.target.value)}
         >
-          <option>微软雅黑</option>
-          <option>仿宋</option>
+          {language === "中文"
+            ? fontOptions.zh.map((fontOption) => (
+              <option key={fontOption} value={fontOption}>
+                {fontOption}
+              </option>
+            ))
+            : fontOptions.en.map((fontOption) => (
+              <option key={fontOption} value={fontOption}>
+                {fontOption}
+              </option>
+            ))}
         </select>
       </div>
       <div className="mb-4">
@@ -103,7 +156,7 @@ const ResumeFormatter = ({ exportMarkdown, exportPDF }) => {
           className="block text-gray-700 text-sm font-bold mb-2"
           htmlFor="font-size"
         >
-          字号: <span id="font-size-value">16</span>
+          字号: <span id="font-size-value">{fontSize}</span>
         </label>
         <input
           type="range"
