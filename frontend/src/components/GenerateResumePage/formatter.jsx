@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import html2pdf from "html2pdf.js";
 
-const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
-  const [paperSize, setPaperSize] = useState("A4");
+const ResumeFormatter = ({ pagesize, handleChangePageSize, exportMarkdown, resumeTitle }) => {
   const [themeColor, setThemeColor] = useState("#000000");
-  const [language, setLanguage] = useState("中文");
+  const [language, setLanguage] = useState("zh");
   const [font, setFont] = useState("微软雅黑");
   const [fontSize, setFontSize] = useState(16);
 
@@ -13,21 +12,34 @@ const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
     en: ["Arial", "Times New Roman", "Courier New", "Georgia"],
   };
 
+  const langOptions = [
+    { key: "zh", value: "中文" },
+    { key: "en", value: "English" },
+  ];
+
+  const handleChangeofLanguage = (e) => {
+    setLanguage(e.target.value);
+  };
+
   useEffect(() => {
     // Change theme-title's font color
     console.log(themeColor);
     document.documentElement.style.setProperty("--theme-color", themeColor);
   }, [themeColor]);
 
+
   useEffect(() => {
     // Change font size
-    document.documentElement.style.setProperty("--base-font-size", `${fontSize}px`);
+    document.documentElement.style.setProperty(
+      "--base-font-size",
+      `${fontSize}px`
+    );
   }, [fontSize]);
 
   useEffect(() => {
     // Change language
     const root = document.documentElement;
-    if (language === "中文") {
+    if (language === "zh") {
       root.setAttribute("lang", "zh");
       setFont(fontOptions.zh[0]);
     } else {
@@ -85,11 +97,10 @@ const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
         <select
           id="paper-size"
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          value={paperSize}
-          onChange={(e) => setPaperSize(e.target.value)}
+          value={pagesize}
+          onChange={(e) => handleChangePageSize(e.target.value)}
         >
           <option>A4</option>
-          <option>A3</option>
           <option>Letter</option>
         </select>
       </div>
@@ -119,11 +130,14 @@ const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
         <select
           id="font-chinese"
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
+          value={langOptions.find((option) => option.key === language).value}
+          onChange={handleChangeofLanguage}
         >
-          <option>中文</option>
-          <option>English</option>
+          {langOptions.map((langOption) => (
+            <option key={langOption.key} value={langOption.key}>
+              {langOption.value}
+            </option>
+          ))}
         </select>
       </div>
       <div className="mb-4">
@@ -141,15 +155,15 @@ const ResumeFormatter = ({ exportMarkdown, htmlContent, resumeTitle }) => {
         >
           {language === "中文"
             ? fontOptions.zh.map((fontOption) => (
-              <option key={fontOption} value={fontOption}>
-                {fontOption}
-              </option>
-            ))
+                <option key={fontOption} value={fontOption}>
+                  {fontOption}
+                </option>
+              ))
             : fontOptions.en.map((fontOption) => (
-              <option key={fontOption} value={fontOption}>
-                {fontOption}
-              </option>
-            ))}
+                <option key={fontOption} value={fontOption}>
+                  {fontOption}
+                </option>
+              ))}
         </select>
       </div>
       <div className="mb-4">
