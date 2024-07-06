@@ -140,14 +140,9 @@ router.put('/resume-chat/:_id', async (req, res) => {
         await ResumeChat.addAnswer(_id, quesId, answer);
 
         const sectionId = chatRecord.sectionId;
-        const pythonProcess = null;
-        // 调用 Python 文件
-        try {
-            pythonProcess = spawn('python3', [pythonScriptPath, _id, resumeId,sectionId]);
 
-        } catch (error) {
-            
-        }
+        // 调用 Python 文件
+        const pythonProcess = spawn('python3', [pythonScriptPath, _id, resumeId,sectionId]);
         
         pythonProcess.stdout.on('data', (data) => {
             console.log(data.toString());
