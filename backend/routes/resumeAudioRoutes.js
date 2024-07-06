@@ -13,7 +13,7 @@ router.post('/upload-audio', upload.single('audio'), async (req, res) => {
         const audioBuffer = fs.readFileSync(audioPath);
 
         // 创建ResumeAudio实例并保存到数据库
-        const resumeAudio = new ResumeAudio(audioBuffer);
+        const resumeAudio = new ResumeAudio( audioBuffer );
         const audioId = await resumeAudio.save();
 
         // 删除临时上传的文件

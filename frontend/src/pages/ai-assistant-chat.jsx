@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Navbar from "../components/navbar";
 import ChatSegment from "../components/chat";
+import AudioSegment from "../components/audioSegment";
 // import ChatChoice from "../components/chat-choice";
 // import { blockData } from "../lib/quesLib";
 import { useSelector } from "react-redux";
@@ -59,9 +60,23 @@ export default function AIChat({ dbFormData }) {
   const [showLeaveBtn, setShowLeaveBtn] = useState(false);
   const [chatId, setChatId] = useState(dbFormData._id);
 
-  const handleResult = useCallback((result) => {
-    console.log("Speech recognition result:", result);
-  }, []);
+  const handleResult = (result) => {
+    setLoading(true);
+    console.log(chatHistory);
+    const question = chatHistory[chatHistory.length - 1].text;
+    console.log("Question:", question);
+    const quesId = chatHistory[chatHistory.length - 1].id;
+    console.log("QuesId:", quesId);
+    const newChat = {
+      id: chatHistory.length + 1,
+      text: result.id,
+      sender: "user",
+      type: "audio",
+    };
+    setChatHistory((prevChatHistory) => [...prevChatHistory, newChat]);
+    console.log("Audio result:", result.id);
+    setLoading(false);
+  };
 
   const handleError = useCallback((error) => {
     console.error("Speech recognition error:", error);
@@ -82,6 +97,7 @@ export default function AIChat({ dbFormData }) {
           sender: "bot",
           text: "你好，我是你的简历规划师，在帮助你制作一份求职简历之前，我需要了解你的一些个人基本信息和过往学习实习经历，对话可以随时开始或暂停，你的资料会被妥善保存，仅用于简历制作。\n 此次交流仅作为初步信息搜集，如有遗漏不用担心，你可以随时告诉我们，我们将为你修改并补充。\n首先，您能提供一下您的基本信息吗？包括姓名、联系电话、电子邮件和微信号。",
           id: 1,
+          type: "text",
         },
       ]);
     }
@@ -175,6 +191,7 @@ export default function AIChat({ dbFormData }) {
         id: chatHistory.length + 1,
         text: message,
         sender: "user",
+        type: "text",
       };
       setChatHistory((prevChatHistory) => [...prevChatHistory, newChat]);
       textInputRef.current.value = "";
@@ -285,7 +302,11 @@ export default function AIChat({ dbFormData }) {
                 }`}
               >
                 {avatar}
-                <ChatSegment sender={chat.sender} chatMessage={chat.text} />
+                {chat.type === "text" ? (
+                  <ChatSegment sender={chat.sender} chatMessage={chat.text} />
+                ) : (
+                  <AudioSegment sender={chat.sender} audioId={chat.text} />
+                )}
               </li>
             ))}
           </ul>
@@ -297,7 +318,13 @@ export default function AIChat({ dbFormData }) {
             <input
               type="text"
               className="w-full p-1 focus:outline-none"
-              placeholder={loading ? "请稍等……" : isListening ? "请说话……" : "请输入您的回答"}
+              placeholder={
+                loading
+                  ? "请稍等……"
+                  : isListening
+                  ? "请说话……"
+                  : "请输入您的回答"
+              }
               ref={textInputRef}
               onKeyUp={handleKeyUp}
               onKeyDown={handleKeyDown}
@@ -345,7 +372,7 @@ export default function AIChat({ dbFormData }) {
           <div className="h-12 w-12 flex justify-center items-center">
             <button
               className="h-full w-full border border-alpha-blue shadow-md bg-white text-black p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading}
+              disabled={loading || isListening}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 // import { useRouter } from 'next/router'; // 导入 useRouter 钩子
 import ResumeEditer from "@/components/GenerateResumePage/editer";
 import ResumeRender from "@/components/GenerateResumePage/renderer";
+import ResumerRenderPage from "@/components/GenerateResumePage/pageComponent";
 import LoadingBar from "@/components/GenerateResumePage/loadingBar";
 import dynamic from "next/dynamic";
 import { saveAs } from "file-saver";
@@ -32,6 +33,7 @@ export default function GeneratedResumePage({ dbFormData }) {
   const [progress, setProgress] = useState(0);
   const [markdownContent, setMarkdownContent] = useState("");
   const [htmlContent, setHtmlContent] = useState("");
+  const [paperSize, setPaperSize] = useState("A4");
 
   const exportMarkdown = useCallback(() => {
     if (dbFormData.resumeTitle === "") {
@@ -42,6 +44,10 @@ export default function GeneratedResumePage({ dbFormData }) {
     });
     saveAs(blob, `${dbFormData.resumeTitle}.md`);
   }, [markdownContent, dbFormData.resumeTitle]);
+
+  const handleChangePageSize = (size) => {
+    setPaperSize(size);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,20 +123,20 @@ export default function GeneratedResumePage({ dbFormData }) {
   useEffect(() => {
     if (markdownContent) {
       // console.log(markdownContent);
-      const htmlContent = renderMarkdown(markdownContent);
-      setHtmlContent(htmlContent);
+      const processedHtmlContent = renderMarkdown(markdownContent);
+      setHtmlContent(processedHtmlContent);
     }
   }, [markdownContent]);
 
   return (
     <>
-      <div className="grid grid-cols-12 h-full pb-2 overflow-y-auto gap-x-1">
+      <div className="grid grid-cols-12 py-4 gap-x-1 h-full max-h-[calc(100vh-8rem-100px)] overflow-y-hidden">
         <div
           id="edit zone"
-          className="col-span-5 p-8 flex flex-col justify-center items-center"
+          className="col-span-5 px-2 flex flex-col justify-center items-center max-h-full"
         >
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">编辑简历</h2>
-          <div className="w-full rounded-lg bg-white shadow-lg flex-1">
+          <div className="w-full h-full rounded-lg bg-white shadow-lg">
             {loading ? (
               <div className="h-full flex flex-col justify-center mx-8">
                 <div className="flex justify-between mb-1">
@@ -153,10 +159,10 @@ export default function GeneratedResumePage({ dbFormData }) {
         </div>
         <div
           id="output zone"
-          className="col-span-5 p-8 flex flex-col justify-center items-center"
+          className="col-span-5 px-2 flex-1 flex flex-col justify-center items-center h-full overflow-auto"
         >
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">导出效果</h2>
-          <div className="w-full rounded-lg bg-white shadow-lg flex-1">
+          <div id="preview" className="h-full overflow-auto">
             {loading ? (
               <div className="h-full flex flex-col justify-center mx-8">
                 <div className="flex justify-between mb-1">
@@ -170,18 +176,26 @@ export default function GeneratedResumePage({ dbFormData }) {
                 <LoadingBar progress={progress} />
               </div>
             ) : (
-              <ResumeRender htmlContent={htmlContent} />
+              <ResumerRenderPage
+                htmlContent={htmlContent}
+                paperSize={paperSize}
+              />
             )}
           </div>
         </div>
 
         <div
           id="format zone"
-          className="p-8 flex flex-col justify-center items-center w-72"
+          className="px-4 flex flex-col justify-center items-center col-span-2 w-full max-h-full"
         >
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">格式调节</h2>
-          <div className="w-full rounded-lg bg-white shadow-lg flex-1 p-4">
-            <Formatter exportMarkdown={exportMarkdown} htmlContent={htmlContent} resumeTitle={dbFormData.resumeTitle} />
+          <div className="w-full rounded-lg bg-white shadow-lg flex-1 h-full p-8">
+            <Formatter
+              pageSize={paperSize}
+              handleChangePageSize={handleChangePageSize}
+              exportMarkdown={exportMarkdown}
+              resumeTitle={dbFormData.resumeTitle}
+            />
           </div>
         </div>
       </div>

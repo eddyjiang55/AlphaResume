@@ -125,6 +125,9 @@ dependencies:
   uuid:
     specifier: ^9.0.1
     version: 9.0.1
+  wavesurfer.js:
+    specifier: ^7.8.1
+    version: 7.8.1
 
 devDependencies:
   '@types/node':
@@ -6496,6 +6499,10 @@ packages:
     dependencies:
       glob-to-regexp: 0.4.1
       graceful-fs: 4.2.11
+    dev: false
+
+  /wavesurfer.js@7.8.1:
+    resolution: {integrity: sha512-KMebCPZF7jjo1/B+G7JGJgQc7hshIhJLnM/gUi4pdyCwb89s4apivpVZY2kdvausqbm+ceeudvKGPBcR9uqXnQ==}
     dev: false
 
   /web-namespaces@2.0.1:

@@ -165,7 +165,7 @@ export const renderMarkdown = (md) => {
 
   let html = markdown.render(body);
   // console.log(html);
-  html = formatResume(html);
+  // html = formatResume(html);
   // console.log(html);
   html = resolveHeader(html, attributes);
 
