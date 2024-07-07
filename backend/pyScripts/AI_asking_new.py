@@ -368,4 +368,3 @@ new_query = process_asking(json_update, section_id, standard_json)
 update_mongodb(chatId, new_query, resumeId, json_update)
 close_mongodb()
 print(new_query)
-
