@@ -11,25 +11,16 @@ import time
 import requests
 import urllib
 import audio_to_text
-from volcenginesdkarkruntime import Ark
-import re
 
-base_url = "https://ark.cn-beijing.volces.com/api/v3"
-ak = "AKLTZWQ4ODVhYTE4MmY4NDA1NTg3ZWNlZmY5YWJiMTQ1MDU"
-sk = "WlRrMFpETmxPVEZqTVRBM05EazBZemd4TURZeFpEbG1Oell4T1RGaFltSQ=="
-
-model = "ep-20240703000957-s4rjp"
-client = Ark(
-    base_url=base_url,
-    ak=ak,
-    sk=sk
-)
 
 
 lfasr_host = 'https://raasr.xfyun.cn/v2/api'
 # 请求的接口名
 api_upload = '/upload'
 api_get_result = '/getResult'
+
+dashscope.api_key = 'sk-3c43423c9fee4af8928fd8bc647291ee'
+import re
 from pymongo import MongoClient
 import sys
 import io
@@ -246,7 +237,7 @@ def check_if_initial(json_data, section_id):
 
 
 
-def ask_new_question(updated_json, priority_json, section_id, current_key):
+def ask_new_question(updated_json, key, section_id, current_key):
     prompt = f"你是一个面试官，正在询问求职者的个人信息。"
     prompt += f'现在你正在询问的是有关求职者{keys_list[section_id]}这一块的内容。'
     #prompt += f"我还有一个优先级列表，包含了这一部分里所需必填项的信息。"
@@ -256,18 +247,24 @@ def ask_new_question(updated_json, priority_json, section_id, current_key):
     #prompt += f"以下是json文件内容：{updated_json}"
     #prompt += f"以下是优先级顺序：{priority_json[list(priority_json.keys())[section_id]]}"
 
-    messages = [
-        {"role": "system", "content": "你是一个面试官，正在询问求职者的个人信息。"},
-        {"role": "user",
-         "content": prompt},
-    ]
-
-    completion = client.chat.completions.create(
-        model=model,
-        messages=messages,
+    response = dashscope.Generation.call(
+        model=dashscope.Generation.Models.qwen_max,
+        prompt=prompt,
+        seed=1234,
+        top_p=0.2,
+        result_format='text',
+        enable_search=False,
+        max_tokens=2000,
+        temperature=0.1,
+        repetition_penalty=1.0
     )
 
-    return completion.choices[0].message.content
+    if response.status_code == HTTPStatus.OK:
+        #print(response.usage)  # The usage information
+        return response.output['text']  # The output text
+    else:
+        print(response.code)  # The error code.
+        print(response.message)  # The error message.
 
 
 def find_all_empty(standard_json, updated_json, section_id):
@@ -340,18 +337,25 @@ def update_json(original_json, last_chat):
               f"你需要返回一个完整的json文件。不需要加任何注释。以下是对话内容：{last_chat}")
     prompt += f"以下是json文件内容：{original_json}"
 
-    messages = [
-        {"role": "system", "content": "你是一个审核员，正在审核求职者的个人信息。"},
-        {"role": "user",
-         "content": prompt},
-    ]
-
-    completion = client.chat.completions.create(
-        model=model,
-        messages=messages,
+    response = dashscope.Generation.call(
+        model=dashscope.Generation.Models.qwen_max,
+        prompt=prompt,
+        seed=1234,
+        top_p=0.2,
+        result_format='text',
+        enable_search=False,
+        max_tokens=2000,
+        temperature=0.1,
+        repetition_penalty=1.0
     )
 
-    return completion.choices[0].message.content
+    if response.status_code == HTTPStatus.OK:
+        # print(response.usage)  # The usage information
+        #print(response.output['text'])
+        return response.output['text']  # The output text
+    else:
+        print(response.code)  # The error code.
+        print(response.message)  # The error message.
 
 
 def extract_json(data_str):
