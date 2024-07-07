@@ -155,7 +155,7 @@ def get_chat_from_mongodb(chat_id, resume_id):
         # convert the audio to text
         api = audio_to_text.RequestApi(appid="80922260",
                      secret_key="84268ea312aee377ace0b8468633bd0a",
-                     upload_file_path=r"test1-1.wav")        # needs to be adjusted
+                     upload_file_path=audio_data)        # needs to be adjusted
         result = api.get_result()
         last_message['answer'] = result
 
