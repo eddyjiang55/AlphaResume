@@ -39,7 +39,7 @@ collection_1 = db[COLLECTION_NAME_1]
 collection_2 = db[COLLECTION_NAME_2]
 
 priority = {
-    "基础信息": {
+    "基本信息": {
         "简历标题": "简历标题",
         "姓名": "姓名",
         "手机号码": "手机号码",

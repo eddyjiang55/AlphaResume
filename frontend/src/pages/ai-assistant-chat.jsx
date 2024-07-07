@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import Navbar from "../components/navbar";
+import { useRouter } from "next/router";
 import ChatSegment from "../components/chat";
 import AudioSegment from "../components/audioSegment";
 // import ChatChoice from "../components/chat-choice";
@@ -35,16 +35,20 @@ export async function getServerSideProps(context) {
     );
     const data = await res.json();
     const messageList = data.messages;
+    console.log(data);
     // messageList = { question: string, answer: string}[]
     const reformattedMessageList = messageList
-      .map((message) => {
-        return [
-          { text: message.question, sender: "bot" },
-          { text: message.answer, sender: "user" },
+      .map((message, index) => {
+        const messages = [
+          { text: message.question, id: index, sender: "bot", type: "text" },
         ];
+        if (message.answer) {
+          messages.push({ text: message.answer, id: index, sender: "user" });
+        }
+        return messages;
       })
       .flat();
-
+    console.log(reformattedMessageList);
     dbFormData = { _id: data._id, messages: reformattedMessageList };
   } else {
     dbFormData = { _id: "", messages: [] };
@@ -55,6 +59,7 @@ export async function getServerSideProps(context) {
 
 export default function AIChat({ dbFormData }) {
   const user = useSelector((state) => state.user);
+  const router = useRouter();
   const [chatHistory, setChatHistory] = useState(dbFormData.messages);
   const [loading, setLoading] = useState(false);
   const [showLeaveBtn, setShowLeaveBtn] = useState(false);
@@ -215,7 +220,7 @@ export default function AIChat({ dbFormData }) {
           const nextQuesId = data.quesId;
           setChatHistory((prevChatHistory) => [
             ...prevChatHistory,
-            { text: nextQuestion, sender: "bot", id: nextQuesId },
+            { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
           ]);
         } else {
           console.error("Failed to save chat");
@@ -248,8 +253,16 @@ export default function AIChat({ dbFormData }) {
           const nextQuesId = data.quesId;
           setChatHistory((prevChatHistory) => [
             ...prevChatHistory,
-            { text: nextQuestion, sender: "bot", id: nextQuesId },
+            { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
           ]);
+          router.push(
+            {
+              pathname: "/ai-assistant-chat",
+              query: { id: data.id },
+            },
+            undefined,
+            { shallow: true }
+          );
         } else {
           console.error("Failed to save chat");
           alert("Server error");
@@ -302,10 +315,10 @@ export default function AIChat({ dbFormData }) {
                 }`}
               >
                 {avatar}
-                {chat.type === "text" ? (
-                  <ChatSegment sender={chat.sender} chatMessage={chat.text} />
-                ) : (
+                {chat.type === "audio" ? (
                   <AudioSegment sender={chat.sender} audioId={chat.text} />
+                ) : (
+                  <ChatSegment sender={chat.sender} chatMessage={chat.text} />
                 )}
               </li>
             ))}
