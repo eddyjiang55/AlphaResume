@@ -31,7 +31,7 @@ MONGODB_URL = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mong
 DB_NAME = "airesumedb"
 COLLECTION_NAME = "resumeChats"
 COLLECTION_NAME_1 = "improvedUsers"
-COLLECTION_NAME_2 = "resumeAudios"
+COLLECTION_NAME_2 = "resumeAudio"
 client = MongoClient(MONGODB_URL)
 db = client[DB_NAME]
 collection = db[COLLECTION_NAME]
@@ -148,16 +148,33 @@ def get_chat_from_mongodb(chat_id, resume_id):
 
     last_answer = last_message['answer']
     # check if it is an id, ie, no chinese characters
-    if is_valid_uuid(last_answer):
-        audio_id = last_answer
-        audio_record = collection_2.find_one({"_id": audio_id})
-        audio_data = audio_record['audio'] # which is a .wav file
-        # convert the audio to text
-        api = audio_to_text.RequestApi(appid="80922260",
-                     secret_key="84268ea312aee377ace0b8468633bd0a",
-                     upload_file_path=r"test1-1.wav")        # needs to be adjusted
-        result = api.get_result()
-        last_message['answer'] = result
+    try:
+        if is_valid_uuid(last_answer):
+            audio_id = last_answer
+            audio_record = collection_2.find_one({"_id": audio_id})
+
+            if audio_record is None:
+                raise ValueError("No audio record found for the given UUID.")
+
+            audio_data = audio_record['audio'] # assuming this is a .wav file
+
+            try:
+                # Convert the audio to text
+                api = audio_to_text.RequestApi(
+                appid="80922260",
+                secret_key="84268ea312aee377ace0b8468633bd0a",
+                upload_file_path=audio_record['audio']
+                )
+                result = api.get_result()
+                last_message['answer'] = result
+
+            except Exception as e:
+                print(f"Error during audio-to-text conversion: {e}")
+                last_message['answer'] = "Error during audio-to-text conversion."
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        last_message['answer'] = "An error occurred while processing the request."
 
 
 

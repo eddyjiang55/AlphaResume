@@ -65,23 +65,111 @@ export default function AIChat({ dbFormData }) {
   const [showLeaveBtn, setShowLeaveBtn] = useState(false);
   const [chatId, setChatId] = useState(dbFormData._id);
 
-  const handleResult = (result) => {
-    setLoading(true);
-    console.log(chatHistory);
-    const question = chatHistory[chatHistory.length - 1].text;
-    console.log("Question:", question);
-    const quesId = chatHistory[chatHistory.length - 1].id;
-    console.log("QuesId:", quesId);
-    const newChat = {
-      id: chatHistory.length + 1,
-      text: result.id,
-      sender: "user",
-      type: "audio",
-    };
-    setChatHistory((prevChatHistory) => [...prevChatHistory, newChat]);
-    console.log("Audio result:", result.id);
-    setLoading(false);
-  };
+  const latestChatHistory = useRef(dbFormData.messages);
+
+  const handleResult = useCallback(
+    async (result) => {
+      setLoading(true);
+      console.log(chatHistory);
+      const question = latestChatHistory.current[latestChatHistory.current.length - 1].text;
+      console.log("Question:", question);
+      const quesId = latestChatHistory.current[latestChatHistory.current.length - 1].id;
+      console.log("QuesId:", quesId);
+      const newChat = {
+        id: latestChatHistory.current.length + 1,
+        text: result.id,
+        sender: "user",
+        type: "audio",
+      };
+      setChatHistory((prevChatHistory) => {
+        latestChatHistory.current = [...prevChatHistory, newChat];
+        return latestChatHistory.current;
+      });
+      console.log("Audio result:", result.id);
+      if (chatId) {
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatId,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              quesId: quesId,
+              answer: result.id,
+              answer_type: "audio",
+            }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const nextQuestion = data.message;
+          const nextQuesId = data.quesId;
+          setChatHistory((prevChatHistory) => {
+            latestChatHistory.current = [
+              ...prevChatHistory,
+              { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
+            ];
+            return latestChatHistory.current;
+          });
+        } else {
+          console.error("Failed to save chat");
+          alert("Server error");
+        }
+      } else {
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userAccount: user.phoneNumber,
+              messages: [
+                {
+                  id: quesId,
+                  question: question,
+                  answer: result.id,
+                  answer_type: "audio",
+                },
+              ],
+            }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setChatId(data.id);
+          const nextQuestion = data.message;
+          const nextQuesId = data.quesId;
+          setChatHistory((prevChatHistory) => {
+            latestChatHistory.current = [
+              ...prevChatHistory,
+              { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
+            ];
+            return latestChatHistory.current;
+          });
+          router.push(
+            {
+              pathname: "/ai-assistant-chat",
+              query: { id: data.id },
+            },
+            undefined,
+            { shallow: true }
+          );
+        } else {
+          console.error("Failed to save chat");
+          alert("Server error");
+        }
+      }
+      setLoading(false);
+    },
+    [chatHistory, chatId, user.phoneNumber, router]
+  );
+
+  useEffect(() => {
+    latestChatHistory.current = chatHistory;
+  }, [chatHistory]);
 
   const handleError = useCallback((error) => {
     console.error("Speech recognition error:", error);
@@ -107,17 +195,6 @@ export default function AIChat({ dbFormData }) {
       ]);
     }
   }, []);
-  // useEffect(() => {
-  //   setCurrentBlockId(blockData[0].id);
-  //   setCurrentQuestionId(blockData[0].questions[0].id);
-  // }, [blockData]);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   setTimeout(() => {
-  //     processCurrentQuestion();
-  //   }, 1000);
-  // }, [currentQuestionId, currentBlockId]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -126,55 +203,6 @@ export default function AIChat({ dbFormData }) {
       chatContainerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
     }
   }, [chatHistory]);
-
-  // const processCurrentQuestion = () => {
-  //   const currentBlock = blockData.find((block) => block.id === currentBlockId);
-  //   if (!currentBlock) return;
-
-  //   const currentQuestion = currentBlock.questions.find(
-  //     (question) => question.id === currentQuestionId
-  //   );
-  //   if (!currentQuestion) return;
-
-  //   setChatHistory((prev) => [
-  //     ...prev,
-  //     { ...currentQuestion, key: Date.now() },
-  //   ]);
-
-  //   if (currentQuestion.type === "text") {
-  //     // Automatically move to the next question
-  //     let nextQuestionId = currentQuestion.next.default;
-  //     setCurrentQuestionId(nextQuestionId);
-  //   } else if (currentQuestion.type === "end") {
-  //     let nextBlockId = currentBlock.next;
-  //     if (nextBlockId) {
-  //       setCurrentBlockId(nextBlockId);
-  //       setCurrentQuestionId(
-  //         blockData.find((block) => block.id === nextBlockId).questions[0].id
-  //       );
-  //     } else {
-  //       // End of the chat
-  //       console.log("End of the chat");
-  //     }
-  //   }
-  //   setLoading(false);
-  // };
-
-  // const handleChoiceClick = (choice) => {
-  //   if (choice) {
-  //     let nextQuestionId = blockData
-  //       .find((block) => block.id === currentBlockId)
-  //       .questions.find((question) => question.id === currentQuestionId)
-  //       .next.yes;
-  //     setCurrentQuestionId(nextQuestionId);
-  //   } else {
-  //     let nextQuestionId = blockData
-  //       .find((block) => block.id === currentBlockId)
-  //       .questions.find((question) => question.id === currentQuestionId)
-  //       .next.no;
-  //     setCurrentQuestionId(nextQuestionId);
-  //   }
-  // };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -190,6 +218,7 @@ export default function AIChat({ dbFormData }) {
     const message = textInputRef.current.value;
     if (message.trim().length > 0) {
       setLoading(true);
+      console.log(chatHistory);
       const question = chatHistory[chatHistory.length - 1].text;
       const quesId = chatHistory[chatHistory.length - 1].id;
       const newChat = {
@@ -211,6 +240,7 @@ export default function AIChat({ dbFormData }) {
             body: JSON.stringify({
               quesId: quesId,
               answer: message,
+              answer_type: "text",
             }),
           }
         );
@@ -241,6 +271,7 @@ export default function AIChat({ dbFormData }) {
                   id: quesId,
                   question: question,
                   answer: message,
+                  answer_type: "text",
                 },
               ],
             }),
@@ -268,10 +299,6 @@ export default function AIChat({ dbFormData }) {
           alert("Server error");
         }
       }
-      // setChatHistory((prevChatHistory) => [
-      //   ...prevChatHistory,
-      //   { text: "Testing", sender: "bot", id: 2 },
-      // ]);
     }
     setLoading(false);
   };
