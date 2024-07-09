@@ -24,6 +24,7 @@ export async function getServerSideProps(context) {
     const data = await res.json();
     dbFormData = { _id: context.query.id, resumeTitle: data.data.title };
   }
+  console.log(dbFormData);
   // let dbFormData = { _id: '123' };
   return { props: { dbFormData } };
 }
@@ -189,7 +190,7 @@ export default function GeneratedResumePage({ dbFormData }) {
           className="px-4 flex flex-col justify-center items-center col-span-2 w-full max-h-full"
         >
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">格式调节</h2>
-          <div className="w-full rounded-lg bg-white shadow-lg flex-1 h-full p-8">
+          <div className="w-3/4 rounded-lg bg-white shadow-lg flex-1 h-full p-6 mx-auto">
             <Formatter
               pageSize={paperSize}
               handleChangePageSize={handleChangePageSize}

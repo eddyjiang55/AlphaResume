@@ -120,7 +120,7 @@ function ResumeBox({ resumeId, userPhoneNumber, deletefromCards }) {
               className="py-2 px-6 text-white text-base 2xl:text-lg font-bold bg-alpha-blue rounded-full"
               onClick={handleDownloadPdf}
             >
-              下载PDF
+              查看结果
             </button>
           </div>
         </div>
