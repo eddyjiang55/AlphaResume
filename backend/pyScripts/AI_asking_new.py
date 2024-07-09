@@ -31,7 +31,7 @@ MONGODB_URL = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mong
 DB_NAME = "airesumedb"
 COLLECTION_NAME = "resumeChats"
 COLLECTION_NAME_1 = "improvedUsers"
-COLLECTION_NAME_2 = "resumeAudio"
+COLLECTION_NAME_2 = "resumeAudios"
 client = MongoClient(MONGODB_URL)
 db = client[DB_NAME]
 collection = db[COLLECTION_NAME]
@@ -39,7 +39,7 @@ collection_1 = db[COLLECTION_NAME_1]
 collection_2 = db[COLLECTION_NAME_2]
 
 priority = {
-    "基本信息": {
+    "基础信息": {
         "简历标题": "简历标题",
         "姓名": "姓名",
         "手机号码": "手机号码",
@@ -148,33 +148,16 @@ def get_chat_from_mongodb(chat_id, resume_id):
 
     last_answer = last_message['answer']
     # check if it is an id, ie, no chinese characters
-    try:
-        if is_valid_uuid(last_answer):
-            audio_id = last_answer
-            audio_record = collection_2.find_one({"_id": audio_id})
-
-            if audio_record is None:
-                raise ValueError("No audio record found for the given UUID.")
-
-            audio_data = audio_record['audio'] # assuming this is a .wav file
-
-            try:
-                # Convert the audio to text
-                api = audio_to_text.RequestApi(
-                appid="80922260",
-                secret_key="84268ea312aee377ace0b8468633bd0a",
-                upload_file_path=audio_record['audio']
-                )
-                result = api.get_result()
-                last_message['answer'] = result
-
-            except Exception as e:
-                print(f"Error during audio-to-text conversion: {e}")
-                last_message['answer'] = "Error during audio-to-text conversion."
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        last_message['answer'] = "An error occurred while processing the request."
+    if is_valid_uuid(last_answer):
+        audio_id = last_answer
+        audio_record = collection_2.find_one({"_id": audio_id})
+        audio_data = audio_record['audio'] # which is a .wav file
+        # convert the audio to text
+        api = audio_to_text.RequestApi(appid="80922260",
+                     secret_key="84268ea312aee377ace0b8468633bd0a",
+                     upload_file_path=r"test1-1.wav")        # needs to be adjusted
+        result = api.get_result()
+        last_message['answer'] = result
 
 
 
@@ -237,22 +220,30 @@ def ask_new_question(updated_json, priority_json, section_id, current_key):
 
 
 def find_first_diff(standard_json, updated_json, section_id):
-    # 获取当前部分的数据
+    # change type of standard_json and updated_json
+    print(type(standard_json))
+    print(list(standard_json.keys())[section_id])
     section_standard = standard_json[keys_list[section_id]]
     section_updated = updated_json[list(updated_json.keys())[section_id]]
+    # print type of section_standard
+    print(type(section_standard))
+    print(section_standard)    # 空的
+    print(section_updated)      # 空的
 
     if isinstance(section_standard, dict):
         for key in section_standard:
             if section_standard[key] == section_updated[key] and section_standard[key] == "":
                 return key
+        # if all the keys are the same, return the first key that is nan
         for key in section_updated:
             if section_updated[key] == "":
                 return key
     elif isinstance(section_standard, list):
         for i in range(len(section_standard)):
             for key in section_standard[i]:
-                if key in section_updated[i] and section_standard[i][key] == section_updated[i][key] and section_standard[i][key] == "":
+                if section_standard[i][key] == section_updated[i][key] and section_standard[i][key] == "":
                     return key
+        # if all the keys are the same, return the first key that is nan
         for item in section_updated:
             for key in item:
                 if item[key] == "":
@@ -261,16 +252,16 @@ def find_first_diff(standard_json, updated_json, section_id):
 def process_asking(json_data, section_id, standard_json):
     bool_check = check_if_initial(json_data, section_id)
     print(bool_check)
-    if bool_check:  # 如果部分已经填写
+    if bool_check: # if the section is already filled
         section_id += 1
-        # 更新聊天记录中的 section_id
+        # update the section_id in the chat record
         collection.update_one(
             {"_id": chatId},
             {"$set": {"sectionId": section_id}}
         )
         return initial_question_list[section_id]
     else:
-        # 获取 json 数据中的聊天记录
+        # not the initial question, get the json chat data from json
         current_key = find_first_diff(standard_json, json_data, section_id)
         print(current_key)
         print(section_id)
@@ -278,8 +269,6 @@ def process_asking(json_data, section_id, standard_json):
         print(relevant_section)
         new_question = ask_new_question(relevant_section, priority[keys_list[section_id]], section_id, current_key)
         return new_question
-
-# 其他函数不变
 
 
 def update_json(original_json, last_chat):
@@ -385,3 +374,4 @@ new_query = process_asking(json_update, section_id, standard_json)
 update_mongodb(chatId, new_query, resumeId, json_update)
 close_mongodb()
 print(new_query)
+

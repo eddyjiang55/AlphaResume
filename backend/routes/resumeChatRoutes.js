@@ -205,5 +205,20 @@ router.delete('/resume-chat/:_id', async (req, res) => {
         res.status(500).json({ message: 'Failed to delete chat', error: error.toString() });
     }
 });
-
+// 新增的接口
+router.get('/resume-chat/completeness/:_id', async (req, res) => {
+    try {
+        const _id = req.params._id;
+        const chatRecord = await ResumeChat.findById(_id);
+        if (!chatRecord) {
+            return res.status(404).json({ message: 'Chat not found' });
+        }
+        const resumeId = chatRecord.resumeId;
+        const completeness = await ImprovedUser.getCompletenessById(resumeId);
+        res.status(200).json({ completeness });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to retrieve completeness.', error: error.toString() });
+    }
+});
 module.exports = router;

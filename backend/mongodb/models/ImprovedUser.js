@@ -76,6 +76,13 @@ class ImprovedUser {
         const result = await collection.updateOne({ _id }, { $set: { completeness, updatedAt: new Date() } });
         return result;
     }
+    // 添加新的方法，通过 _id 获取 completeness
+    static async getCompletenessById(_id) {
+        const db = await connect();
+        const collection = db.collection('improvedUsers');
+        const resumeRecord = await collection.findOne({ _id }, { projection: { completeness: 1 } });
+        return resumeRecord ? resumeRecord.completeness : null;
+    }
 }
 
 module.exports = ImprovedUser;
