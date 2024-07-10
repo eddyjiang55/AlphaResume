@@ -37,6 +37,8 @@
   --dl-space-space-fourunits: 64px;
   --dl-space-space-threeunits: 48px;
   --dl-space-space-oneandhalfunits: 24px;
+  --theme-color: #377BB5;
+  --base-font-size: 16px;
 }
 
 .button {
@@ -265,9 +267,9 @@
 
 .resume-header h1 {
   width: 100%;
-  font-size: 32px;
+  font-size: calc(var(--base-font-size) * 2);
   margin: 0 0 20px;
-  color: #333;
+  color: var(--theme-color);
   font-family: "Times New Roman", Times, serif;
 }
 
@@ -276,8 +278,8 @@
   display: flex;
   align-items: center;
   padding: 0 10px;
-  font-size: 16px;
-  color: #333;
+  font-size: var(--base-font-size);
+  color: black;
   font-family: "Times New Roman", Times, serif;
 }
 
@@ -291,7 +293,7 @@
 /* Style for links within header items */
 .resume-header-item a {
   text-decoration: none;
-  color: #0073e6;
+  color: var(--theme-color);
 }
 
 .resume-header-item a:hover {
@@ -304,9 +306,9 @@
 }
 
 /* Icon styles */
-.icon {
+/* .icon {
   margin-right: 5px;
-}
+} */
 
 
 #education-section {
@@ -318,10 +320,10 @@
 }
 
 .section h2 {
-  font-size: 24px;
-  color: #0073e6;
+  font-size: calc(var(--base-font-size) * 1.5);
+  color: var(--theme-color);
   /* 蓝色标题 */
-  border-bottom: 1px solid #0073e6;
+  border-bottom: 1px solid var(--theme-color);
   /* 下划线 */
   padding-bottom: 5px;
   margin-bottom: 20px;
@@ -330,6 +332,12 @@
 
 .section dl {
   display: flex;
+}
+
+.section dl,
+.section ul,
+.section p {
+  font-size: var(--base-font-size);
 }
 
 .section dl dt,

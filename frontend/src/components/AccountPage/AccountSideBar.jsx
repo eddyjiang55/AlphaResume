@@ -3,10 +3,32 @@ import { useRouter } from "next/router";
 
 const AccountPageSideBar = () => {
   const router = useRouter();
+  console.log(router.pathname);
   return (
-    <ul>
-      <Link href="/account/settings"> <li key="settings" className={`text-center w-full py-5 cursor-pointer hover:bg-[#cdefff] ${router.pathname.includes("settings")}`}>账户设置</li></Link>
-      <Link href="/account/membership"> <li key="membership" className={`text-center w-full py-5 cursor-pointer hover:bg-[#cdefff] ${router.pathname.includes("membership")}`}>我的会员</li></Link>
+    <ul className="flex flex-col justify-center items-center gap-y-2 first:mt-4">
+      <li key="settings" className="w-full px-4">
+        {" "}
+        <Link href="/account/settings">
+          <button
+            className={`text-center text-xl text-alpha-blue w-full rounded-lg py-5 cursor-pointer hover:bg-sky-300 ${
+              router.pathname === "/account/settings" ? "bg-sky-300" : ""
+            }`}
+          >
+            账户设置
+          </button>
+        </Link>
+      </li>
+      <li key="membership" className="w-full px-4">
+        <Link href="/account/membership">
+          <button
+            className={`text-center text-xl text-alpha-blue w-full rounded-lg py-5 cursor-pointer hover:bg-sky-300 ${
+              router.pathname === "/account/membership" ? "bg-sky-300" : ""
+            }`}
+          >
+            我的会员
+          </button>
+        </Link>
+      </li>
     </ul>
   );
 };

@@ -1,94 +1,95 @@
-
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
-<<<<<<< Updated upstream:frontend/src/pages/fill-info-step9.js
+<<<<<<< HEAD:frontend/src/pages/fill-info-step8.js
+<<<<<<< Updated upstream:frontend/src/pages/fill-info-step8.js
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
+import { step8Tips } from '../lib/tips';
 import { fetchPartData } from '../utils/fetchResumePartData';
 import SaveToast from '../components/Toast/SaveToast';
-import { step9Tips } from '../lib/tips';
 =======
+import { step8Tips } from '@/lib/tips';
 import { fetchPartData } from '@/utils/fetchResumePartData';
 import SaveToast from '@/components/Toast/SaveToast';
-import { step9Tips } from '@/lib/tips';
 import Link from 'next/link';
->>>>>>> Stashed changes:frontend/src/pages/resume/fill-info-step9.js
+>>>>>>> Stashed changes:frontend/src/pages/resume/fill-info-step8.js
+=======
+import { step8Tips } from '@/lib/tips';
+import { fetchPartData } from '@/utils/fetchResumePartData';
+import SaveToast from '@/components/Toast/SaveToast';
+>>>>>>> e03e4d3935c0164da6460473b509f952b11adaa1:frontend/src/pages/resume/fill-info-step8.js
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
-    const preformattedData = await fetchPartData(context.query.id, 'languages');
+    const preformattedData = await fetchPartData(context.query.id, "skills");
     // console.log(preformattedData);
     if (preformattedData.data) {
-      const displayData = preformattedData.data.map(data => {
+      const displayData = preformattedData.data.map((data) => {
         return {
-          language: data.语言,
-          proficiency: data.熟练度,
-          certificate: data["证书/资格认证"],
-          score: data.成绩,
+          skill: data["技能名称"] ? data["技能名称"] : data["skill_name"],
+          proficiency: data["熟练度"] ? data["熟练度"] : data["proficiency"] || "",
         };
       });
+      // console.log(displayData);
       dbFormData = { _id: preformattedData._id, data: displayData };
     } else {
       dbFormData = { _id: preformattedData._id, data: null };
     }
   } else {
-    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+    return { redirect: { destination: `/resume/fill-info-step1`, permanent: false } }
   }
-  // Pass data to the page via props
+  //Pass data to the page via props
   return { props: { dbFormData } }
 }
 
-export default function Step10Page({ dbFormData }) {
+export default function Step8Page({ dbFormData }) {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
   const [error, setError] = useState(false);
-  const [languageFormData, setLanguageFormData] = useState(dbFormData.data || []);
+  const [skillFormData, setSkillFormData] = useState(dbFormData.data || []);
   const [saveState, setSaveState] = useState(false);
   const [message, setMessage] = useState('');
   const [activeIndex, setActiveIndex] = useState(dbFormData.data && dbFormData.data.length > 0 ? 0 : -1);
 
-  const AddLanguage = () => {
-    if (languageFormData.length >= 5) {
-      alert('最多添加5个语言');
+  const AddSkill = () => {
+    if (skillFormData.length >= 10) {
+      alert("最多添加10个技能");
       return;
     };
-    setLanguageFormData([...languageFormData, { language: '', proficiency: '', certificate: '', score: '' }]);
+    setSkillFormData([...skillFormData, { skill: "", proficiency: "" }]);
     setActiveIndex((prev) => prev + 1);
   }
 
-  const RemoveLanguage = (index) => {
-    if (languageFormData.length === 1) {
-      setLanguageFormData([]);
+  const RemoveSkill = (index) => {
+    if (skillFormData.length <= 1) {
+      setSkillFormData([]);
       setActiveIndex(-1);
       return;
-    }
-    const newLanguageFormData = languageFormData.filter((_, i) => i !== index);
-    setLanguageFormData(newLanguageFormData);
-    setActiveIndex((prev) => prev - 1);
+    };
+    setSkillFormData(skillFormData.filter((_, i) => i !== index));
+    setActiveIndex((prevIndex) => Math.min(prevIndex, skillFormData.length - 2));
   }
 
   const handleSave = async () => {
-    for (let i = 0; i < languageFormData.length; i++) {
-      if (languageFormData[i].language === '' || languageFormData[i].proficiency === '') {
+    for (let i = 0; i < skillFormData.length; i++) {
+      if (skillFormData[i].skill === "" || skillFormData[i].proficiency === "") {
         setError(true);
         return;
       }
     }
-    const translatedLanguageFormData = languageFormData.map(data => {
+    const translatedSkillFormData = skillFormData.map((data) => {
       return {
-        语言: data.language,
+        技能名称: data.skill,
         熟练度: data.proficiency,
-        "证书/资格认证": data.certificate,
-        成绩: data.score,
       };
     });
     const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
-        type: 'languages',
-        data: translatedLanguageFormData,
+        type: 'skills',
+        data: translatedSkillFormData,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -114,26 +115,24 @@ export default function Step10Page({ dbFormData }) {
   }, [saveState]);
 
   const handleSubmit = () => {
-    for (let i = 0; i < languageFormData.length; i++) {
-      if (languageFormData[i].language === '' || languageFormData[i].proficiency === '') {
+    for (let i = 0; i < skillFormData.length; i++) {
+      if (skillFormData[i].skill === "" || skillFormData[i].proficiency === "") {
         setError(true);
         return;
       }
     }
-    const translatedLanguageFormData = languageFormData.map(data => {
+    const translatedSkillFormData = skillFormData.map((data) => {
       return {
-        语言: data.language,
+        技能名称: data.skill,
         熟练度: data.proficiency,
-        "证书/资格认证": data.certificate,
-        成绩: data.score,
       };
     });
     fetch(process.env.NEXT_PUBLIC_API_URL + '/api/save-data', {
       method: 'POST',
       body: JSON.stringify({
         id: dbFormData._id,
-        type: 'languages',
-        data: translatedLanguageFormData,
+        type: 'skills',
+        data: translatedSkillFormData,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -146,21 +145,19 @@ export default function Step10Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step10?id=${dbFormData._id}`);
+    router.push(`/resume/fill-info-step9?id=${dbFormData._id}`);
   }
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden">
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
-      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+    <>
+      <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
-            <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">语言</h2>
-            {languageFormData.length > 0 &&
+            <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">技能</h2>
+            {skillFormData.length > 0 &&
               <>
                 <div className="flex flex-row justify-start items-center text-alpha-blue mx-auto">
-                  {languageFormData.map((data, index) => (
+                  {skillFormData.map((data, index) => (
                     <>
                       <button
                         key={index}
@@ -170,9 +167,9 @@ export default function Step10Page({ dbFormData }) {
                           }`}
                         onClick={() => setActiveIndex(index)}
                       >
-                        语言 {index + 1}
+                        技能 {index + 1}
                       </button>
-                      {index !== languageFormData.length - 1 && (
+                      {index !== skillFormData.length - 1 && (
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="icon icon-tabler icon-tabler-chevron-right w-4 h-4"
@@ -191,69 +188,37 @@ export default function Step10Page({ dbFormData }) {
                   ))}
                 </div>
                 <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
-                  <label>*语言</label>
+                  <label>*技能名称</label>
                   <input type="text"
-                    placeholder='请输入语言'
-                    value={languageFormData[activeIndex].language}
+                    placeholder='请输入技能名称'
+                    value={skillFormData[activeIndex].skill}
                     onChange={(e) => {
-                      const newLanguageFormData = [...languageFormData];
-                      newLanguageFormData[activeIndex].language = e.target.value;
-                      setLanguageFormData(newLanguageFormData);
+                      const newSkillFormData = [...skillFormData];
+                      newSkillFormData[activeIndex].skill = e.target.value;
+                      setSkillFormData(newSkillFormData);
                     }}
                   />
-
-
                   <label>*熟练度</label>
                   <select
-                    value={languageFormData[activeIndex].proficiency}
+                    value={skillFormData[activeIndex].proficiency}
                     onChange={(e) => {
-                      const newLanguageFormData = [...languageFormData];
-                      newLanguageFormData[activeIndex].proficiency = e.target.value;
-                      setLanguageFormData(newLanguageFormData);
+                      const newSkillFormData = [...skillFormData];
+                      newSkillFormData[activeIndex].proficiency = e.target.value;
+                      setSkillFormData(newSkillFormData);
                     }}
                   >
                     <option value="" disabled hidden>请选择熟练度</option>
-                    <option value="基础">基础</option>
-                    <option value="中级">中级</option>
                     <option value="熟练">熟练</option>
-                    <option value="流利">流利</option>
-                    <option value="母语">母语</option>
+                    <option value="高级">高级</option>
+                    <option value="基础">基础</option>
                   </select>
 
-
-
-                  <div className="w-full flex flex-row justify-between items-center gap-x-16">
-                    <div className="w-full flex flex-col justify-start items-stretch">
-                      <label>证书/资格认证</label>
-                      <input type="text"
-                        placeholder='请输入证书/资格认证'
-                        value={languageFormData[activeIndex].certificate}
-                        onChange={(e) => {
-                          const newLanguageFormData = [...languageFormData];
-                          newLanguageFormData[activeIndex].certificate = e.target.value;
-                          setLanguageFormData(newLanguageFormData);
-                        }}
-                      />
-                    </div>
-                    <div className="w-full flex flex-col justify-start items-stretch">
-                      <label>成绩</label>
-                      <input type="text"
-                        placeholder='请输入成绩'
-                        value={languageFormData[activeIndex].score}
-                        onChange={(e) => {
-                          const newLanguageFormData = [...languageFormData];
-                          newLanguageFormData[activeIndex].score = e.target.value;
-                          setLanguageFormData(newLanguageFormData);
-                        }}
-                      />
-                    </div>
-                  </div>
                   <div className="w-full flex flex-row justify-end items-center mt-1">
                     <button
                       className="text-gray-500 hover:text-red-500"
                       title="删除这段经历"
                       type="button"
-                      onClick={() => RemoveLanguage(activeIndex)}
+                      onClick={() => RemoveSkill(activeIndex)}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -275,10 +240,12 @@ export default function Step10Page({ dbFormData }) {
                     </button>
                   </div>
                 </form>
-              </>}
+              </>
+            }
             <button
               className="rounded-full border-4 border-alpha-blue px-4 py-2 flex flex-row justify-center items-center gap-y-2 w-40 mx-auto text-alpha-blue font-bold transition-colors duration-100 hover:bg-alpha-blue hover:text-white whitespace-nowrap"
-              onClick={AddLanguage}
+              type='button'
+              onClick={AddSkill}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -294,11 +261,11 @@ export default function Step10Page({ dbFormData }) {
                 <path d="M12 5l0 14" />
                 <path d="M5 12l14 0" />
               </svg>
-              增加语言
+              增加技能
             </button>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
-            <Link href={`/resume/fill-info-step8?id=${dbFormData._id}`}><button className="form-b" type="button" >
+            <Link href={`/resume/fill-info-step7?id=${dbFormData._id}`}><button className="form-b" type="button" >
               上一步
             </button></Link>
             <button className="form-b" onClick={handleSave}>保存</button>
@@ -307,10 +274,10 @@ export default function Step10Page({ dbFormData }) {
             </button>
           </div>
         </div>
-        <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20'>
+        <div className='w-1/2 bg-[#EDF8FD] h-full pt-8 pb-16 gap-y-16 px-20 flex flex-col justify-start items-stretch '>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
           <div className='flex flex-col gap-y-4'>
-            {step9Tips.map((topic, index) => (
+            {step8Tips.map((topic, index) => (
               <div className='text-black ' key={index}>
                 <h2 className="font-bold text-xl">{topic.title}</h2>
                 {topic.subtopics.map((subtopic, subIndex) => (
@@ -414,7 +381,8 @@ export default function Step10Page({ dbFormData }) {
         input[type="text"],
         input[type="tel"],
         input[type="email"],
-        select{
+        select
+        {
           padding: 10px;
           margin-top: 5px;
           border: 1px solid #ccc;
@@ -531,7 +499,7 @@ export default function Step10Page({ dbFormData }) {
           height: 50px; // 调整图标大小
         }
       `}</style>
-    </div>
+    </>
   );
 }
 

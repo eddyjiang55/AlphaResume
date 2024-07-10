@@ -85,10 +85,10 @@ const LoginPage = () => {
 
 
   return (
-    <div className="flex justify-between h-screen">
-      <div className="w-1/2 bg-alpha-blue">
+    <div className="flex justify-between h-[calc(100vh-8rem)]">
+      <div className="w-1/2 bg-alpha-blue relative">
         <Link href='/'>
-          <div className='flex items-center fixed left-0 top-0 pl-8 pt-5 text-white'>
+          <div className='flex items-center absolute left-0 top-0 pl-8 pt-5 text-white'>
             <div className="w-8 h-8">{backIcon}</div>
             <p className='text-lg'>返回</p>
           </div>
@@ -105,7 +105,7 @@ const LoginPage = () => {
           </div>
           <div className="relative mb-4">
             <input type="text" placeholder="验证码" className="text-black pl-4 pr-32 py-3 w-full rounded-md border border-gray-300" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value)} />
-            <button className={`absolute inset-y-0 right-0 px-6 text-white rounded-r-md ${phone !== "" ? "bg-blue-400" : "bg-blue-400"} transition-colors duration-100`} onClick={handleSendCode}>发送验证码</button>
+            <button className={`absolute inset-y-0 right-0 px-6 text-white rounded-r-md ${phone !== "" ? "bg-blue-600" : "cursor-not-allowed bg-blue-300"} transition-colors duration-100`} onClick={handleSendCode}>发送验证码</button>
           </div>
           <div className="flex items-center mb-4">
             <input

@@ -1,6 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+<<<<<<< HEAD:frontend/src/pages/fill-info-step4.js
 <<<<<<< Updated upstream:frontend/src/pages/fill-info-step4.js
 import Navbar from '../components/navbar';
 import ResumeNavbar from "../components/resume-navbar";
@@ -13,6 +14,11 @@ import { extractDateRange, fetchPartData } from '@/utils/fetchResumePartData';
 import SaveToast from '@/components/Toast/SaveToast';
 import Link from 'next/link';
 >>>>>>> Stashed changes:frontend/src/pages/resume/fill-info-step4.js
+=======
+import { step4Tips } from '@/lib/tips';
+import { extractDateRange, fetchPartData } from '@/utils/fetchResumePartData';
+import SaveToast from '@/components/Toast/SaveToast';
+>>>>>>> e03e4d3935c0164da6460473b509f952b11adaa1:frontend/src/pages/resume/fill-info-step4.js
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -23,12 +29,17 @@ export async function getServerSideProps(context) {
     if (preformattedData.data) {
       const displayData = preformattedData.data.map((data) => {
         const [formattedStart, formattedEnd] = extractDateRange(data.起止时间);
+        let tillPresent = false;
+        if (formattedEnd === "至今") {
+          tillPresent = true;
+        }
         return {
           company: data.公司名称,
           city: data.城市,
           country: data.国家,
           startDate: formattedStart,
           endDate: formattedEnd,
+          tillPresent: tillPresent,
           department: data.部门,
           position: data.职位,
           description: data["职责/业绩描述"],
@@ -39,7 +50,7 @@ export async function getServerSideProps(context) {
       dbFormData = { _id: preformattedData._id, data: null };
     }
   } else {
-    return { redirect: { destination: `/fill-info-step1`, permanent: false } }
+    return { redirect: { destination: `/resume/fill-info-step1`, permanent: false } }
   }
   // Pass data to the page via props
   return { props: { dbFormData } }
@@ -126,7 +137,7 @@ export default function step4Page({ dbFormData }) {
       .catch(error => {
         console.error('Save error:', error);
       });
-    router.push(`/fill-info-step5?id=${dbFormData._id}`);
+    router.push(`/resume/fill-info-step5?id=${dbFormData._id}`);
   }
 
   const handleSave = async () => {
@@ -141,7 +152,7 @@ export default function step4Page({ dbFormData }) {
         公司名称: data.company,
         城市: data.city,
         国家: data.country,
-        起始时间: data.startDate + "-" + data.endDate,
+        起止时间: data.startDate + "-" + data.endDate,
         部门: data.department,
         职位: data.position,
         "职责/业绩描述": data.description,
@@ -178,17 +189,15 @@ export default function step4Page({ dbFormData }) {
   }, [saveState]);
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden relative">
-      <Navbar />
-      <ResumeNavbar currentIndex={dbFormData._id} />
-      <div className="flex flex-row justify-center items-start h-[calc(100%-170px)]">
+    <>
+      <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <div className="flex flex-col flex-grow justify-start items-stretch gap-y-8 w-full max-w-[75%] mx-auto">
             <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">职业经历</h2>
             {formData.length > 0 && <>
               <div className="flex flex-row justify-start items-center text-alpha-blue mx-auto">
                 {formData.map((data, index) => (
-                  <>
+                  <section className='flex flex-row justify-start items-center gap-x-2' key={index}>
                     <button
                       key={index}
                       className={`${activeIndex === index
@@ -214,7 +223,7 @@ export default function step4Page({ dbFormData }) {
                         <path d="M9 6l6 6l-6 6" />
                       </svg>
                     )}{" "}
-                  </>
+                  </section>
                 ))}
               </div>
               <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
@@ -252,45 +261,65 @@ export default function step4Page({ dbFormData }) {
                     />
                   </div>
                 </div>
-                <label>*起止时间</label>
-                <div className="w-full p-2.5 mt-1.5 rounded-xl border border-[#ccc] flex flex-row justify-between items-center gap-x-6">
-                  <input
-                    className="flex-grow"
-                    type="month"
-                    max="3000-12"
-                    value={formData[activeIndex].startDate}
-                    onChange={(e) => {
-                      const newFormData = [...formData];
-                      newFormData[activeIndex].startDate = e.target.value;
-                      setFormData(newFormData);
-                    }}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="icon icon-tabler icon-tabler-arrow-narrow-right w-6 h-6"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="#000000"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M5 12l14 0" />
-                    <path d="M15 16l4 -4" />
-                    <path d="M15 8l4 4" />
-                  </svg>
-                  <input
-                    className="flex-grow"
-                    type="month"
-                    max="3000-12"
-                    value={formData[activeIndex].endDate}
-                    onChange={(e) => {
-                      const newFormData = [...formData];
-                      newFormData[activeIndex].endDate = e.target.value;
-                      setFormData(newFormData);
-                    }}
-                  />
+                <div className="w-full flex flex-row justify-between items-center gap-x-16">
+                  <div className="w-4/5 flex flex-col justify-start items-stretch">
+                    <label>*起止时间</label>
+                    <div className="w-full p-2.5 mt-1.5 rounded-xl border border-[#ccc] flex flex-row justify-between items-center gap-x-6">
+                      <input
+                        className="flex-grow"
+                        type="month"
+                        max="3000-12"
+                        value={formData[activeIndex].startDate}
+                        onChange={(e) => {
+                          const newFormData = [...formData];
+                          newFormData[activeIndex].startDate = e.target.value;
+                          setFormData(newFormData);
+                        }}
+                      />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-arrow-narrow-right w-6 h-6"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="#000000"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M5 12l14 0" />
+                        <path d="M15 16l4 -4" />
+                        <path d="M15 8l4 4" />
+                      </svg>
+                      <input
+                        className="flex-grow"
+                        type="month"
+                        max="3000-12"
+                        disabled={formData[activeIndex].tillPresent}
+                        value={formData[activeIndex].endDate}
+                        onChange={(e) => {
+                          const newFormData = [...formData];
+                          newFormData[activeIndex].endDate = e.target.value;
+                          setFormData(newFormData);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="w-1/5 flex flex-col justify-start items-center">
+                    <label>仍然在职</label>
+                    <div className="w-full p-2.5 mt-1.5 flex flex-row justify-center items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData[activeIndex].tillPresent}
+                        onChange={(e) => {
+                          const newFormData = [...formData];
+                          newFormData[activeIndex].tillPresent = e.target.checked;
+                          newFormData[activeIndex].endDate = e.target.checked ? "至今" : "";
+                          setFormData(newFormData);
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
                 <label>*职位</label>
                 <input type="text" placeholder="请输入实习职位"
@@ -588,7 +617,7 @@ export default function step4Page({ dbFormData }) {
           color: white; /* 激活按钮的文本颜色 */
         }
       `}</style>
-    </div>
+    </>
   );
 }
 

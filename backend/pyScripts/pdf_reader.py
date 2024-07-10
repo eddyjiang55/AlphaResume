@@ -10,12 +10,6 @@ import dashscope
 import time
 import re
 
-import io
-
-# Ensure UTF-8 encoding
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
-
 dashscope.api_key = 'sk-3c43423c9fee4af8928fd8bc647291ee'
 
 # get resume_history_id from command line
@@ -39,7 +33,6 @@ def get_pdf_from_mongodb(resumehist_id):
 
     # 查询特定用户的聊天记录
     resume_hist = collection.find_one({"_id": resumehist_id})
-    print(resume_hist.keys())
 
     # 需要修改代码：同一个useraccount有多个聊天记录，拿取最后一条记录
     # 初始化一个空字典来存储问题和答案
@@ -52,7 +45,7 @@ def get_pdf_from_mongodb(resumehist_id):
 
 # 从本地读取json模板
 template = {
-    "基本信息": {
+    "基础信息": {
         "姓": "",
         "名": "",
         "手机号码": "",
@@ -244,6 +237,8 @@ template = {
 def transform_chat_json(md_data):
     prompt = f"我有一个个人简历的md版本，还有一个模式规整的json的key。这个json的value是空缺的，我需要你把md文件中的信息填入json格式的value中。" \
              f"你返回的数据是json格式，一定不需要除了json的其他内容。" \
+             f"如果需要填充的内容为时间，那么请填充为'yyyy-mm-dd'这种格式。" \
+             f"如果是至今，请填充为yyyy-mm-至今。" \
              f"如果范例中有的内容没有在md里找到，请储存空值。md简历： "
     # 把md转换成json, 用于填充
     md_data = md(md_data)
@@ -255,10 +250,10 @@ def transform_chat_json(md_data):
         model='qwen-max-longcontext',
         prompt=prompt,
         seed=1234,
-        top_p=0.1,
+        top_p=0.2,
         result_format='json',
         enable_search=False,
-        # max_tokens=2000,
+        max_tokens=2000,
         temperature=0.1,
         repetition_penalty=1.0
     )
@@ -273,7 +268,7 @@ def transform_chat_json(md_data):
 
 # 此处需要修改
 md_data = get_pdf_from_mongodb(resume_history_id)
-# print(md_data)
+print(md_data)
 # 去掉所有除了中文，英文，数字和'-', ' ', '.', '\n'之外的字符
 md_data = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9\- \n]', '', md_data)
 # save md_data to a file
@@ -303,40 +298,11 @@ def upload_standard_data_to_mongodb(json_data, improved_user_id):
 
     resume_id = "resume_2"
 
-    # 解析传入的 JSON 数据
-    data_to_upload = json.loads(json_data)
-
-    # 构建将要上传的数据字典
-    data_dict = {
-        "personal_data": {
-            "基本信息": data_to_upload['基本信息'],
-            "教育经历": data_to_upload['教育经历'],
-            "职业经历": data_to_upload['职业经历'],
-            "项目经历": data_to_upload['项目经历'],
-            "获奖与证书": data_to_upload['获奖与证书'],
-            "语言": data_to_upload['语言'],
-            "技能": data_to_upload['技能'],
-            "科研论文与知识产权": data_to_upload['科研论文与知识产权'],
-            "个人评价": data_to_upload['个人评价']
-        }
-    }
-    # print(data_dict["_id"])
-
-    result = collection.update_one(
-        {"_id": improved_user_id},
-        {"$set": data_dict},
-        upsert=True  # This will insert the document if it does not exist
-    )
-
-    if result.matched_count > 0:
-        print(f"Document with _id {improved_user_id} updated successfully.")
-    else:
-        print(f"Document with _id {improved_user_id} inserted successfully.")
+    collection.insert_one({"_id": improved_user_id, "personal_data": json.loads(json_data)})
 
     # 关闭MongoDB连接
     client.close()
 
-# print(response)
-print(improved_user_id)
-upload_standard_data_to_mongodb(response, improved_user_id)
 
+upload_standard_data_to_mongodb(response, improved_user_id)
+print(response)
