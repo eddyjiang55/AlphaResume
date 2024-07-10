@@ -62,8 +62,8 @@ export default function AIChat({ dbFormData }) {
   const router = useRouter();
   const [chatHistory, setChatHistory] = useState(dbFormData.messages);
   const [loading, setLoading] = useState(false);
-  const [showLeaveBtn, setShowLeaveBtn] = useState(false);
   const [chatId, setChatId] = useState(dbFormData._id);
+  const [completeness, setCompleteness] = useState("");
 
   const latestChatHistory = useRef(dbFormData.messages);
 
@@ -71,10 +71,10 @@ export default function AIChat({ dbFormData }) {
     async (result) => {
       setLoading(true);
       console.log(chatHistory);
-      const question = latestChatHistory.current[latestChatHistory.current.length - 1].text;
-      console.log("Question:", question);
-      const quesId = latestChatHistory.current[latestChatHistory.current.length - 1].id;
-      console.log("QuesId:", quesId);
+      const question =
+        latestChatHistory.current[latestChatHistory.current.length - 1].text;
+      const quesId =
+        latestChatHistory.current[latestChatHistory.current.length - 1].id;
       const newChat = {
         id: latestChatHistory.current.length + 1,
         text: result.id,
@@ -108,7 +108,12 @@ export default function AIChat({ dbFormData }) {
           setChatHistory((prevChatHistory) => {
             latestChatHistory.current = [
               ...prevChatHistory,
-              { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
+              {
+                text: nextQuestion,
+                sender: "bot",
+                id: nextQuesId,
+                type: "text",
+              },
             ];
             return latestChatHistory.current;
           });
@@ -145,7 +150,12 @@ export default function AIChat({ dbFormData }) {
           setChatHistory((prevChatHistory) => {
             latestChatHistory.current = [
               ...prevChatHistory,
-              { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
+              {
+                text: nextQuestion,
+                sender: "bot",
+                id: nextQuesId,
+                type: "text",
+              },
             ];
             return latestChatHistory.current;
           });
@@ -173,6 +183,23 @@ export default function AIChat({ dbFormData }) {
 
   const handleError = useCallback((error) => {
     console.error("Speech recognition error:", error);
+  }, []);
+
+  const handleCompleteness = useCallback(async (chatId) => {
+    if (chatId !== "") {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_URL +
+          "/api/resume-chat/completeness/" +
+          chatId
+      );
+      if (response.status === 200) {
+        const data = await response.json();
+        setCompleteness(data.completeness);
+      } else {
+        console.error("Failed to retrieve completeness");
+        alert("Server error");
+      }
+    }
   }, []);
 
   const { handleRecognition, isListening } = useSpeechRecognition({
@@ -203,13 +230,6 @@ export default function AIChat({ dbFormData }) {
       chatContainerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
     }
   }, [chatHistory]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLeaveBtn(true);
-    }, 10000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const textInputRef = useRef(null);
   const sendMessage = async (event) => {
@@ -322,13 +342,6 @@ export default function AIChat({ dbFormData }) {
         <h1 className="font-semibold text-2xl text-alpha-blue text-center py-2">
           简历信息收集
         </h1>
-        {showLeaveBtn ? (
-          <Link href="/start-resumeserve">
-            <button className="absolute top-4 right-4 bg-gray-400 text-white px-4 py-2 rounded-xl">
-              结束会话
-            </button>
-          </Link>
-        ) : null}
         <div
           ref={chatContainerRef}
           className="overflow-y-auto max-h-[calc(100vh-350px)] mt-4 mb-32 pr-4"
@@ -352,7 +365,31 @@ export default function AIChat({ dbFormData }) {
           </ul>
         </div>
       </div>
-      <div className="fixed inset-x-0 bottom-0 flex justify-center items-center flex-row gap-x-4 w-full">
+      <div className="fixed inset-x-0 bottom-0 flex justify-center items-center flex-row gap-x-10 w-full">
+        <div className="flex flex-row justify-center items-center gap-x-4 text-black mt-2 mb-6 h-full">
+          <button
+            className="bg-alpha-blue text-white px-6 py-3 rounded-xl disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={chatId === ""}
+            onClick={() => handleCompleteness(chatId)}
+          >
+            信息完整度{completeness === "" ? "" : `：${completeness}%`}
+          </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="icon icon-tabler icon-tabler-refresh w-6 h-6 cursor-pointer"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            onClick={() => handleCompleteness(chatId)}
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+            <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+          </svg>
+        </div>
         <div className="flex justify-center items-start flex-row w-full max-w-[864px] gap-x-6 mt-2 mb-6 h-full">
           <div className="flex justify-center items-center flex-row w-full p-2 mx-auto border border-solid border-alpha-blue rounded-lg bg-white shadow-lg text-black h-12">
             <input
@@ -431,6 +468,16 @@ export default function AIChat({ dbFormData }) {
               </svg>
             </button>
           </div>
+        </div>
+        <div className="flex flex-row justify-center items-center mt-2 mb-6 h-full">
+          <Link href="/start-resumeserve">
+            <button
+              disabled={chatId === ""}
+              className="disabled:cursor-not-allowed disabled:bg-gray-400 bg-red-400 text-white px-6 py-3 rounded-xl"
+            >
+              结束会话
+            </button>
+          </Link>
         </div>
       </div>
     </div>
