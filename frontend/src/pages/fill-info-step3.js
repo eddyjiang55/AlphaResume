@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/router';
+<<<<<<< Updated upstream:frontend/src/pages/fill-info-step3.js
 import Navbar from "../components/navbar";
 import ResumeNavbar from "../components/resume-navbar";
 import { step3Tips } from '../lib/tips';
 import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
 import SaveToast from '../components/Toast/SaveToast';
+=======
+import { step3Tips } from '@/lib/tips';
+import { extractDateRange, fetchPartData } from '@/utils/fetchResumePartData';
+import SaveToast from '@/components/Toast/SaveToast';
+import Link from 'next/link';
+>>>>>>> Stashed changes:frontend/src/pages/resume/fill-info-step3.js
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
   if (context.query.id) {
     // Fetch dbFormData from external API
     const preformattedData = await fetchPartData(context.query.id, 'educationHistory');
-    // console.log(preformattedData);
+    console.log(preformattedData);
     if (preformattedData.data) {
       const displayData = preformattedData.data.map((data) => {
         const [formattedStart, formattedEnd] = extractDateRange(data.起止时间);
@@ -449,7 +456,9 @@ export default function Step3Page({ dbFormData }) {
               增加教育经历
             </button>
           </div>
-          <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
+          <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto"><Link href={`/resume/fill-info-step2?id=${dbFormData._id}`}><button className="form-b" type="button" >
+            上一步
+          </button></Link>
             <button className="form-b" onClick={handleSave}>保存</button>
             <button className="form-b" type="button" onClick={handleSubmit}>
               下一步

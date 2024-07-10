@@ -1,10 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+<<<<<<< Updated upstream:frontend/src/pages/fill-info-step2.js
 import Navbar from '../components/navbar';
 import ResumeNavbar from '../components/resume-navbar';
 import { step2Tips } from '../lib/tips';
 import SaveToast from '../components/Toast/SaveToast';
+=======
+import { step2Tips } from '@/lib/tips';
+import SaveToast from '@/components/Toast/SaveToast';
+import Link from 'next/link';
+>>>>>>> Stashed changes:frontend/src/pages/resume/fill-info-step2.js
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -95,6 +101,7 @@ export default function Step2Page({ dbFormData }) {
             </form>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
+            <Link href={`/resume/fill-info-step1?id=${dbFormData._id}`}><button className='form-b' type="button" >上一步</button> </Link>
             <button className='form-b' onClick={handleSave}>保存</button>
             <button className='form-b' type="button" onClick={handleSubmit}>下一步</button>
           </div>
