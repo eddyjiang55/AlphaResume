@@ -19,6 +19,7 @@ class ImprovedUser {
         this.updatedAt = new Date();
         this.resumeId = "";
         this.completeness = 0;
+        this.page = 0;
     }
 
     async save() {

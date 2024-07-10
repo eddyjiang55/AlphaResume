@@ -8,7 +8,6 @@ class ResumeHistory {
         this.createdAt = createdAt;
         this.pdfData = pdfData; // Storing PDF file data
         this.markdownData = markdownData; // Storing converted Markdown data
-        this.title = title;
         this.position = position;
     }
 
