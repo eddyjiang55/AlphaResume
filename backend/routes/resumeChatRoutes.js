@@ -13,7 +13,7 @@ function getFormattedDate() {
 }
 
 // 获取 Python 脚本的绝对路径
-const pythonScriptPath = path.resolve(__dirname, '../pyScripts/AI_asking_new.py');
+const pythonScriptPath = path.resolve(__dirname, '../pyScripts/AI_asking_method1.py');
 
 router.post('/resume-chat', async (req, res) => {
     try {
