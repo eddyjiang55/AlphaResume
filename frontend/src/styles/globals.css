@@ -257,9 +257,9 @@
   /* Slightly darker thumb on hover for visual feedback */
 }
 
-.resume-page {
+/* .resume-page {
   padding: 55px 45px 45px;
-}
+} */
 
 /* Container for the entire resume header */
 .resume-header {
@@ -323,9 +323,9 @@
   /* padding: 20px; */
 }
 
-.resume-page {
+/* .resume-page {
   padding: 20px;
-}
+} */
 
 .resume-page h2 {
   font-size: calc(var(--base-font-size) * 1.5);

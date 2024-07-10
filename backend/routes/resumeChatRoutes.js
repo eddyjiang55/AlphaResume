@@ -245,7 +245,7 @@ router.get('/resume-chat/completeness/:_id', async (req, res) => {
         }
         const resumeId = chatRecord.resumeId;
         const completeness = await ImprovedUser.getCompletenessById(resumeId);
-        res.status(200).json({ completeness });
+        res.status(200).json({ completeness: completeness });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Failed to retrieve completeness.', error: error.toString() });
