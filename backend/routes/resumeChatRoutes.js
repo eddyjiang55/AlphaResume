@@ -17,7 +17,7 @@ const pythonScriptPath = path.resolve(__dirname, '../pyScripts/AI_asking_method1
 
 router.post('/resume-chat', async (req, res) => {
     try {
-        const { userAccount, messages } = req.body;
+        const { userAccount, messages ,phoneNumber} = req.body;
         const currentDate = getFormattedDate();
         const personal_data = {
             "基本信息": {
@@ -128,7 +128,7 @@ router.post('/resume-chat', async (req, res) => {
         
         
 
-        const resume_id = await newUser.save();
+        const resume_id = await newUser.save(phoneNumber);
 
         const resumeChat = new ResumeChat(userAccount, messages, resume_id);
         const _id = await resumeChat.save();
