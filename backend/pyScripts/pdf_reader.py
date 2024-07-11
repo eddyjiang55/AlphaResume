@@ -1,5 +1,5 @@
 import sys
-
+import io
 from pymongo import MongoClient
 import requests
 from markdownify import markdownify as md
@@ -11,6 +11,9 @@ import time
 import re
 
 dashscope.api_key = 'sk-3c43423c9fee4af8928fd8bc647291ee'
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 # get resume_history_id from command line
 resume_history_id = sys.argv[1]

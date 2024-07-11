@@ -17,7 +17,7 @@ const preprocessMarkdown = (md) => {
 
   // Function to sanitize lines by removing colon and any value following it within text properties
   const sanitizeLine = (line) => {
-    console.log(line);
+    // console.log(line);
     // Find and sanitize text properties
     if (line.includes('text:')) {
       const parts = line.split('</span>');
@@ -165,7 +165,7 @@ export const renderMarkdown = (md) => {
 
   let html = markdown.render(body);
   // console.log(html);
-  html = formatResume(html);
+  // html = formatResume(html);
   // console.log(html);
   html = resolveHeader(html, attributes);
 

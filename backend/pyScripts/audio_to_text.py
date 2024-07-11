@@ -36,20 +36,17 @@ class RequestApi(object):
 
     def upload(self):
         upload_file_path = self.upload_file_path
-        file_len = os.path.getsize(upload_file_path)
-        file_name = os.path.basename(upload_file_path)
+        # upload_file_path is already a wav base64 string
+        file_len = len(upload_file_path)
 
         param_dict = {}
         param_dict['appId'] = self.appid
         param_dict['signa'] = self.signa
         param_dict['ts'] = self.ts
-        param_dict["fileSize"] = file_len
-        param_dict["fileName"] = file_name
         param_dict["duration"] = "200"
-        data = open(upload_file_path, 'rb').read(file_len)
 
         response = requests.post(url=lfasr_host + api_upload + "?" + urllib.parse.urlencode(param_dict),
-                                 headers={"Content-type": "application/json"}, data=data)
+                                 headers={"Content-type": "application/json"}, data=upload_file_path)
         result = json.loads(response.text)
         return result
 

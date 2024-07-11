@@ -39,12 +39,13 @@ collection_1 = db[COLLECTION_NAME_1]
 collection_2 = db[COLLECTION_NAME_2]
 
 priority = {
-    "基础信息": {
+    "基本信息": {
         "简历标题": "简历标题",
         "姓名": "姓名",
         "手机号码": "手机号码",
         "邮箱": "邮箱"
     },
+    "个人评价": "个人评价",
     "教育经历": {
         "学历": "学历",
         "学校名称": "学校名称",
@@ -180,17 +181,19 @@ def check_if_initial(json_data, section_id):
         if check_point == 0:
             return True
         return False
-    else:
+    else: # it is a string
         if section_data != "":
             return True
-    return False
+        return False
+
 
 
 def ask_new_question(updated_json, priority_json, section_id, current_key):
     prompt = f"你是一个面试官，正在询问求职者的个人信息。"
-    prompt += f'现在你正在询问的是有关{keys_list[section_id]}的内容。'
+    prompt += f'现在你正在询问的是有关求职者{keys_list[section_id]}这一块的内容。'
     #prompt += f"我还有一个优先级列表，包含了这一部分里所需必填项的信息。"
     prompt += f"目前，你发现这个求职者的当前栏目下的{current_key}是空的。请你提出一个问题，让求职者填写这个空缺值。"
+    prompt += f"请在这个问题中包含目前询问的是哪一块的内容，和对这个空缺值的具体描述。"
     prompt += f"你只需要返回问题本身，不需要任何其他内容，比如解释。"
     #prompt += f"以下是json文件内容：{updated_json}"
     #prompt += f"以下是优先级顺序：{priority_json[list(priority_json.keys())[section_id]]}"
@@ -217,18 +220,19 @@ def ask_new_question(updated_json, priority_json, section_id, current_key):
 
 
 def find_first_diff(standard_json, updated_json, section_id):
-    #standard_json = json.loads(standard_json)
-    #updated_json = json.loads(updated_json)
+    # change type of standard_json and updated_json
     print(type(standard_json))
     print(list(standard_json.keys())[section_id])
-    section_standard = standard_json[list(standard_json.keys())[section_id]]
+    section_standard = standard_json[keys_list[section_id]]
     section_updated = updated_json[list(updated_json.keys())[section_id]]
+    # print type of section_standard
     print(type(section_standard))
-    print(standard_json)
-    print(updated_json)
+    print(section_standard)    # 空的
+    print(section_updated)      # 空的
+
     if isinstance(section_standard, dict):
         for key in section_standard:
-            if section_standard[key] == section_updated[key]:
+            if section_standard[key] == section_updated[key] and section_standard[key] == "":
                 return key
         # if all the keys are the same, return the first key that is nan
         for key in section_updated:
@@ -237,7 +241,7 @@ def find_first_diff(standard_json, updated_json, section_id):
     elif isinstance(section_standard, list):
         for i in range(len(section_standard)):
             for key in section_standard[i]:
-                if section_standard[i][key] == section_updated[i][key]:
+                if section_standard[i][key] == section_updated[i][key] and section_standard[i][key] == "":
                     return key
         # if all the keys are the same, return the first key that is nan
         for item in section_updated:
@@ -269,9 +273,9 @@ def process_asking(json_data, section_id, standard_json):
 
 def update_json(original_json, last_chat):
     prompt = (f"我有一段对话和一个有一部分填空的json文件。请你判断这段对话中包含的信息能填入json文件的哪里,然后更新这个json。''"
-            f"如果对话的回答中希望跳过某一个部分，或者特别说明并无这部分的信息，请在这个部分的值中填入'无'，而不是空字符串。"
-            f"请注意，如果问题中没有提到的键，和回答中没有特别说明并无这部分信息的键，请不要擅自填充无，而是保持为空。"
-            f"你需要返回一个完整的json文件。不需要加任何注释。以下是对话内容：{last_chat}")
+              f"如果对话的回答中希望跳过某一个部分，或者特别说明并无这部分的信息，请在这个部分的值中填入'无'，而不是空字符串。"
+              f"请注意，如果问题中没有提到的键，和回答中没有特别说明并无这部分信息的键，请不要擅自填充无，而是保持为空。"
+              f"你需要返回一个完整的json文件。不需要加任何注释。以下是对话内容：{last_chat}")
     prompt += f"以下是json文件内容：{original_json}"
 
     response = dashscope.Generation.call(

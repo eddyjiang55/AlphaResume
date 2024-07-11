@@ -26,23 +26,22 @@ const useSpeechRecognition = ({
               type: "audio/wav",
             });
             const formData = new FormData();
-            formData.append("file", audioFile, "audio.wav");
-            // try {
-            //   const response = await fetch("/api/speechToText", {
-            //     method: "POST",
-            //     body: formData,
-            //   });
-            //   const data = await response.json();
-            //   if (response.status !== 200) {
-            //     throw new Error(
-            //       data.error || `Request failed with status ${response.status}`
-            //     );
-            //   }
-            //   onResult(data.result);
-            // } catch (error) {
-            //   onError(error.message);
-            // }
-            onResult("This is a test");
+            formData.append("audio", audioFile, "audio.wav");
+            try {
+              const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/api/upload-audio", {
+                method: "POST",
+                body: formData,
+              });
+              const data = await response.json();
+              if (response.status !== 200) {
+                throw new Error(
+                  data.error || `Request failed with status ${response.status}`
+                );
+              }
+              onResult(data);
+            } catch (error) {
+              onError(error.message);
+            }
           };
           newMediaRecorder.onstop = () => {
             console.log("Recording stopped");

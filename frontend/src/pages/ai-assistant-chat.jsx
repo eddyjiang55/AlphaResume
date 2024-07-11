@@ -1,8 +1,9 @@
 "use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import Navbar from "../components/navbar";
+import { useRouter } from "next/router";
 import ChatSegment from "../components/chat";
+import AudioSegment from "../components/audioSegment";
 // import ChatChoice from "../components/chat-choice";
 // import { blockData } from "../lib/quesLib";
 import { useSelector } from "react-redux";
@@ -34,16 +35,20 @@ export async function getServerSideProps(context) {
     );
     const data = await res.json();
     const messageList = data.messages;
+    console.log(data);
     // messageList = { question: string, answer: string}[]
     const reformattedMessageList = messageList
-      .map((message) => {
-        return [
-          { text: message.question, sender: "bot" },
-          { text: message.answer, sender: "user" },
+      .map((message, index) => {
+        const messages = [
+          { text: message.question, id: index, sender: "bot", type: "text" },
         ];
+        if (message.answer) {
+          messages.push({ text: message.answer, id: index, sender: "user" });
+        }
+        return messages;
       })
       .flat();
-
+    console.log(reformattedMessageList);
     dbFormData = { _id: data._id, messages: reformattedMessageList };
   } else {
     dbFormData = { _id: "", messages: [] };
@@ -54,17 +59,147 @@ export async function getServerSideProps(context) {
 
 export default function AIChat({ dbFormData }) {
   const user = useSelector((state) => state.user);
+  const router = useRouter();
   const [chatHistory, setChatHistory] = useState(dbFormData.messages);
   const [loading, setLoading] = useState(false);
-  const [showLeaveBtn, setShowLeaveBtn] = useState(false);
   const [chatId, setChatId] = useState(dbFormData._id);
+  const [completeness, setCompleteness] = useState("");
 
-  const handleResult = useCallback((result) => {
-    console.log("Speech recognition result:", result);
-  }, []);
+  const latestChatHistory = useRef(dbFormData.messages);
+
+  const handleResult = useCallback(
+    async (result) => {
+      setLoading(true);
+      console.log(chatHistory);
+      const question =
+        latestChatHistory.current[latestChatHistory.current.length - 1].text;
+      const quesId =
+        latestChatHistory.current[latestChatHistory.current.length - 1].id;
+      const newChat = {
+        id: latestChatHistory.current.length + 1,
+        text: result.id,
+        sender: "user",
+        type: "audio",
+      };
+      setChatHistory((prevChatHistory) => {
+        latestChatHistory.current = [...prevChatHistory, newChat];
+        return latestChatHistory.current;
+      });
+      console.log("Audio result:", result.id);
+      if (chatId) {
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatId,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              quesId: quesId,
+              answer: result.id,
+              answer_type: "audio",
+            }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const nextQuestion = data.message;
+          const nextQuesId = data.quesId;
+          setChatHistory((prevChatHistory) => {
+            latestChatHistory.current = [
+              ...prevChatHistory,
+              {
+                text: nextQuestion,
+                sender: "bot",
+                id: nextQuesId,
+                type: "text",
+              },
+            ];
+            return latestChatHistory.current;
+          });
+        } else {
+          console.error("Failed to save chat");
+          alert("Server error");
+        }
+      } else {
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userAccount: user.phoneNumber,
+              messages: [
+                {
+                  id: quesId,
+                  question: question,
+                  answer: result.id,
+                  answer_type: "audio",
+                },
+              ],
+            }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setChatId(data.id);
+          const nextQuestion = data.message;
+          const nextQuesId = data.quesId;
+          setChatHistory((prevChatHistory) => {
+            latestChatHistory.current = [
+              ...prevChatHistory,
+              {
+                text: nextQuestion,
+                sender: "bot",
+                id: nextQuesId,
+                type: "text",
+              },
+            ];
+            return latestChatHistory.current;
+          });
+          router.push(
+            {
+              pathname: "/ai-assistant-chat",
+              query: { id: data.id },
+            },
+            undefined,
+            { shallow: true }
+          );
+        } else {
+          console.error("Failed to save chat");
+          alert("Server error");
+        }
+      }
+      setLoading(false);
+    },
+    [chatHistory, chatId, user.phoneNumber, router]
+  );
+
+  useEffect(() => {
+    latestChatHistory.current = chatHistory;
+  }, [chatHistory]);
 
   const handleError = useCallback((error) => {
     console.error("Speech recognition error:", error);
+  }, []);
+
+  const handleCompleteness = useCallback(async (chatId) => {
+    if (chatId !== "") {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_URL +
+          "/api/resume-chat/completeness/" +
+          chatId
+      );
+      if (response.status === 200) {
+        const data = await response.json();
+        setCompleteness(data.completeness);
+      } else {
+        console.error("Failed to retrieve completeness");
+        alert("Server error");
+      }
+    }
   }, []);
 
   const { handleRecognition, isListening } = useSpeechRecognition({
@@ -82,21 +217,11 @@ export default function AIChat({ dbFormData }) {
           sender: "bot",
           text: "你好，我是你的简历规划师，在帮助你制作一份求职简历之前，我需要了解你的一些个人基本信息和过往学习实习经历，对话可以随时开始或暂停，你的资料会被妥善保存，仅用于简历制作。\n 此次交流仅作为初步信息搜集，如有遗漏不用担心，你可以随时告诉我们，我们将为你修改并补充。\n首先，您能提供一下您的基本信息吗？包括姓名、联系电话、电子邮件和微信号。",
           id: 1,
+          type: "text",
         },
       ]);
     }
   }, []);
-  // useEffect(() => {
-  //   setCurrentBlockId(blockData[0].id);
-  //   setCurrentQuestionId(blockData[0].questions[0].id);
-  // }, [blockData]);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   setTimeout(() => {
-  //     processCurrentQuestion();
-  //   }, 1000);
-  // }, [currentQuestionId, currentBlockId]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -106,62 +231,6 @@ export default function AIChat({ dbFormData }) {
     }
   }, [chatHistory]);
 
-  // const processCurrentQuestion = () => {
-  //   const currentBlock = blockData.find((block) => block.id === currentBlockId);
-  //   if (!currentBlock) return;
-
-  //   const currentQuestion = currentBlock.questions.find(
-  //     (question) => question.id === currentQuestionId
-  //   );
-  //   if (!currentQuestion) return;
-
-  //   setChatHistory((prev) => [
-  //     ...prev,
-  //     { ...currentQuestion, key: Date.now() },
-  //   ]);
-
-  //   if (currentQuestion.type === "text") {
-  //     // Automatically move to the next question
-  //     let nextQuestionId = currentQuestion.next.default;
-  //     setCurrentQuestionId(nextQuestionId);
-  //   } else if (currentQuestion.type === "end") {
-  //     let nextBlockId = currentBlock.next;
-  //     if (nextBlockId) {
-  //       setCurrentBlockId(nextBlockId);
-  //       setCurrentQuestionId(
-  //         blockData.find((block) => block.id === nextBlockId).questions[0].id
-  //       );
-  //     } else {
-  //       // End of the chat
-  //       console.log("End of the chat");
-  //     }
-  //   }
-  //   setLoading(false);
-  // };
-
-  // const handleChoiceClick = (choice) => {
-  //   if (choice) {
-  //     let nextQuestionId = blockData
-  //       .find((block) => block.id === currentBlockId)
-  //       .questions.find((question) => question.id === currentQuestionId)
-  //       .next.yes;
-  //     setCurrentQuestionId(nextQuestionId);
-  //   } else {
-  //     let nextQuestionId = blockData
-  //       .find((block) => block.id === currentBlockId)
-  //       .questions.find((question) => question.id === currentQuestionId)
-  //       .next.no;
-  //     setCurrentQuestionId(nextQuestionId);
-  //   }
-  // };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLeaveBtn(true);
-    }, 10000);
-    return () => clearTimeout(timer);
-  }, []);
-
   const textInputRef = useRef(null);
   const sendMessage = async (event) => {
     event.preventDefault();
@@ -169,12 +238,14 @@ export default function AIChat({ dbFormData }) {
     const message = textInputRef.current.value;
     if (message.trim().length > 0) {
       setLoading(true);
+      console.log(chatHistory);
       const question = chatHistory[chatHistory.length - 1].text;
       const quesId = chatHistory[chatHistory.length - 1].id;
       const newChat = {
         id: chatHistory.length + 1,
         text: message,
         sender: "user",
+        type: "text",
       };
       setChatHistory((prevChatHistory) => [...prevChatHistory, newChat]);
       textInputRef.current.value = "";
@@ -189,6 +260,7 @@ export default function AIChat({ dbFormData }) {
             body: JSON.stringify({
               quesId: quesId,
               answer: message,
+              answer_type: "text",
             }),
           }
         );
@@ -198,7 +270,7 @@ export default function AIChat({ dbFormData }) {
           const nextQuesId = data.quesId;
           setChatHistory((prevChatHistory) => [
             ...prevChatHistory,
-            { text: nextQuestion, sender: "bot", id: nextQuesId },
+            { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
           ]);
         } else {
           console.error("Failed to save chat");
@@ -219,6 +291,7 @@ export default function AIChat({ dbFormData }) {
                   id: quesId,
                   question: question,
                   answer: message,
+                  answer_type: "text",
                 },
               ],
             }),
@@ -231,17 +304,21 @@ export default function AIChat({ dbFormData }) {
           const nextQuesId = data.quesId;
           setChatHistory((prevChatHistory) => [
             ...prevChatHistory,
-            { text: nextQuestion, sender: "bot", id: nextQuesId },
+            { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
           ]);
+          router.push(
+            {
+              pathname: "/ai-assistant-chat",
+              query: { id: data.id },
+            },
+            undefined,
+            { shallow: true }
+          );
         } else {
           console.error("Failed to save chat");
           alert("Server error");
         }
       }
-      // setChatHistory((prevChatHistory) => [
-      //   ...prevChatHistory,
-      //   { text: "Testing", sender: "bot", id: 2 },
-      // ]);
     }
     setLoading(false);
   };
@@ -265,13 +342,6 @@ export default function AIChat({ dbFormData }) {
         <h1 className="font-semibold text-2xl text-alpha-blue text-center py-2">
           简历信息收集
         </h1>
-        {showLeaveBtn ? (
-          <Link href="/start-resumeserve">
-            <button className="absolute top-4 right-4 bg-gray-400 text-white px-4 py-2 rounded-xl">
-              结束会话
-            </button>
-          </Link>
-        ) : null}
         <div
           ref={chatContainerRef}
           className="overflow-y-auto max-h-[calc(100vh-350px)] mt-4 mb-32 pr-4"
@@ -285,19 +355,53 @@ export default function AIChat({ dbFormData }) {
                 }`}
               >
                 {avatar}
-                <ChatSegment sender={chat.sender} chatMessage={chat.text} />
+                {chat.type === "audio" ? (
+                  <AudioSegment sender={chat.sender} audioId={chat.text} />
+                ) : (
+                  <ChatSegment sender={chat.sender} chatMessage={chat.text} />
+                )}
               </li>
             ))}
           </ul>
         </div>
       </div>
-      <div className="fixed inset-x-0 bottom-0 flex justify-center items-center flex-row gap-x-4 w-full">
+      <div className="fixed inset-x-0 bottom-0 flex justify-center items-center flex-row gap-x-10 w-full">
+        <div className="flex flex-row justify-center items-center gap-x-4 text-black mt-2 mb-6 h-full">
+          <button
+            className="bg-alpha-blue text-white px-6 py-3 rounded-xl disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={chatId === ""}
+            onClick={() => handleCompleteness(chatId)}
+          >
+            信息完整度{completeness === "" ? "" : `：${completeness}%`}
+          </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="icon icon-tabler icon-tabler-refresh w-6 h-6 cursor-pointer"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            onClick={() => handleCompleteness(chatId)}
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+            <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+          </svg>
+        </div>
         <div className="flex justify-center items-start flex-row w-full max-w-[864px] gap-x-6 mt-2 mb-6 h-full">
           <div className="flex justify-center items-center flex-row w-full p-2 mx-auto border border-solid border-alpha-blue rounded-lg bg-white shadow-lg text-black h-12">
             <input
               type="text"
               className="w-full p-1 focus:outline-none"
-              placeholder={loading ? "请稍等……" : isListening ? "请说话……" : "请输入您的回答"}
+              placeholder={
+                loading
+                  ? "请稍等……"
+                  : isListening
+                  ? "请说话……"
+                  : "请输入您的回答"
+              }
               ref={textInputRef}
               onKeyUp={handleKeyUp}
               onKeyDown={handleKeyDown}
@@ -345,7 +449,7 @@ export default function AIChat({ dbFormData }) {
           <div className="h-12 w-12 flex justify-center items-center">
             <button
               className="h-full w-full border border-alpha-blue shadow-md bg-white text-black p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading}
+              disabled={loading || isListening}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -364,6 +468,16 @@ export default function AIChat({ dbFormData }) {
               </svg>
             </button>
           </div>
+        </div>
+        <div className="flex flex-row justify-center items-center mt-2 mb-6 h-full">
+          <Link href="/start-resumeserve">
+            <button
+              disabled={chatId === ""}
+              className="disabled:cursor-not-allowed disabled:bg-gray-400 bg-red-400 text-white px-6 py-3 rounded-xl"
+            >
+              结束会话
+            </button>
+          </Link>
         </div>
       </div>
     </div>

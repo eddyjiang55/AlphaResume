@@ -39,6 +39,10 @@
   --dl-space-space-oneandhalfunits: 24px;
   --theme-color: #377BB5;
   --base-font-size: 16px;
+  --a4-width: 210mm;
+  --a4-height: 297mm;
+  --letter-width: 8.5in;
+  --letter-height: 11in;
 }
 
 .button {
@@ -253,6 +257,10 @@
   /* Slightly darker thumb on hover for visual feedback */
 }
 
+/* .resume-page {
+  padding: 55px 45px 45px;
+} */
+
 /* Container for the entire resume header */
 .resume-header {
   display: flex;
@@ -315,11 +323,11 @@
   /* padding: 20px; */
 }
 
-.section {
+/* .resume-page {
   padding: 20px;
-}
+} */
 
-.section h2 {
+.resume-page h2 {
   font-size: calc(var(--base-font-size) * 1.5);
   color: var(--theme-color);
   /* 蓝色标题 */
@@ -330,22 +338,22 @@
   font-family: "Times New Roman", Times, serif;
 }
 
-.section dl {
+.resume-page dl {
   display: flex;
 }
 
-.section dl,
-.section ul,
-.section p {
+.resume-page dl,
+.resume-page ul,
+.resume-page p {
   font-size: var(--base-font-size);
 }
 
-.section dl dt,
-.section dl dd:not(:last-child) {
+.resume-page dl dt,
+.resume-page dl dd:not(:last-child) {
   flex: 1;
 }
 
-.section ul {
+.resume-page ul {
   padding-left: 20px;
 }
 

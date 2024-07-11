@@ -12,6 +12,7 @@ export async function getServerSideProps(context) {
     dbFormData = await res.json();
   }
   // Pass data to the page via props
+  console.log(dbFormData);
   return { props: { dbFormData } }
 }
 
@@ -72,7 +73,7 @@ export default function Step1Page({ dbFormData }) {
 
   const uploadFile = async (file, additionalParams) => {
 
-    if (additionalParams.improved_user_id === '') {
+    if (!additionalParams.improved_user_id) {
       try {
         const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users', {
           method: 'POST',
@@ -131,7 +132,9 @@ export default function Step1Page({ dbFormData }) {
           clearInterval(fetchStatusInterval);
           const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/improved-users/${resumeId}/basicInformation`);
           const formData = await res.json();
-          setForm(formData.data);
+          if (formData.data) {
+            setForm(formData.data);
+          }
           console.log("resume analysis complete");
           console.log(formData);
           setLoading(false);
