@@ -41,8 +41,8 @@ DB_NAME = "airesumedb"
 COLLECTION_NAME = "resumeChats"
 COLLECTION_NAME_1 = "improvedUsers"
 COLLECTION_NAME_2 = "resumeAudios"
-client = MongoClient(MONGODB_URL)
-db = client[DB_NAME]
+client_1 = MongoClient(MONGODB_URL)
+db = client_1[DB_NAME]
 collection = db[COLLECTION_NAME]
 collection_1 = db[COLLECTION_NAME_1]
 collection_2 = db[COLLECTION_NAME_2]
@@ -409,7 +409,7 @@ def update_mongodb(chat_id, new_question, resume_id, updated_json):
 
 
 def close_mongodb():
-    client.close()
+    client_1.close()
 
 
 
