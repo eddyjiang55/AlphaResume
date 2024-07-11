@@ -80,7 +80,10 @@ export default function Step10Page({ dbFormData }) {
               </div>
             ))}
           </div>
-          <div className="mx-auto w-fit">
+          <div className="w-full max-w-[75%] flex flex-row justify-center items-center gap-x-12 mx-auto">
+            <Link href={`/resume/fill-info-step9?id=${dbFormData._id}`}><button className="form-b" type="button" >
+              上一步
+            </button></Link>
             <button className='form-b' type="button" onClick={handleSubmit} disabled={selectedImage === ''}>生成简历</button>
           </div>
         </div>

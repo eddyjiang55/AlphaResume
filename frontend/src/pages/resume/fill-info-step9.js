@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
+
 import { fetchPartData } from '@/utils/fetchResumePartData';
 import SaveToast from '@/components/Toast/SaveToast';
 import { step9Tips } from '@/lib/tips';
+import Link from 'next/link';
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
@@ -286,6 +288,9 @@ export default function Step10Page({ dbFormData }) {
             </button>
           </div>
           <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
+            <Link href={`/resume/fill-info-step8?id=${dbFormData._id}`}><button className="form-b" type="button" >
+              上一步
+            </button></Link>
             <button className="form-b" onClick={handleSave}>保存</button>
             <button className="form-b" type="button" onClick={handleSubmit}>
               下一步
