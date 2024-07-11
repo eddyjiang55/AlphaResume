@@ -1,24 +1,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-<<<<<<< HEAD:frontend/src/pages/fill-info-step4.js
-<<<<<<< Updated upstream:frontend/src/pages/fill-info-step4.js
-import Navbar from '../components/navbar';
-import ResumeNavbar from "../components/resume-navbar";
-import { step4Tips } from '../lib/tips';
-import { extractDateRange, fetchPartData } from '../utils/fetchResumePartData';
-import SaveToast from '../components/Toast/SaveToast';
-=======
+
 import { step4Tips } from '@/lib/tips';
 import { extractDateRange, fetchPartData } from '@/utils/fetchResumePartData';
 import SaveToast from '@/components/Toast/SaveToast';
 import Link from 'next/link';
->>>>>>> Stashed changes:frontend/src/pages/resume/fill-info-step4.js
-=======
-import { step4Tips } from '@/lib/tips';
-import { extractDateRange, fetchPartData } from '@/utils/fetchResumePartData';
-import SaveToast from '@/components/Toast/SaveToast';
->>>>>>> e03e4d3935c0164da6460473b509f952b11adaa1:frontend/src/pages/resume/fill-info-step4.js
 
 export async function getServerSideProps(context) {
   let dbFormData = {};

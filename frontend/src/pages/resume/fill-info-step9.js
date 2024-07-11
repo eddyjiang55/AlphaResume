@@ -1,23 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
-<<<<<<< HEAD:frontend/src/pages/fill-info-step9.js
-<<<<<<< Updated upstream:frontend/src/pages/fill-info-step9.js
-import Navbar from '../components/navbar';
-import ResumeNavbar from "../components/resume-navbar";
-import { fetchPartData } from '../utils/fetchResumePartData';
-import SaveToast from '../components/Toast/SaveToast';
-import { step9Tips } from '../lib/tips';
-=======
+
 import { fetchPartData } from '@/utils/fetchResumePartData';
 import SaveToast from '@/components/Toast/SaveToast';
 import { step9Tips } from '@/lib/tips';
 import Link from 'next/link';
->>>>>>> Stashed changes:frontend/src/pages/resume/fill-info-step9.js
-=======
-import { fetchPartData } from '@/utils/fetchResumePartData';
-import SaveToast from '@/components/Toast/SaveToast';
-import { step9Tips } from '@/lib/tips';
->>>>>>> e03e4d3935c0164da6460473b509f952b11adaa1:frontend/src/pages/resume/fill-info-step9.js
 
 export async function getServerSideProps(context) {
   let dbFormData = {};
