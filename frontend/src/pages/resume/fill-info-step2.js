@@ -33,6 +33,7 @@ export default function Step2Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'personalEvaluation',
         data: formData,
+        page: 2,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -64,6 +65,7 @@ export default function Step2Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'personalEvaluation',
         data: formData,
+        page: 2,
       }),
       headers: {
         'Content-Type': 'application/json',

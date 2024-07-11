@@ -111,7 +111,8 @@ export default function step4Page({ dbFormData }) {
       body: JSON.stringify({
         id: dbFormData._id,
         type: 'professionalExperience',
-        data: translatedData
+        data: translatedData,
+        page: 4,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -150,7 +151,8 @@ export default function step4Page({ dbFormData }) {
       body: JSON.stringify({
         id: dbFormData._id,
         type: 'professionalExperience',
-        data: translatedData
+        data: translatedData,
+        page: 4,
       }),
       headers: {
         'Content-Type': 'application/json',

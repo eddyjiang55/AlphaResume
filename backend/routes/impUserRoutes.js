@@ -59,6 +59,22 @@ router.get('/improved-users/:_id', async (req, res) => {
     }
 });
 
+router.get('/improved-users/:_id/meta-data', async (req, res) => {
+    try {
+        const resumeRecord = await ImprovedUser.findById(req.params._id);
+        if (!resumeRecord) {
+            return res.status(404).json({ message: 'Resume record not found' });
+        }
+        const title = resumeRecord.personal_data['基本信息']['title'];
+
+        // 返回用户信息
+        res.status(200).json({ _id: resumeRecord._id, resumeId: resumeRecord.resumeId, page: resumeRecord.page, title: title, updatedAt: resumeRecord.updatedAt });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to retrieve user', error: error.toString() });
+    }
+});
+
 
 // 根据ID和类型查询用户的特定信息
 router.get('/improved-users/:_id/:type', async (req, res) => {
@@ -67,7 +83,7 @@ router.get('/improved-users/:_id/:type', async (req, res) => {
         //console.log(`Received type: ${type}`);
         const chineseType = typeToChinese[type]; // 获得中文字段名
         //console.log(`Mapped chineseType: ${chineseType}`);
-        
+
         if (!chineseType) {
             return res.status(400).json({ message: "Invalid type specified" });
         }
@@ -168,7 +184,7 @@ router.post('/save-data', async (req, res) => {
 
         // 添加page的更新
         if (page !== undefined) {
-            updatePath['page'] = page;
+            await ImprovedUser.updatePage(id, page );
         }
 
         // 更新数据库记录
@@ -187,31 +203,38 @@ router.post('/save-data', async (req, res) => {
 
 // 生成简历并保存到ResumeHistory
 router.post('/improved-users/generate-resume', async (req, res) => {
-    const { id } = req.body;
-    console.log('Generating resume for user:', id);
+    const { id, phoneNumber } = req.body;
+
     try {
         const userRecord = await ImprovedUser.findById(id);
         if (!userRecord) {
             return res.status(404).json({ message: 'ImprovedUser not found' });
         }
 
-        const account = await Account.findByPhoneNumber(userRecord.personal_data.基本信息.手机号码);
+        const account = await Account.findByPhoneNumber(phoneNumber);
         if (!account) {
             return res.status(404).json({ message: 'Account not found' });
         }
 
         const createdAt = formatDate(new Date());
 
-        const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id], {
+        const title = userRecord.personal_data['基本信息']['title'];
+
+        const newResumeHistory = new ResumeHistory(
+            account._id,
+            createdAt,
+            title,
+        );
+        const resumeHistoryId = await newResumeHistory.save();
+        await ImprovedUser.updateResumeId(id, resumeHistoryId);
+
+        const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id, resumeHistoryId], {
             env: {
                 ...process.env,
             }
         });
         console.log('Python process spawned:', pythonProcess.pid);
         processResult[id] = { status: 'running', progress: 0 };
-
-        let markdownData = '';
-        let pdfData = '';
 
         pythonProcess.stdout.on('data', (data) => {
             const output = data.toString();
@@ -224,14 +247,6 @@ router.post('/improved-users/generate-resume', async (req, res) => {
                 processResult[id].progress = progressValue;
             }
 
-            // Collect markdown data and pdf data from the output
-            if (output.includes('MARKDOWN:')) {
-                markdownData += output.split('MARKDOWN:')[1];
-            }
-
-            if (output.includes('PDF:')) {
-                pdfData += output.split('PDF:')[1];
-            }
         });
 
         pythonProcess.stderr.on('data', (data) => {
@@ -241,17 +256,6 @@ router.post('/improved-users/generate-resume', async (req, res) => {
         pythonProcess.on('close', async (code) => {
             console.log(`child process exited with code ${code}`);
             processResult[id].status = 'done';
-
-            const newResumeHistory = new ResumeHistory(
-                account._id,
-                createdAt,
-                pdfData,
-                markdownData
-            );
-            const resumeHistoryId = await newResumeHistory.save();
-
-            // 将 resumeHistoryId 关联到 ImprovedUser
-            await ImprovedUser.update(id, { resumeId: resumeHistoryId });
 
             res.status(200).json({ message: "Resume generation completed", resumeHistoryId });
         });
@@ -282,11 +286,19 @@ router.post('/improved-users/markdown', async (req, res) => {
         if (!record) {
             return res.status(404).send({ message: "User not found" });
         }
-        const markdown = record.improved_cv_md;
-        if (!markdown) {
-            return res.status(404).send({ message: "Markdown data not found for the user" });
+        console.log(record);
+        const resumeId = record.resumeId;
+        if (!resumeId) {
+            return res.status(404).send({ message: "resumeId not found for the user" });
         }
-        res.type('text/markdown').status(200).send(markdown);
+        console.log(resumeId);
+        const resumeRecord = await ResumeHistory.findById(resumeId);
+        if (!resumeRecord) {
+            return res.status(404).send({ message: "Resume record not found" });
+        }
+        const markdown = resumeRecord.markdownData;
+
+        res.type('text/markdown').status(200).send(markdown);  
     } catch (error) {
         console.error('Failed to retrieve user data:', error);
         res.status(500).send({ message: "Server error while retrieving data" });

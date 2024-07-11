@@ -145,6 +145,7 @@ export default function Step6Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'awardsAndCertificates',
         data: { 获奖: translatedAwardFormData },
+        page: 6,
       }),
     })
     const translatedCertificateFormData = certificateFormData.map((data) => {
@@ -212,6 +213,7 @@ export default function Step6Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'awardsAndCertificates',
         data: { 获奖: translatedAwardFormData },
+        page: 6,
       }),
     })
       .then(response => response.json())

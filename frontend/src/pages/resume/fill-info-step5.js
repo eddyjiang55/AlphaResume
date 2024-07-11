@@ -116,7 +116,8 @@ export default function Step5Page({ dbFormData }) {
       body: JSON.stringify({
         id: dbFormData._id,
         type: 'projectExperience',
-        data: translatedData
+        data: translatedData,
+        page: 5,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -167,7 +168,8 @@ export default function Step5Page({ dbFormData }) {
       body: JSON.stringify({
         id: dbFormData._id,
         type: 'projectExperience',
-        data: translatedData
+        data: translatedData,
+        page: 5,
       }),
       headers: {
         'Content-Type': 'application/json',

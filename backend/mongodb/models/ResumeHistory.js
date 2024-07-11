@@ -6,6 +6,7 @@ class ResumeHistory {
         this._id = id || uuidv4();
         this.account = account;
         this.createdAt = createdAt;
+        this.title = title;
         this.pdfData = pdfData; // Storing PDF file data
         this.markdownData = markdownData; // Storing converted Markdown data
         this.position = position;

@@ -125,6 +125,7 @@ export default function Step7Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'researchPapersAndPatents',
         data: { "科研论文": translatedPaperFormData },
+        page: 7,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -189,6 +190,7 @@ export default function Step7Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'researchPapersAndPatents',
         data: { "科研论文": translatedPaperFormData },
+        page: 7,
       }),
       headers: {
         'Content-Type': 'application/json',
