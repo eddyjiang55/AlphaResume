@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const JobInformation = require('../mongodb/models/JobInformation'); // 确保路径正确
 const { spawn } = require('child_process');
+const { connect } = require('../mongodb/dbconfig'); // 确保路径正确
 const path = require('path');
 
 // 添加新的职位信息
@@ -109,4 +110,16 @@ router.post('/job-information/match', async (req, res) => {
     }
 });
 
+// 提取所有的岗位名称
+router.get('/job-titles', async (req, res) => {
+    try {
+        const db = await connect();
+        const collection = db.collection('jobInformation');
+        const jobTitles = await collection.distinct('岗位名称');
+        res.status(200).json(jobTitles);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: '获取岗位名称时出错', error: error.toString() });
+    }
+});
 module.exports = router;
