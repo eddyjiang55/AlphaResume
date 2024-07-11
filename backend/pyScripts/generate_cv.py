@@ -17,7 +17,8 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 dashscope.api_key='sk-3c43423c9fee4af8928fd8bc647291ee'
 
 userId = sys.argv[1]
-print(userId, flush=True)
+resumeHistoryId = sys.argv[2]
+# print(userId, flush=True)
 
 # get database
 # load_dotenv()
@@ -98,13 +99,13 @@ md_simple = re.sub(r'```','',md_simple)
 #     "_id": '6621e0f77b5f95efede7b4fc'
 # }
 
-feedback_cv = {
-    "improved_cv_md" : md_simple,
-    "improved_cv_json": improved_cv_json,
-    "resumeId" : 'improved_resume_4',
-    "_id": userId
-}
+# feedback_cv = {
+#     "improved_cv_md" : md_simple,
+#     "improved_cv_json": improved_cv_json,
+#     "resumeId" : resumeHistoryId,
+#     "_id": userId
+# }
 
-ut.send_cv_to_mongodb(db, feedback_cv)
+ut.send_cv_to_mongodb(db, md_simple, resumeHistoryId)
 print(f'PROGRESS: {100}', flush=True)
 print('generate and send resume successfully!')

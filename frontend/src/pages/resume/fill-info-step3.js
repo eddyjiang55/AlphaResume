@@ -125,6 +125,7 @@ export default function Step3Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'educationHistory',
         data: translatedData,
+        page: 3,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -177,6 +178,7 @@ export default function Step3Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'educationHistory',
         data: translatedData,
+        page: 3,
       }),
       headers: {
         'Content-Type': 'application/json',

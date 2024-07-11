@@ -1,6 +1,7 @@
 import { useState } from 'react'; // Import useState here
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
+import { useSelector } from 'react-redux';
 
 export async function getServerSideProps(context) {
   let dbFormData = { _id: context.query.id };
@@ -30,7 +31,7 @@ export async function getServerSideProps(context) {
 
 export default function Step10Page({ dbFormData }) {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
-
+  const User = useSelector((state) => state.user);
   const [selectedImage, setSelectedImage] = useState('');
   const images = [
     '/img/result-1.jpg',
@@ -41,20 +42,17 @@ export default function Step10Page({ dbFormData }) {
 
   const handleSubmit = async () => {
     // Save the selected image to the database
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users/generate-resume', {
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users/generate-resume', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         id: dbFormData._id,
+        phoneNumber: User.phoneNumber,
       })
     });
-    if (response.status === 200) {
-      router.push('/resume/generated-resume?id=' + dbFormData._id);
-    } else {
-      alert('Failed to generate resume');
-    }
+    router.push('/resume/generated-resume?id=' + dbFormData._id);
     // Redirect to the next page
     // router.push('/generate-resume');
   }
@@ -84,7 +82,7 @@ export default function Step10Page({ dbFormData }) {
             <Link href={`/resume/fill-info-step9?id=${dbFormData._id}`}><button className="form-b" type="button" >
               上一步
             </button></Link>
-            <button className='form-b' type="button" onClick={handleSubmit} disabled={selectedImage === ''}>生成简历</button>
+            <button className='form-b disabled:bg-gray-500 disabled:cursor-not-allowed' type="button" onClick={handleSubmit} disabled={selectedImage === ''}>生成简历</button>
           </div>
         </div>
         <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch gap-y-8 px-6 py-8 overflow-y-auto'>

@@ -77,6 +77,7 @@ export default function Step8Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'skills',
         data: translatedSkillFormData,
+        page: 8,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -120,6 +121,7 @@ export default function Step8Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'skills',
         data: translatedSkillFormData,
+        page: 8,
       }),
       headers: {
         'Content-Type': 'application/json',

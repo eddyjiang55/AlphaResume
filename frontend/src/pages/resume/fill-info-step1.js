@@ -222,6 +222,7 @@ export default function Step1Page({ dbFormData }) {
         id: currentResumeId,
         type: 'basicInformation',
         data: form,
+        page: 1,
       }),
     })
       .then(response => response.json())
@@ -273,6 +274,7 @@ export default function Step1Page({ dbFormData }) {
         id: currentResumeId,
         type: 'basicInformation',
         data: form,
+        page: 1,
       }),
     })
 

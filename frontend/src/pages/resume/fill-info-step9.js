@@ -81,6 +81,7 @@ export default function Step10Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'languages',
         data: translatedLanguageFormData,
+        page: 9,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -126,6 +127,7 @@ export default function Step10Page({ dbFormData }) {
         id: dbFormData._id,
         type: 'languages',
         data: translatedLanguageFormData,
+        page: 9,
       }),
       headers: {
         'Content-Type': 'application/json',

@@ -56,6 +56,20 @@ class ImprovedUser {
         return result;
     }
 
+    static async updatePage(_id, page) {
+        const db = await connect();
+        const collection = db.collection('improvedUsers');
+        const result = await collection.updateOne({ _id }, { $set: { page } });
+        return result;
+    }
+
+    static async updateResumeId(_id, resumeId) {
+        const db = await connect();
+        const collection = db.collection('improvedUsers');
+        const result = await collection.updateOne({ _id }, { $set: { resumeId } });
+        return result;
+    }
+
     static async delete(improvedUserId, phoneNumber) {
         const db = await connect();
         const collection = db.collection('improvedUsers');

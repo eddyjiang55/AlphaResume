@@ -49,19 +49,16 @@ def split_cv_into_twoparts(improved_cv_json):
             second_cv_json[key] = value
     return (first_cv_json, second_cv_json)
 
-def send_cv_to_mongodb(db, insert_data):
-    collection_name = "improvedUsers"
+def send_cv_to_mongodb(db, markdownData, resumeHistoryId):
+    collection_name = "resumeHistories"
     collection = db[collection_name]
-    record_id = insert_data.pop('_id', None)
-    
-    if record_id is None:
-        return 'Error: No _id provided in update data.'
+
     # try:
     #     record_id = ObjectId(record_id)
     # except InvalidId:
     #     return 'Error: Invalid _id format.'
 
-    result = collection.update_one({'_id': record_id}, {'$set': insert_data})
+    result = collection.update_one({'_id': resumeHistoryId}, {'$set': {'markdownData': markdownData}})
     
     if result.matched_count == 0:
         return 'No record found with the specified _id.'
