@@ -1,23 +1,9 @@
-import base64
-import hashlib
-import hmac
-import json
-import os
-import time
-import requests
-import urllib
-
-lfasr_host = 'https://raasr.xfyun.cn/v2/api'
-# 请求的接口名
-api_upload = '/upload'
-api_get_result = '/getResult'
-
-
 class RequestApi(object):
-    def __init__(self, appid, secret_key, upload_file_path):
+    def __init__(self, appid, secret_key, upload_file_path=None, audio_data=None):
         self.appid = appid
         self.secret_key = secret_key
         self.upload_file_path = upload_file_path
+        self.audio_data = audio_data
         self.ts = str(int(time.time()))
         self.signa = self.get_signa()
 
@@ -35,30 +21,42 @@ class RequestApi(object):
         return signa
 
     def upload(self):
-        upload_file_path = self.upload_file_path
-        # upload_file_path is already a wav base64 string
-        file_len = len(upload_file_path)
+        if self.audio_data:
+            # 如果直接传入了音频数据
+            data = self.audio_data
+            file_len = len(data)
+            file_name = "audio_data.wav"  # 可以是任意名称
+        else:
+            # 如果传入了文件路径
+            upload_file_path = self.upload_file_path
+            file_len = os.path.getsize(upload_file_path)
+            file_name = os.path.basename(upload_file_path)
+            data = open(upload_file_path, 'rb').read(file_len)
 
-        param_dict = {}
-        param_dict['appId'] = self.appid
-        param_dict['signa'] = self.signa
-        param_dict['ts'] = self.ts
-        param_dict["duration"] = "200"
+        param_dict = {
+            'appId': self.appid,
+            'signa': self.signa,
+            'ts': self.ts,
+            "fileSize": file_len,
+            "fileName": file_name,
+            "duration": "200"
+        }
 
         response = requests.post(url=lfasr_host + api_upload + "?" + urllib.parse.urlencode(param_dict),
-                                 headers={"Content-type": "application/json"}, data=upload_file_path)
+                                 headers={"Content-type": "application/json"}, data=data)
         result = json.loads(response.text)
         return result
 
     def get_result(self):
         uploadresp = self.upload()
         orderId = uploadresp['content']['orderId']
-        param_dict = {}
-        param_dict['appId'] = self.appid
-        param_dict['signa'] = self.signa
-        param_dict['ts'] = self.ts
-        param_dict['orderId'] = orderId
-        param_dict['resultType'] = "transfer,predict"
+        param_dict = {
+            'appId': self.appid,
+            'signa': self.signa,
+            'ts': self.ts,
+            'orderId': orderId,
+            'resultType': "transfer,predict"
+        }
         status = 3
         # 建议使用回调的方式查询结果，查询接口有请求频率限制
         while status == 3:
@@ -81,15 +79,4 @@ class RequestApi(object):
             for word in ws_list:
                 concatenated_text += word['cw'][0]['w']
 
-
         return concatenated_text
-
-
-# 输入讯飞开放平台的appid，secret_key和待转写的文件路径
-if __name__ == '__main__':
-    api = RequestApi(appid="80922260",
-                     secret_key="84268ea312aee377ace0b8468633bd0a",
-                     upload_file_path=r"test1-1.wav")
-
-    result = api.get_result()
-    print(result)
