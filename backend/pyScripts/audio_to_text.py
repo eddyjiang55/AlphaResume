@@ -1,3 +1,4 @@
+import time
 class RequestApi(object):
     def __init__(self, appid, secret_key, upload_file_path=None, audio_data=None):
         self.appid = appid
