@@ -151,17 +151,17 @@ def get_chat_from_mongodb(chat_id, resume_id):
     # 查询特定用户的聊天记录
     chat_record = collection.find_one({"_id": chat_id})
     user_record = collection_1.find_one({"_id": resume_id})
-
+    #print(user_record)
     chat_messages = chat_record['messages']
 
     standard_json = user_record['personal_data']
-
+    print(standard_json);
     # 获取最后一条消息. 格式是mock_qa.json里的格式
     last_message = chat_messages[-1]
 
     section_id = chat_record['sectionId']
 
-    print(last_message)
+    #print(last_message)
 
     last_answer = last_message['answer']
     # check if it is an id, ie, no chinese characters
@@ -180,7 +180,8 @@ def get_chat_from_mongodb(chat_id, resume_id):
                 api = audio_to_text.RequestApi(
                     appid="80922260",
                     secret_key="84268ea312aee377ace0b8468633bd0a",
-                    upload_file_path=audio_record['audio']
+                    upload_file_path=None,
+                    audio_data=audio_data
                 )
                 result = api.get_result()
                 last_message['answer'] = result
@@ -430,4 +431,3 @@ new_query = process_asking(json_update, section_id, standard_json)
 update_mongodb(chatId, new_query, resumeId, json_update)
 close_mongodb()
 print(new_query)
-
