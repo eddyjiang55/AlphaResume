@@ -1,7 +1,6 @@
 import json
 from http import HTTPStatus
 import dashscope
-import time
 import base64
 import hashlib
 import hmac
@@ -13,10 +12,18 @@ import urllib
 import audio_to_text
 from volcenginesdkarkruntime import Ark
 import re
+from pymongo import MongoClient
+import sys
+import io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 base_url = "https://ark.cn-beijing.volces.com/api/v3"
 ak = "AKLTZWQ4ODVhYTE4MmY4NDA1NTg3ZWNlZmY5YWJiMTQ1MDU"
 sk = "WlRrMFpETmxPVEZqTVRBM05EazBZemd4TURZeFpEbG1Oell4T1RGaFltSQ=="
+
+print("server started", flush=True)
 
 model = "ep-20240703000957-s4rjp"
 client = Ark(
@@ -30,17 +37,12 @@ lfasr_host = 'https://raasr.xfyun.cn/v2/api'
 # 请求的接口名
 api_upload = '/upload'
 api_get_result = '/getResult'
-from pymongo import MongoClient
-import sys
-import io
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 MONGODB_URL = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mongodb.net/?retryWrites=true&w=majority&appName=AIResume"
 DB_NAME = "airesumedb"
 COLLECTION_NAME = "resumeChats"
 COLLECTION_NAME_1 = "improvedUsers"
-COLLECTION_NAME_2 = "resumeAudios"
+COLLECTION_NAME_2 = "resumeAudio"
 client_1 = MongoClient(MONGODB_URL)
 db = client_1[DB_NAME]
 collection = db[COLLECTION_NAME]
@@ -48,7 +50,7 @@ collection_1 = db[COLLECTION_NAME_1]
 collection_2 = db[COLLECTION_NAME_2]
 
 priority = {
-    "基础信息": {
+    "基本信息": {
         "简历标题": "简历标题",
         "姓名": "姓名",
         "手机号码": "手机号码",
@@ -170,13 +172,14 @@ def get_chat_from_mongodb(chat_id, resume_id):
 
     section_id = chat_record['sectionId']
 
-    print(last_message)
+    print(last_message, flush=True)
 
     last_answer = last_message['answer']
     # check if it is an id, ie, no chinese characters
     try:
         if is_valid_uuid(last_answer):
             audio_id = last_answer
+            print(audio_id, flush=True)
             audio_record = collection_2.find_one({"_id": audio_id})
 
             if audio_record is None:
@@ -313,7 +316,7 @@ def process_asking(json_data, section_id, standard_json):
     if section_id == 11:
         return "您的简历已经填写完毕。"
     bool_check = check_if_initial(json_data, section_id)
-    print(bool_check)
+    print(bool_check, flush=True)
     if bool_check: # if the section is already filled
         section_id += 1
         if section_id == 11:
@@ -327,8 +330,8 @@ def process_asking(json_data, section_id, standard_json):
     else:
         # not the initial question, get the json chat data from json
         current_key, section_new = find_all_empty(standard_json, json_data, section_id)
-        print(current_key)
-        print(section_id)
+        print(current_key, flush=True)
+        print(section_id, flush=True)
         new_question = ask_new_question(section_new, keys_list[section_id], section_id, current_key)
         return new_question
 
@@ -389,18 +392,18 @@ def update_mongodb(chat_id, new_question, resume_id, updated_json):
             {"$push": {"messages": new_message}}
         )
 
-        print(json.dumps({"status": "success", "id": messages_length + 1, "message": new_message}))
+        print(json.dumps({"status": "success", "id": messages_length + 1, "message": new_message}), flush=True)
     else:
-        print(json.dumps({"status": "error", "message": "Chat record not found"}))
+        print(json.dumps({"status": "error", "message": "Chat record not found"}), flush=True)
 
     if resume_record:
         collection_1.update_one(
             {"_id": resume_id},
             {"$set": {"personal_data": updated_json}}
         )
-        print(json.dumps({"status": "success", "message": "Resume record updated"}))
+        print(json.dumps({"status": "success", "message": "Resume record updated"}), flush=True)
     else:
-        print(json.dumps({"status": "error", "message": "Resume record not found"}))
+        print(json.dumps({"status": "error", "message": "Resume record not found"}), flush=True)
 
 
 
@@ -425,5 +428,5 @@ json_update = extract_json(json_update)
 new_query = process_asking(json_update, section_id, standard_json)
 update_mongodb(chatId, new_query, resumeId, json_update)
 close_mongodb()
-print(new_query)
+print(new_query, flush=True)
 
