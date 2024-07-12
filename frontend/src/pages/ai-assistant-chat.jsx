@@ -43,7 +43,7 @@ export async function getServerSideProps(context) {
           { text: message.question, id: index, sender: "bot", type: "text" },
         ];
         if (message.answer) {
-          messages.push({ text: message.answer, id: index, sender: "user" });
+          messages.push({ text: message.answer, id: index, sender: "user", type: message.answer_type});
         }
         return messages;
       })
