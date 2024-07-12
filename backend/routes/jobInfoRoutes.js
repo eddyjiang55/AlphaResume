@@ -18,15 +18,36 @@ router.post('/job-information', async (req, res) => {
     }
 });
 
-// 根据ID查找职位信息
-router.get('/job-information/:id', async (req, res) => {
+// // 根据ID查找职位信息
+// router.get('/job-information/:id', async (req, res) => {
+//     try {
+//         const id = req.params.id;
+//         const jobInfo = await JobInformation.findById(id);
+//         if (jobInfo) {
+//             res.status(200).json(jobInfo);
+//         } else {
+//             res.status(404).json({ message: '未找到职位信息' });
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: '查询职位信息时出错', error: error.toString() });
+//     }
+// });
+
+
+// 根据岗位名称查找职位信息
+router.get('/job-information/:position', async (req, res) => {
+    console.log("调用了接口");
     try {
-        const id = req.params.id;
-        const jobInfo = await JobInformation.findById(id);
+        // console.log("进入try语句");
+        const position = req.params.position;
+        // console.log(`接收到的岗位名称: ${position}`);
+        const jobInfo = await JobInformation.findByPosition(position);
+        // console.log('岗位信息：${jobInfo}');
         if (jobInfo) {
             res.status(200).json(jobInfo);
         } else {
-            res.status(404).json({ message: '未找到职位信息' });
+            res.status(404).json({ message: '1未找到职位信息' });
         }
     } catch (error) {
         console.error(error);
