@@ -21,12 +21,14 @@ resumeHistoryId = sys.argv[2]
 # print(userId, flush=True)
 
 # apply_position 需要修改为前端填入的应聘岗位字符串
-apply_position = '软件工程师'
+# apply_position = '软件工程师'
+apply_position = sys.argv[3]
+print(apply_position, flush=True)
 # template 目前数据库中只有一个模板，故这里是固定id，后期完成模板功能后需修改为前端用户选择id
 template_id = '9b7ba048-9cdb-49d0-8160-af05a0ef0658'
 
 # get original personal cv json
-personal_json = ut.get_personal_information(userId)
+personal_json = ut.get_personal_cv(userId)
 print(f'PROGRESS: {10}', flush=True)
 
 # get job imformation josn

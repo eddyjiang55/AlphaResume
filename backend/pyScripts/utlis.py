@@ -73,9 +73,9 @@ def get_resume_templateNull(template_id):
 
 def get_improved_cv_json(personal_cv, job_information, guidence):
     target_list = ["项目经历","技能","科研论文与知识产权"]
-    notarget_list = ['基础信息','教育经历',"获奖与证书","语言"]
+    notarget_list = ['基本信息','教育经历',"获奖与证书","语言"]
     keywords_target_list = ["职业经历"]
-    cv_key_order = ['基础信息','教育经历','职业经历','项目经历','科研论文与知识产权','技能','获奖与证书','语言']
+    cv_key_order = ['基本信息','教育经历','职业经历','项目经历','科研论文与知识产权','技能','获奖与证书','语言']
     improved_cv_json = {}
     for key in cv_key_order:
         if key in notarget_list:
@@ -102,8 +102,20 @@ def split_cv_into_twoparts(improved_cv_json):
     
     return (first_cv_json, second_cv_json)
 
-def sent_cv_to_mongodb(db, insert_data): # usr's id and job's id
-    collection_name = "improvedUsers"
+def send_cv_to_mongodb(db, markdownData, resumeHistoryId):
+    collection_name = "resumeHistories"
     collection = db[collection_name]
-    result = collection.insert_one(insert_data)
-    return 'Insert successfully!'
+
+    # try:
+    #     record_id = ObjectId(record_id)
+    # except InvalidId:
+    #     return 'Error: Invalid _id format.'
+
+    result = collection.update_one({'_id': resumeHistoryId}, {'$set': {'markdownData': markdownData}})
+
+    if result.matched_count == 0:
+        return 'No record found with the specified _id.'
+    elif result.modified_count == 0:
+        return 'No changes were made to the existing record.'
+    else:
+        return 'Update successfully!'
