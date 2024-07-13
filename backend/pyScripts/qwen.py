@@ -3,7 +3,7 @@ from http import HTTPStatus
 import dashscope
 import time
 import ast
-import utilis as ut
+import utlis as ut
 
 def get_most_similar_position(apply_position, similarity_threshold):
     positions_list = ut.get_positions_list()
