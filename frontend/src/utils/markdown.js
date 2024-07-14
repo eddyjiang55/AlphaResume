@@ -98,36 +98,36 @@ const resolveDeflist = (html) => {
   return html;
 };
 
-const formatResume = (html) => {
-  html = resolveDeflist(html);
+// const formatResume = (html) => {
+//   html = resolveDeflist(html);
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
+//   const parser = new DOMParser();
+//   const doc = parser.parseFromString(html, 'text/html');
 
-  const sections = doc.querySelectorAll('h2');
-  let formattedHtml = '';
+//   const sections = doc.querySelectorAll('h2');
+//   let formattedHtml = '';
 
-  sections.forEach(section => {
-    section.classList.add('theme-title');
-    const sectionTitleText = section.textContent.trim().toLowerCase().replace(/\s+/g, '-');
-    const sectionDiv = document.createElement('div');
-    sectionDiv.classList.add('section');
-    sectionDiv.id = `${sectionTitleText}-section`;
+//   sections.forEach(section => {
+//     section.classList.add('theme-title');
+//     const sectionTitleText = section.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+//     const sectionDiv = document.createElement('div');
+//     sectionDiv.classList.add('section');
+//     sectionDiv.id = `${sectionTitleText}-section`;
 
-    const sectionTitle = section.outerHTML;
-    sectionDiv.innerHTML = sectionTitle;
-    // console.log(sectionDiv);
-    let sibling = section.nextElementSibling;
-    while (sibling && sibling.tagName !== 'H2') {
-      sectionDiv.innerHTML += sibling.outerHTML;
-      sibling = sibling.nextElementSibling;
-    }
+//     const sectionTitle = section.outerHTML;
+//     sectionDiv.innerHTML = sectionTitle;
+//     // console.log(sectionDiv);
+//     let sibling = section.nextElementSibling;
+//     while (sibling && sibling.tagName !== 'H2') {
+//       sectionDiv.innerHTML += sibling.outerHTML;
+//       sibling = sibling.nextElementSibling;
+//     }
 
-    formattedHtml += sectionDiv.outerHTML;
-  });
+//     formattedHtml += sectionDiv.outerHTML;
+//   });
 
-  return formattedHtml;
-};
+//   return formattedHtml;
+// };
 
 const resolveHeader = (html, frontmatter) => {
   let header = "";
@@ -157,6 +157,12 @@ const resolveHeader = (html, frontmatter) => {
   return `<div class="resume-header">${header}</div>` + html;
 };
 
+function convertBoldMarkdownToHTML(html) {
+  const boldRegex = /\*\*(.*?)\*\*/g;
+  return html.replace(boldRegex, '<strong>$1</strong>');
+}
+
+
 export const renderMarkdown = (md) => {
   // console.log(md);
   const preprocessedMd = preprocessMarkdown(md);
@@ -166,6 +172,7 @@ export const renderMarkdown = (md) => {
   let html = markdown.render(body);
   // console.log(html);
   // html = formatResume(html);
+  html = convertBoldMarkdownToHTML(html);
   // console.log(html);
   html = resolveHeader(html, attributes);
 

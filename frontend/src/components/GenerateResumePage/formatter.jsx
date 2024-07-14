@@ -6,11 +6,13 @@ const ResumeFormatter = ({
   handleChangePageSize,
   exportMarkdown,
   resumeTitle,
+  fontSize,
+  setFontSize,
 }) => {
   const [themeColor, setThemeColor] = useState("#000000");
   const [language, setLanguage] = useState("zh");
   const [font, setFont] = useState("微软雅黑");
-  const [fontSize, setFontSize] = useState(16);
+  // const [fontSize, setFontSize] = useState(15);
 
   const fontOptions = {
     zh: ["微软雅黑", "仿宋", "宋体", "黑体"],
@@ -32,13 +34,13 @@ const ResumeFormatter = ({
     document.documentElement.style.setProperty("--theme-color", themeColor);
   }, [themeColor]);
 
-  useEffect(() => {
-    // Change font size
-    document.documentElement.style.setProperty(
-      "--base-font-size",
-      `${fontSize}px`
-    );
-  }, [fontSize]);
+  // useEffect(() => {
+  //   // Change font size
+  //   document.documentElement.style.setProperty(
+  //     "--base-font-size",
+  //     `${fontSize}px`
+  //   );
+  // }, [fontSize]);
 
   useEffect(() => {
     // Change language
@@ -68,6 +70,38 @@ const ResumeFormatter = ({
     const exportContainer = document.querySelector(".resume-body");
     html2pdf().from(exportContainer).save(`${resumeTitle}.pdf`);
   };
+  // const exportPDF = () => {
+  //   console.log(resumeTitle);
+  //   if (resumeTitle === "") {
+  //     return;
+  //   }
+  
+  //   // Select all elements with the class name "resume-page"
+  //   const resumePages = document.querySelectorAll(".resume-page");
+    
+  //   // Create a container to combine all the resume pages
+  //   const combinedContent = document.createElement("div");
+  //   combinedContent.style.width = '100%'; // Ensure the container has the correct width
+  //   combinedContent.style.pageBreakAfter = 'always'; // Ensure each page breaks after each section
+    
+  //   // Clone and append each resume page to the combined content
+  //   resumePages.forEach(page => {
+  //     const pageClone = page.cloneNode(true);
+  //     combinedContent.appendChild(pageClone);
+  //   });
+  
+  //   // Append the combined content to the body to ensure styles are applied
+  //   document.body.appendChild(combinedContent);
+  
+  //   // Use html2pdf to convert the combined content to a PDF
+  //   html2pdf()
+  //     .from(combinedContent)
+  //     .save(`${resumeTitle}.pdf`)
+  //     .then(() => {
+  //       // Remove the combined content from the body after PDF generation
+  //       document.body.removeChild(combinedContent);
+  //     });
+  // };
 
   return (
     <>
