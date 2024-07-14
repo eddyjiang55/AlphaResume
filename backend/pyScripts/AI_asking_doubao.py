@@ -171,7 +171,7 @@ def get_chat_from_mongodb(chat_id, resume_id):
     last_message = chat_messages[-1]
 
     section_id = chat_record['sectionId']
-
+    print("last_message", flush=True)
     print(last_message, flush=True)
 
     last_answer = last_message['answer']
@@ -368,10 +368,10 @@ def extract_json(data_str):
             json_data = json.loads(json_str)
             return json_data
         except json.JSONDecodeError as e:
-            print("找到的字符串不是有效的 JSON。",e)
+            print("找到的字符串不是有效的 JSON。",e, flush=True)
             return None
     else:
-        print("没有找到符合 JSON 格式的内容。")
+        print("没有找到符合 JSON 格式的内容。", flush=True)
         return None
 
 
@@ -419,12 +419,20 @@ def close_mongodb():
 
 
 last_message, standard_json, section_id = get_chat_from_mongodb(chatId, resumeId)
+print("standard_json", flush=True)
+print(standard_json, flush=True)
 json_update = update_json(standard_json, last_message)
+print("json_update", flush=True)
+print(json_update, flush=True)
+time.sleep(3)
 json_update = re.sub(r"```json", '', json_update)
 json_update = re.sub(r"```", '', json_update)
 # json_update dtype: str
 # 只保留str最外层的两个{}之内的内容，删除其他内容
 json_update = extract_json(json_update)
+print("json_update after extract", flush=True)
+print(json_update, flush=True)
+time.sleep(3)
 new_query = process_asking(json_update, section_id, standard_json)
 update_mongodb(chatId, new_query, resumeId, json_update)
 close_mongodb()

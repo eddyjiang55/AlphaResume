@@ -271,7 +271,7 @@ def transform_chat_json(md_data):
 
 # 此处需要修改
 md_data = get_pdf_from_mongodb(resume_history_id)
-print(md_data)
+print(md_data, flush=True)
 # 去掉所有除了中文，英文，数字和'-', ' ', '.', '\n'之外的字符
 md_data = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9\- \n]', '', md_data)
 # save md_data to a file
@@ -298,12 +298,14 @@ def upload_standard_data_to_mongodb(json_data, improved_user_id, resume_history_
     db = client[database_name]
 
     collection = db[collection_name]
+    
+    print(json_data, flush=True)
 
-    collection.update_one({"_id": improved_user_id}, {'$set':{ resumeId: resume_history_id, "personal_data": json.loads(json_data)}})
+    collection.update_one({"_id": improved_user_id}, {'$set':{ "resumeId": resume_history_id, "personal_data": json.loads(json_data)}})
 
     # 关闭MongoDB连接
     client.close()
 
 
 upload_standard_data_to_mongodb(response, improved_user_id, resume_history_id)
-print(response)
+print(response, flush=True)
