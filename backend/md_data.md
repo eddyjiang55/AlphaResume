@@ -2,150 +2,92 @@
 
 
 
-Ruiqing Yu
+教育背景Education 
 
-217-974-0723leoyuruiqinggmailcomlinkedincominruiqingyu0237Leos Profolio
+201709-202106 吉林大学 农业机械化及其自动化       工学学士  成绩排名30 
 
-Education
+201809-202106 吉林大学 行政管理双学位     管理学学士 成绩排名10 
 
-University of Illinois Urbana-ChampaignChampaign IL
+实习经历Internship 
 
-Bachelor of Science Computer Science  StatisticsGPA 380Aug 2020 - May 2024
+202008-至今                                               安永咨询     咨询PTA 
 
+咨询PTA产品方向协劣项目组为一汽大众销售有限公司搭建BI数据可视化平台 
 
+需求调研深入销售公司各部门业务与各部门进行全维度的需求调研记彔访谈报告并输出可视化需求点
 
-Relevant Coursework  Data Structures Computer System System Programming Database Algorithm Web Development
+可视化系统设计确讣并对数据和指标值按场景分类选取展示形式设计页面布局并完成页面原型设计
 
-Cloud Development Machine Learning Algorithms  Models Statistical Learning NLP Distributed System Optimization
+202005-202007                               蔷薇控股股份有限公司大树金融   平台型产品经理 
 
-University of Illinois Urbana-ChampaignChampaign IL
+可信平台区块链事业部参与Baas应用层策略落地方案的制定与项目组从0到1搭建供应链金融产品 
 
-Master of Computer ScienceAug 2024 - Dec 2025
+后台架构搭建跟进青港二期项目落地业务场景负责全新面客端与后台系统的产品规划功能流程及原
 
-Technical Skills
+型设计实习期间独立接手4个功能模块撰写需求文档与详绅设计并成功通过企业客户方签字交付
 
-Programming Languages  Python JavaScript TypeScript Java CC SQL HTMLCSS Dart Golang
+协调沟通梳理接口文档并协调中台完成业务需求补充与开发测试UI多方沟通跟进设计与研发进度
 
-Framework  Nextjs Reactjs Vuejs Expressjs Flask Django Nodejs Flutter PyTorch TensorFlow TailwindCSS
+深度学习深度自学产融全流程业务相关知识与区块链技术的应用层落地方案能快速融入工作状态
 
-Databases  Tools  AWS S3EC2RDB Docker Redis MongoDB Redux Gunicorn Ngnix Git Celery NPM Vercel LLM
+202003-202005                                   小熊博望原百度国际化                                               产品运营 
 
-Experience
+百度国际化部门拆分独立公司北京小熊博望科技有限公司加入运营部负责海外社交直播类产品wemeet 
 
-Full Stack Developer InternJan 2023 - Present
+产品优化联劢印度市场工会资源制定数据标准对主播进行筛选根据控接通率进行内容侧优化
 
-AristAIChampaign IL
+竞品分析分析比较竞品在话术模块上的差异调整自身产品聊天功能上的话术引导提出场景化话术勾引方案
 
+最终将IM页订单接通率同比提升10以上
 
+201907-201909                沪江教育科技上海股份有限公司   项目运营 
 
-Product site  httpswwwaristaiio
+进入互计划项目团队负责乡村教育公益项目整合互联网教育资源开展乡村学生与乡村教师课程 
 
+用户增长积极开展To B合作与省市县教育局电教馆沟通完成9省21市69县14万名教师的报名
 
+数据分析分析每周参与教师的增长与留存对课程的运营提出优化意见并向省市教育局反馈工作文档
 
-Startup company developing an AI teaching assistant to improve students learning efficiency and reduce educators work
+用户粘性参与到课程预告的推送头图海报的制作当中通过社群运营大幅度提升公众号UVPV
 
+社会经历Item
 
+201908-201909                                    上海为新跨界平台 种子计划学员 
 
-Expanded our services to200customers by playing a key role in the startups growth and leading a motivated team
+通过网络筛选及现场面试941200参与到人才培养计划协劣艾瑞咨询完成95后洞察报告 
 
+用户调研负责95后群体在音视频领域的调研运用问卷深访焦点小组等方式调研用户音视频使用习惯收
 
+集有效样本1200余个通过整理分析独立完成调研报告的撰写
 
-Reduced33website rendering time by implementing Server-side rendering inNextjs
+商业化分析调研期间创新性地提出了音视频领域种草现象的发展趋势与变现研究面向企业发展角度提出
 
+商业化建议在终期汇报时得到嘉宾的高度赞赏并荣获第二名
 
 
-Optimized interaction response time by80by utilizing Edge Runtime in production
 
+荣誉技能Skills Certificate 
 
+东荣奖学金3                   校优秀学生干部4 学院本科生党支部书记               校学生会副主席 
 
-Enhanced service infrastructure to simultaneously accommodatehundreds ofrequests boosted capacity and reliability
+大学英语四六级CET-46良好的听说读写能力        全国大学生工科专业创新竞赛一等奖3 
 
+通过计算机二级考试熟练ExcelVlookup以及数据透视表     掌握AxureX-mind墨刀等产品设计软件 
 
+自我评价Self-assessment 
 
-Increased deployment speed by20by establishing comprehensive CICD pipelines incorporating testing and enforcing code
+深度互联网爱好者对互联网保持高度的敏感性和关注度逻辑性良好善亍归纳点状需求熟悉产品开发流程
 
-style linting
+有产品规划需求分析交互设计能力具有很强的同理心善亍沟通贴近用户希望做一个温暖而被需要的人 
 
-Software Engineer InternMay 2023 - Aug 2023
+个人信息Personal Info 
 
-AlphalioChina
+电    话188-4318-7541 
 
+邮    箱yangyn1817163com 
 
+政治面貌中共党员 
 
-Reduced38latency time by implementingRediscaching strategy in server enhancing user experience
+求职方向产品经理 
 
-
-
-Improved60application scalability by integratingCelerywithFlask enabling efficient asynchronous task processing
-
-
-
-Boosted multi-container app management efficiency by75throughDocker Composeimplementation
-
-Software Engineer InternJan 2023 - May 2023
-
-The Adaptive Cognition and Interaction Design ACTION LabChampaign IL
-
-
-
-Led a team of three people developing mobile applications usingFlutterandDart
-
-
-
-Optimized app performance by leveraging stateless Dart widgets achieving a30reduction in memory usage and enhanced
-
-responsiveness
-
-Projects
-
-OEASEhttpsgithubcomoeasenetJan 2024 - Present
-
-
-
-A new generation of high-performance club management systems and community networks for non-profit organizations
-
-
-
-Enhanced backend response and deployment efficiency usingGo Fiber
-
-
-
-Enhanced site speed by implementing code splitting and lazy loading inVuejs reducing initial load time by20
-
-AI Resume GeneratorhttpsgithubcomLeo-rq-yuAI
-
-R
-
-esume
-
-Dec 2023 - Present
-
-
-
-An AI-enhanced one-stop job application platform offering resume optimization mock interviews and one-click resume
-
-submission features
-
-
-
-Constructed a scalable server infrastructure usingExpressjs achieving improvements in request processing efficiency and
-
-reduced server response times
-
-
-
-Built an asynchronous task system inNodejsto ensure continuity in user experience
-
-ClassTranscribehttpsgithubcomclasstranscribe
-
-Aug 2023 - Present
-
-
-
-A new education video-based application developed at University of Illinois
-
-
-
-Reduced server processing and computational costs by80by embedding a large language model in the local server
-
-infrastructure
+杨宇宁 
