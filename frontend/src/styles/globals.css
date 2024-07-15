@@ -268,15 +268,15 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 20px;
+  padding: 20px 16px;
   border-bottom: 2px solid #ddd;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .resume-header h1 {
   width: 100%;
   font-size: calc(var(--base-font-size) * 2);
-  margin: 0 0 20px;
+  margin: 0 0 16px;
   color: var(--theme-color);
   font-family: "Times New Roman", Times, serif;
 }
@@ -334,7 +334,8 @@
   border-bottom: 1px solid var(--theme-color);
   /* 下划线 */
   padding-bottom: 5px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  margin-top: 6px;
   font-family: "Times New Roman", Times, serif;
 }
 
@@ -355,6 +356,10 @@
 
 .resume-page ul {
   padding-left: 20px;
+}
+
+.resume-page li {
+  font-size: var(--base-font-size);
 }
 
 /* Style for each education item */

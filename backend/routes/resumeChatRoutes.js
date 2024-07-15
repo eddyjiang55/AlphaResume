@@ -18,6 +18,7 @@ const pythonScriptPath = path.resolve(__dirname, '../pyScripts/AI_asking_method1
 router.post('/resume-chat', async (req, res) => {
     try {
         const { userAccount, messages } = req.body;
+        console.log(messages);
         const currentDate = getFormattedDate();
         const personal_data = {
             "基本信息": {
@@ -177,8 +178,8 @@ router.put('/resume-chat/:_id', async (req, res) => {
         const _id = req.params._id;
         const chatRecord = await ResumeChat.findById(_id);
         const resumeId = chatRecord.resumeId;
-        const { quesId, answer } = req.body; // Assume the new message is sent in the request body
-        await ResumeChat.addAnswer(_id, quesId, answer);
+        const { quesId, answer, answer_type } = req.body; // Assume the new message is sent in the request body
+        await ResumeChat.addAnswer(_id, quesId, answer, answer_type);
 
         const sectionId = chatRecord.sectionId;
 
