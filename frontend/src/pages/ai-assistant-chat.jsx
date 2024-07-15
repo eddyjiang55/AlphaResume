@@ -40,10 +40,20 @@ export async function getServerSideProps(context) {
     const reformattedMessageList = messageList
       .map((message, index) => {
         const messages = [
-          { text: message.question, id: index, sender: "bot", type: "text" },
+          {
+            text: message.question,
+            id: index + 1,
+            sender: "bot",
+            type: "text",
+          },
         ];
         if (message.answer) {
-          messages.push({ text: message.answer, id: index, sender: "user", type: message.answer_type});
+          messages.push({
+            text: message.answer,
+            id: index + 1,
+            sender: "user",
+            type: message.answer_type,
+          });
         }
         return messages;
       })
@@ -76,7 +86,7 @@ export default function AIChat({ dbFormData }) {
       const quesId =
         latestChatHistory.current[latestChatHistory.current.length - 1].id;
       const newChat = {
-        id: latestChatHistory.current.length + 1,
+        id: quesId,
         text: result.id,
         sender: "user",
         type: "audio",
@@ -241,8 +251,9 @@ export default function AIChat({ dbFormData }) {
       console.log(chatHistory);
       const question = chatHistory[chatHistory.length - 1].text;
       const quesId = chatHistory[chatHistory.length - 1].id;
+      console.log(quesId);
       const newChat = {
-        id: chatHistory.length + 1,
+        id: quesId + 1,
         text: message,
         sender: "user",
         type: "text",
