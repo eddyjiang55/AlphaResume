@@ -35,7 +35,7 @@ class ResumeChat {
     //     );
     // }
 
-    static async addAnswer(_id, messageId, newAnswer) {
+    static async addAnswer(_id, messageId, newAnswer, answer_type) {
         const db = await connect();
         const collection = db.collection('resumeChats');
         const document = await collection.findOne({ _id });
@@ -47,7 +47,7 @@ class ResumeChat {
 
         return await collection.updateOne(
             { _id },
-            { $set: { [`messages.${messageIndex}.answer`]: newAnswer } }
+            { $set: { [`messages.${messageIndex}.answer`]: newAnswer, [`messages.${messageIndex}.answer_type`]: answer_type } }
         );
     }
 
