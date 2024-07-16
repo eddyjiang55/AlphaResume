@@ -207,8 +207,8 @@ export default function AIChat({ dbFormData }) {
     if (chatId !== "") {
       const response = await fetch(
         process.env.NEXT_PUBLIC_API_URL +
-          "/api/resume-chat/completeness/" +
-          chatId
+        "/api/resume-chat/completeness/" +
+        chatId
       );
       if (response.status === 200) {
         const data = await response.json();
@@ -369,9 +369,8 @@ export default function AIChat({ dbFormData }) {
             {chatHistory.map((chat, index) => (
               <li
                 key={index}
-                className={`flex items-center text-black justify-start gap-x-4 ${
-                  chat.sender === "bot" ? "flex-row" : "flex-row-reverse"
-                }`}
+                className={`flex items-center text-black justify-start gap-x-4 ${chat.sender === "bot" ? "flex-row" : "flex-row-reverse"
+                  }`}
               >
                 {avatar}
                 {chat.type === "audio" ? (
@@ -418,8 +417,8 @@ export default function AIChat({ dbFormData }) {
                 loading
                   ? "请稍等……"
                   : isListening
-                  ? "请说话……"
-                  : "请输入您的回答"
+                    ? "请说话……"
+                    : "请输入您的回答"
               }
               ref={textInputRef}
               onKeyUp={handleKeyUp}
