@@ -184,7 +184,7 @@ router.post('/save-data', async (req, res) => {
 
         // 添加page的更新
         if (page !== undefined) {
-            await ImprovedUser.updatePage(id, page );
+            await ImprovedUser.updatePage(id, page);
         }
 
         // 更新数据库记录
@@ -203,7 +203,7 @@ router.post('/save-data', async (req, res) => {
 
 // 生成简历并保存到ResumeHistory
 router.post('/improved-users/generate-resume', async (req, res) => {
-    const { id, phoneNumber } = req.body;
+    const { id, phoneNumber, position } = req.body;
 
     try {
         const userRecord = await ImprovedUser.findById(id);
@@ -228,7 +228,7 @@ router.post('/improved-users/generate-resume', async (req, res) => {
         const resumeHistoryId = await newResumeHistory.save();
         await ImprovedUser.updateResumeId(id, resumeHistoryId);
 
-        const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id, resumeHistoryId], {
+        const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id, resumeHistoryId, position], {
             env: {
                 ...process.env,
             }
@@ -298,7 +298,7 @@ router.post('/improved-users/markdown', async (req, res) => {
         }
         const markdown = resumeRecord.markdownData;
 
-        res.type('text/markdown').status(200).send(markdown);  
+        res.type('text/markdown').status(200).send(markdown);
     } catch (error) {
         console.error('Failed to retrieve user data:', error);
         res.status(500).send({ message: "Server error while retrieving data" });

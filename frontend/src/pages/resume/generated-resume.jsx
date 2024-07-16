@@ -35,6 +35,7 @@ export default function GeneratedResumePage({ dbFormData }) {
   const [markdownContent, setMarkdownContent] = useState("");
   const [htmlContent, setHtmlContent] = useState("");
   const [paperSize, setPaperSize] = useState("A4");
+  const [fontSize, setFontSize] = useState(15);
 
   const exportMarkdown = useCallback(() => {
     if (dbFormData.resumeTitle === "") {
@@ -123,11 +124,20 @@ export default function GeneratedResumePage({ dbFormData }) {
 
   useEffect(() => {
     if (markdownContent) {
-      // console.log(markdownContent);
+      console.log(markdownContent);
       const processedHtmlContent = renderMarkdown(markdownContent);
+      console.log(processedHtmlContent);
       setHtmlContent(processedHtmlContent);
     }
   }, [markdownContent]);
+
+  useEffect(() => {
+    // Change font size
+    document.documentElement.style.setProperty(
+      "--base-font-size",
+      `${fontSize}px`
+    );
+  }, [fontSize]);
 
   return (
     <>
@@ -180,6 +190,7 @@ export default function GeneratedResumePage({ dbFormData }) {
               <ResumerRenderPage
                 htmlContent={htmlContent}
                 paperSize={paperSize}
+                fontSize={fontSize}
               />
             )}
           </div>
@@ -196,6 +207,8 @@ export default function GeneratedResumePage({ dbFormData }) {
               handleChangePageSize={handleChangePageSize}
               exportMarkdown={exportMarkdown}
               resumeTitle={dbFormData.resumeTitle}
+              fontSize={fontSize}
+              setFontSize={setFontSize}
             />
           </div>
         </div>

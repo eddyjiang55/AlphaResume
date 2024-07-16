@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function PageComponent({ htmlContent, paperSize }) {
+export default function PageComponent({ htmlContent, paperSize, fontSize }) {
   const containerRef = useRef(null);
   const [pages, setPages] = useState([]);
 
   useEffect(() => {
     if (containerRef.current) {
-      const pageHeight = paperSize === "A4" ? 1130 - 64 : 1056 - 64; // px (A4: 1130px, Letter: 1056px)
+      const pageHeight = paperSize === "A4" ? 1130 - 96 : 1056 - 96; // px (A4: 1130px, Letter: 1056px)
       const tempDiv = document.createElement("div");
       tempDiv.classList.add("resume-page");
       tempDiv.style.position = "absolute";
@@ -37,7 +37,7 @@ export default function PageComponent({ htmlContent, paperSize }) {
             clonedNode.classList.contains("resume-header") ||
             clonedNode.tagName.toLowerCase() === "h2"
           ) {
-            nodeHeight += 20; // Adding extra margin
+            nodeHeight += 18; // Adding extra margin
           }
 
           if (clonedNode.tagName.toLowerCase() === "ul") {
@@ -82,7 +82,7 @@ export default function PageComponent({ htmlContent, paperSize }) {
       setPages(newPages);
       document.body.removeChild(tempDiv);
     }
-  }, [htmlContent, paperSize]);
+  }, [htmlContent, paperSize, fontSize]);
 
   return (
     <div
@@ -92,8 +92,11 @@ export default function PageComponent({ htmlContent, paperSize }) {
       {pages.map((page, index) => (
         <div
           key={index}
-          className="resume-page bg-white rounded-lg shadow-lg p-8 mb-4 overflow-hidden flex-shrink-0 "
-          style={{ width: paperSize === "A4" ? "210mm" : "8.5in", height: paperSize === "A4" ? "1130px" : "1056px" }}
+          className="resume-page bg-white rounded-lg shadow-lg px-8 py-6 mb-4 overflow-hidden flex-shrink-0 "
+          style={{
+            width: paperSize === "A4" ? "210mm" : "8.5in",
+            height: paperSize === "A4" ? "1130px" : "1056px",
+          }}
           dangerouslySetInnerHTML={{ __html: page }}
         ></div>
       ))}
