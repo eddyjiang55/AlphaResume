@@ -59,7 +59,11 @@ export async function getServerSideProps(context) {
       })
       .flat();
     console.log(reformattedMessageList);
-    dbFormData = { _id: data._id, messages: reformattedMessageList };
+    dbFormData = {
+      _id: data._id,
+      messages: reformattedMessageList,
+      resumeId: data.resumeId,
+    };
   } else {
     dbFormData = { _id: "", messages: [] };
   }
@@ -73,6 +77,7 @@ export default function AIChat({ dbFormData }) {
   const [chatHistory, setChatHistory] = useState(dbFormData.messages);
   const [loading, setLoading] = useState(false);
   const [chatId, setChatId] = useState(dbFormData._id);
+  const [resumeId, setResumeId] = useState(dbFormData.resumeId);
   const [completeness, setCompleteness] = useState("");
 
   const latestChatHistory = useRef(dbFormData.messages);
@@ -99,7 +104,9 @@ export default function AIChat({ dbFormData }) {
       console.log("Audio result:", result.id);
       if (chatIdRef.current) {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatIdRef.current,
+          process.env.NEXT_PUBLIC_API_URL +
+            "/api/resume-chat/" +
+            chatIdRef.current,
           {
             method: "PUT",
             headers: {
@@ -159,6 +166,7 @@ export default function AIChat({ dbFormData }) {
             chatIdRef.current = data.id;
             return chatIdRef.current;
           });
+          setResumeId(data.resumeId);
           const nextQuestion = data.message;
           const nextQuesId = data.quesId;
           setChatHistory((prevChatHistory) => {
@@ -196,6 +204,10 @@ export default function AIChat({ dbFormData }) {
   }, [chatHistory]);
 
   useEffect(() => {
+    console.log(resumeId);
+  }, [resumeId]);
+
+  useEffect(() => {
     chatIdRef.current = chatId;
   }, [chatId]);
 
@@ -207,8 +219,8 @@ export default function AIChat({ dbFormData }) {
     if (chatId !== "") {
       const response = await fetch(
         process.env.NEXT_PUBLIC_API_URL +
-        "/api/resume-chat/completeness/" +
-        chatId
+          "/api/resume-chat/completeness/" +
+          chatId
       );
       if (response.status === 200) {
         const data = await response.json();
@@ -319,6 +331,7 @@ export default function AIChat({ dbFormData }) {
         if (response.ok) {
           const data = await response.json();
           setChatId(data.id);
+          setResumeId(data.resumeId);
           const nextQuestion = data.message;
           const nextQuesId = data.quesId;
           setChatHistory((prevChatHistory) => [
@@ -369,8 +382,9 @@ export default function AIChat({ dbFormData }) {
             {chatHistory.map((chat, index) => (
               <li
                 key={index}
-                className={`flex items-center text-black justify-start gap-x-4 ${chat.sender === "bot" ? "flex-row" : "flex-row-reverse"
-                  }`}
+                className={`flex items-center text-black justify-start gap-x-4 ${
+                  chat.sender === "bot" ? "flex-row" : "flex-row-reverse"
+                }`}
               >
                 {avatar}
                 {chat.type === "audio" ? (
@@ -417,8 +431,8 @@ export default function AIChat({ dbFormData }) {
                 loading
                   ? "请稍等……"
                   : isListening
-                    ? "请说话……"
-                    : "请输入您的回答"
+                  ? "请说话……"
+                  : "请输入您的回答"
               }
               ref={textInputRef}
               onKeyUp={handleKeyUp}
@@ -488,12 +502,12 @@ export default function AIChat({ dbFormData }) {
           </div>
         </div>
         <div className="flex flex-row justify-center items-center mt-2 mb-6 h-full">
-          <Link href="/start-resumeserve">
+          <Link href={`/resume/fill-info-step1?id=${resumeId}`}>
             <button
-              disabled={chatId === ""}
-              className="disabled:cursor-not-allowed disabled:bg-gray-400 bg-red-400 text-white px-6 py-3 rounded-xl"
+              disabled={chatId === "" || resumeId === ""}
+              className="disabled:cursor-not-allowed disabled:bg-gray-400 bg-alpha-blue text-white px-6 py-3 rounded-xl"
             >
-              结束会话
+              一键生成简历
             </button>
           </Link>
         </div>
