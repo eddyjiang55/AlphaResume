@@ -163,7 +163,7 @@ router.post('/resume-chat', async (req, res) => {
             const lastRoundOfChat = messageList[messageList.length - 1];
             const lastMessage = lastRoundOfChat.question;
             const quesId = lastRoundOfChat.id;
-            res.status(200).json({ id: _id, message: lastMessage, quesId: quesId });
+            res.status(200).json({ id: _id, message: lastMessage, quesId: quesId, resumeId: resume_id});
         });
 
     } catch (error) {
