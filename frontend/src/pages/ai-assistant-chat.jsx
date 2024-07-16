@@ -74,7 +74,7 @@ export default function AIChat({ dbFormData }) {
   const [loading, setLoading] = useState(false);
   const [chatId, setChatId] = useState(dbFormData._id);
   const [completeness, setCompleteness] = useState("");
-
+  const [inputValue, setInputValue] = useState('');
   const latestChatHistory = useRef(dbFormData.messages);
   const chatIdRef = useRef(dbFormData._id);
 
@@ -342,17 +342,27 @@ export default function AIChat({ dbFormData }) {
     setLoading(false);
   };
 
+
   const handleKeyUp = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !event.ctrlKey) {
       event.preventDefault();
       sendMessage(event);
     }
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !event.ctrlKey) {
       event.preventDefault();
     }
+  };
+
+  const handleChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleInput = () => {
+    textInputRef.current.style.height = 'auto';
+    textInputRef.current.style.height = `${textInputRef.current.scrollHeight}px`;
   };
 
   return (
@@ -408,10 +418,9 @@ export default function AIChat({ dbFormData }) {
             <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
           </svg>
         </div>
-        <div className="flex justify-center items-start flex-row w-full max-w-[864px] gap-x-6 mt-2 mb-6 h-full">
-          <div className="flex justify-center items-center flex-row w-full p-2 mx-auto border border-solid border-alpha-blue rounded-lg bg-white shadow-lg text-black h-12">
-            <input
-              type="text"
+        <div className="flex justify-center items-center flex-row w-full max-w-[864px] gap-x-6 mt-2 mb-6 h-full">
+          <div className="flex justify-center items-center flex-row w-full p-2 mx-auto border border-solid border-alpha-blue rounded-lg bg-white shadow-lg text-black">
+            <textarea
               className="w-full p-1 focus:outline-none"
               placeholder={
                 loading
@@ -423,6 +432,13 @@ export default function AIChat({ dbFormData }) {
               ref={textInputRef}
               onKeyUp={handleKeyUp}
               onKeyDown={handleKeyDown}
+              value={inputValue}
+              onChange={(e) => {
+                handleChange(e);
+                handleInput();
+              }}
+              rows="1"
+              style={{ maxHeight: '10em' }} // 6 lines * line-height
               disabled={loading}
             />
             {isListening ? (
