@@ -76,6 +76,7 @@ export default function AIChat({ dbFormData }) {
   const [completeness, setCompleteness] = useState("");
 
   const latestChatHistory = useRef(dbFormData.messages);
+  const chatIdRef = useRef(dbFormData._id);
 
   const handleResult = useCallback(
     async (result) => {
@@ -96,9 +97,9 @@ export default function AIChat({ dbFormData }) {
         return latestChatHistory.current;
       });
       console.log("Audio result:", result.id);
-      if (chatId) {
+      if (chatIdRef.current) {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatId,
+          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatIdRef.current,
           {
             method: "PUT",
             headers: {
@@ -154,7 +155,10 @@ export default function AIChat({ dbFormData }) {
         );
         if (response.ok) {
           const data = await response.json();
-          setChatId(data.id);
+          setChatId((prevChatId) => {
+            chatIdRef.current = data.id;
+            return chatIdRef.current;
+          });
           const nextQuestion = data.message;
           const nextQuesId = data.quesId;
           setChatHistory((prevChatHistory) => {
@@ -190,6 +194,10 @@ export default function AIChat({ dbFormData }) {
   useEffect(() => {
     latestChatHistory.current = chatHistory;
   }, [chatHistory]);
+
+  useEffect(() => {
+    chatIdRef.current = chatId;
+  }, [chatId]);
 
   const handleError = useCallback((error) => {
     console.error("Speech recognition error:", error);
