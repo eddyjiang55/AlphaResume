@@ -190,10 +190,10 @@ def process_asking(json_str):
         f"你的任务是：\n"
         f"1. 遍历整个JSON文件，找出所有value为\"\"的字段，这意味着求职者尚未填写这些信息。\n"
         f"2. 采用鼓励和支持的语气，向求职者指出哪些部分尚未完成，并指导他们如何补充这些信息。\n"
-        f"3. 注意，如果某些字段的value为\"无\"，这表明求职者已经回答了相关问题，因此不需要再次询问。\n"
-        f"4. 例如，如果你发现教育经历和项目经历的字段是空的，你可以这样提问：\n"
-        f"   \"我们注意到你的教育经历和项目经历部分目前是空白的。请分享一些关于你受过的教育和参与过的项目细节，这将帮助我们更好地了解你的背景和技能。\"\n"
-        f"5. 请直接列出你提出的问题，不需要任何其他的内容。\n"
+        f"3. 如果发现有很多字段未填写，可以只告诉求职者大类别，而不必逐一列出所有字段。\n"
+        f"4. 用你的面试官的专业知识，适当提示求职者，告诉他们哪些信息对于他们的简历至关重要。\n"
+        f"5. 注意，如果某些字段的value为\"无\"，这表明求职者已经回答了相关问题，因此不需要再次询问。\n"
+        f"6. 请直接列出你提出的问题，不需要任何其他的内容。\n"
         f"以下是JSON文件内容：\n{json_str}\n"
     )
 
@@ -238,7 +238,8 @@ json_update = re.sub(r"```", '', json_update)
 # 只保留str最外层的两个{}之内的内容，删除其他内容
 json_update = extract_json(json_update)
 new_query = process_asking(json_update)
-update_mongodb(chatId, new_query, resumeId, json_update)
+final_question = concat_question(last_message, new_query)
+update_mongodb(chatId, final_question, resumeId, json_update)
 close_mongodb()
 print(new_query)
 
