@@ -108,7 +108,7 @@ def get_chat_from_mongodb(chat_id, resume_id):
 
 
 
-    return last_message, standard_json, section_id
+    return last_message, standard_json
 
 
 
@@ -230,7 +230,7 @@ def close_mongodb():
 
 
 
-last_message, standard_json, section_id = get_chat_from_mongodb(chatId, resumeId)
+last_message, standard_json = get_chat_from_mongodb(chatId, resumeId)
 json_update = update_json(standard_json, last_message)
 json_update = re.sub(r"```json", '', json_update)
 json_update = re.sub(r"```", '', json_update)
