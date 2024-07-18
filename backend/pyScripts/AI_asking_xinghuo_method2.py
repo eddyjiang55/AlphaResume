@@ -126,6 +126,7 @@ def update_json(original_json, last_chat):
         f"则不应擅自填充'无'，而应保持该字段为空。\n\n"
 
         f"你需要返回一个完整的JSON文件，不需要添加任何注释。\n"
+        f"返回的json的字段需要用双引号。\n"
         f"以下是对话内容：\n{last_chat}\n"
         f"以下是JSON文件内容：\n{original_json}\n"
     )
@@ -146,6 +147,7 @@ def extract_json(data_str):
             return json_data
         except json.JSONDecodeError as e:
             print("找到的字符串不是有效的 JSON。",e)
+            print(json_str)
             return None
     else:
         print("没有找到符合 JSON 格式的内容。")
