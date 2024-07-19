@@ -31,7 +31,7 @@ MONGODB_URL = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mong
 DB_NAME = "airesumedb"
 COLLECTION_NAME = "resumeChats"
 COLLECTION_NAME_1 = "improvedUsers"
-COLLECTION_NAME_2 = "resumeAudios"
+COLLECTION_NAME_2 = "resumeAudio"
 client = MongoClient(MONGODB_URL)
 db = client[DB_NAME]
 collection = db[COLLECTION_NAME]
@@ -151,17 +151,17 @@ def get_chat_from_mongodb(chat_id, resume_id):
     # 查询特定用户的聊天记录
     chat_record = collection.find_one({"_id": chat_id})
     user_record = collection_1.find_one({"_id": resume_id})
-
+    print(user_record, flush=True)
     chat_messages = chat_record['messages']
 
     standard_json = user_record['personal_data']
-
+    print(standard_json, flush=True);
     # 获取最后一条消息. 格式是mock_qa.json里的格式
     last_message = chat_messages[-1]
 
     section_id = chat_record['sectionId']
 
-    print(last_message)
+    #print(last_message)
 
     last_answer = last_message['answer']
     # check if it is an id, ie, no chinese characters
@@ -180,10 +180,13 @@ def get_chat_from_mongodb(chat_id, resume_id):
                 api = audio_to_text.RequestApi(
                     appid="80922260",
                     secret_key="84268ea312aee377ace0b8468633bd0a",
-                    upload_file_path=audio_record['audio']
+                    upload_file_path=None,
+                    audio_data=audio_data
                 )
                 result = api.get_result()
                 last_message['answer'] = result
+                print("audio-to-text result", flush=True)
+                print(last_message, flush=True)
 
             except Exception as e:
                 print(f"Error during audio-to-text conversion: {e}")
@@ -324,8 +327,8 @@ def process_asking(json_data, section_id, standard_json):
     else:
         # not the initial question, get the json chat data from json
         current_key, section_new = find_all_empty(standard_json, json_data, section_id)
-        print(current_key)
-        print(section_id)
+        print(current_key, flush=True)
+        print(section_id, flush=True)
         new_question = ask_new_question(section_new, keys_list[section_id], section_id, current_key)
         return new_question
 
@@ -369,10 +372,10 @@ def extract_json(data_str):
             json_data = json.loads(json_str)
             return json_data
         except json.JSONDecodeError as e:
-            print("找到的字符串不是有效的 JSON。",e)
+            print("找到的字符串不是有效的 JSON。",e, flush=True)
             return None
     else:
-        print("没有找到符合 JSON 格式的内容。")
+        print("没有找到符合 JSON 格式的内容。", flush=True)
         return None
 
 
@@ -393,18 +396,18 @@ def update_mongodb(chat_id, new_question, resume_id, updated_json):
             {"$push": {"messages": new_message}}
         )
 
-        print(json.dumps({"status": "success", "id": messages_length + 1, "message": new_message}))
+        print(json.dumps({"status": "success", "id": messages_length + 1, "message": new_message}), flush=True)
     else:
-        print(json.dumps({"status": "error", "message": "Chat record not found"}))
+        print(json.dumps({"status": "error", "message": "Chat record not found"}), flush=True)
 
     if resume_record:
         collection_1.update_one(
             {"_id": resume_id},
             {"$set": {"personal_data": updated_json}}
         )
-        print(json.dumps({"status": "success", "message": "Resume record updated"}))
+        print(json.dumps({"status": "success", "message": "Resume record updated"}), flush=True)
     else:
-        print(json.dumps({"status": "error", "message": "Resume record not found"}))
+        print(json.dumps({"status": "error", "message": "Resume record not found"}), flush=True)
 
 
 
@@ -421,13 +424,18 @@ def close_mongodb():
 
 last_message, standard_json, section_id = get_chat_from_mongodb(chatId, resumeId)
 json_update = update_json(standard_json, last_message)
+print("json_update", flush=True)
+print(json_update, flush=True)
 json_update = re.sub(r"```json", '', json_update)
 json_update = re.sub(r"```", '', json_update)
 # json_update dtype: str
 # 只保留str最外层的两个{}之内的内容，删除其他内容
 json_update = extract_json(json_update)
+print("json_update after extract", flush=True)
+print(json_update, flush=True)
 new_query = process_asking(json_update, section_id, standard_json)
+print("resumeid", flush=True)
+print(resumeId, flush=True)
 update_mongodb(chatId, new_query, resumeId, json_update)
 close_mongodb()
-print(new_query)
-
+print(new_query, flush=True)

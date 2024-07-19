@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const JobInformation = require('../mongodb/models/JobInformation'); // 确保路径正确
 const { spawn } = require('child_process');
+const { connect } = require('../mongodb/dbconfig'); // 确保路径正确
 const path = require('path');
 
 // 添加新的职位信息
@@ -17,15 +18,36 @@ router.post('/job-information', async (req, res) => {
     }
 });
 
-// 根据ID查找职位信息
-router.get('/job-information/:id', async (req, res) => {
+// // 根据ID查找职位信息
+// router.get('/job-information/:id', async (req, res) => {
+//     try {
+//         const id = req.params.id;
+//         const jobInfo = await JobInformation.findById(id);
+//         if (jobInfo) {
+//             res.status(200).json(jobInfo);
+//         } else {
+//             res.status(404).json({ message: '未找到职位信息' });
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: '查询职位信息时出错', error: error.toString() });
+//     }
+// });
+
+
+// 根据岗位名称查找职位信息
+router.get('/job-information/:position', async (req, res) => {
+    console.log("调用了接口");
     try {
-        const id = req.params.id;
-        const jobInfo = await JobInformation.findById(id);
+        // console.log("进入try语句");
+        const position = req.params.position;
+        // console.log(`接收到的岗位名称: ${position}`);
+        const jobInfo = await JobInformation.findByPosition(position);
+        // console.log('岗位信息：${jobInfo}');
         if (jobInfo) {
             res.status(200).json(jobInfo);
         } else {
-            res.status(404).json({ message: '未找到职位信息' });
+            res.status(404).json({ message: '1未找到职位信息' });
         }
     } catch (error) {
         console.error(error);
@@ -109,4 +131,16 @@ router.post('/job-information/match', async (req, res) => {
     }
 });
 
+// 提取所有的岗位名称
+router.get('/job-titles', async (req, res) => {
+    try {
+        const db = await connect();
+        const collection = db.collection('jobInformation');
+        const jobTitles = await collection.distinct('岗位名称');
+        res.status(200).json(jobTitles);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: '获取岗位名称时出错', error: error.toString() });
+    }
+});
 module.exports = router;

@@ -40,10 +40,20 @@ export async function getServerSideProps(context) {
     const reformattedMessageList = messageList
       .map((message, index) => {
         const messages = [
-          { text: message.question, id: index, sender: "bot", type: "text" },
+          {
+            text: message.question,
+            id: index + 1,
+            sender: "bot",
+            type: "text",
+          },
         ];
         if (message.answer) {
-          messages.push({ text: message.answer, id: index, sender: "user" });
+          messages.push({
+            text: message.answer,
+            id: index + 1,
+            sender: "user",
+            type: message.answer_type,
+          });
         }
         return messages;
       })
@@ -62,21 +72,22 @@ export default function AIChat({ dbFormData }) {
   const router = useRouter();
   const [chatHistory, setChatHistory] = useState(dbFormData.messages);
   const [loading, setLoading] = useState(false);
-  const [showLeaveBtn, setShowLeaveBtn] = useState(false);
   const [chatId, setChatId] = useState(dbFormData._id);
-
+  const [completeness, setCompleteness] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const latestChatHistory = useRef(dbFormData.messages);
+  const chatIdRef = useRef(dbFormData._id);
 
   const handleResult = useCallback(
     async (result) => {
       setLoading(true);
       console.log(chatHistory);
-      const question = latestChatHistory.current[latestChatHistory.current.length - 1].text;
-      console.log("Question:", question);
-      const quesId = latestChatHistory.current[latestChatHistory.current.length - 1].id;
-      console.log("QuesId:", quesId);
+      const question =
+        latestChatHistory.current[latestChatHistory.current.length - 1].text;
+      const quesId =
+        latestChatHistory.current[latestChatHistory.current.length - 1].id;
       const newChat = {
-        id: latestChatHistory.current.length + 1,
+        id: quesId,
         text: result.id,
         sender: "user",
         type: "audio",
@@ -86,9 +97,9 @@ export default function AIChat({ dbFormData }) {
         return latestChatHistory.current;
       });
       console.log("Audio result:", result.id);
-      if (chatId) {
+      if (chatIdRef.current) {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatId,
+          process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatIdRef.current,
           {
             method: "PUT",
             headers: {
@@ -108,7 +119,12 @@ export default function AIChat({ dbFormData }) {
           setChatHistory((prevChatHistory) => {
             latestChatHistory.current = [
               ...prevChatHistory,
-              { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
+              {
+                text: nextQuestion,
+                sender: "bot",
+                id: nextQuesId,
+                type: "text",
+              },
             ];
             return latestChatHistory.current;
           });
@@ -139,13 +155,21 @@ export default function AIChat({ dbFormData }) {
         );
         if (response.ok) {
           const data = await response.json();
-          setChatId(data.id);
+          setChatId((prevChatId) => {
+            chatIdRef.current = data.id;
+            return chatIdRef.current;
+          });
           const nextQuestion = data.message;
           const nextQuesId = data.quesId;
           setChatHistory((prevChatHistory) => {
             latestChatHistory.current = [
               ...prevChatHistory,
-              { text: nextQuestion, sender: "bot", id: nextQuesId, type: "text" },
+              {
+                text: nextQuestion,
+                sender: "bot",
+                id: nextQuesId,
+                type: "text",
+              },
             ];
             return latestChatHistory.current;
           });
@@ -171,8 +195,29 @@ export default function AIChat({ dbFormData }) {
     latestChatHistory.current = chatHistory;
   }, [chatHistory]);
 
+  useEffect(() => {
+    chatIdRef.current = chatId;
+  }, [chatId]);
+
   const handleError = useCallback((error) => {
     console.error("Speech recognition error:", error);
+  }, []);
+
+  const handleCompleteness = useCallback(async (chatId) => {
+    if (chatId !== "") {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_URL +
+        "/api/resume-chat/completeness/" +
+        chatId
+      );
+      if (response.status === 200) {
+        const data = await response.json();
+        setCompleteness(data.completeness);
+      } else {
+        console.error("Failed to retrieve completeness");
+        alert("Server error");
+      }
+    }
   }, []);
 
   const { handleRecognition, isListening } = useSpeechRecognition({
@@ -204,13 +249,6 @@ export default function AIChat({ dbFormData }) {
     }
   }, [chatHistory]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLeaveBtn(true);
-    }, 10000);
-    return () => clearTimeout(timer);
-  }, []);
-
   const textInputRef = useRef(null);
   const sendMessage = async (event) => {
     event.preventDefault();
@@ -221,8 +259,9 @@ export default function AIChat({ dbFormData }) {
       console.log(chatHistory);
       const question = chatHistory[chatHistory.length - 1].text;
       const quesId = chatHistory[chatHistory.length - 1].id;
+      console.log(quesId);
       const newChat = {
-        id: chatHistory.length + 1,
+        id: quesId + 1,
         text: message,
         sender: "user",
         type: "text",
@@ -303,17 +342,27 @@ export default function AIChat({ dbFormData }) {
     setLoading(false);
   };
 
+
   const handleKeyUp = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !event.ctrlKey) {
       event.preventDefault();
       sendMessage(event);
     }
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !event.ctrlKey) {
       event.preventDefault();
     }
+  };
+
+  const handleChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleInput = () => {
+    textInputRef.current.style.height = 'auto';
+    textInputRef.current.style.height = `${textInputRef.current.scrollHeight}px`;
   };
 
   return (
@@ -322,13 +371,6 @@ export default function AIChat({ dbFormData }) {
         <h1 className="font-semibold text-2xl text-alpha-blue text-center py-2">
           简历信息收集
         </h1>
-        {showLeaveBtn ? (
-          <Link href="/start-resumeserve">
-            <button className="absolute top-4 right-4 bg-gray-400 text-white px-4 py-2 rounded-xl">
-              结束会话
-            </button>
-          </Link>
-        ) : null}
         <div
           ref={chatContainerRef}
           className="overflow-y-auto max-h-[calc(100vh-350px)] mt-4 mb-32 pr-4"
@@ -337,9 +379,8 @@ export default function AIChat({ dbFormData }) {
             {chatHistory.map((chat, index) => (
               <li
                 key={index}
-                className={`flex items-center text-black justify-start gap-x-4 ${
-                  chat.sender === "bot" ? "flex-row" : "flex-row-reverse"
-                }`}
+                className={`flex items-center text-black justify-start gap-x-4 ${chat.sender === "bot" ? "flex-row" : "flex-row-reverse"
+                  }`}
               >
                 {avatar}
                 {chat.type === "audio" ? (
@@ -352,22 +393,52 @@ export default function AIChat({ dbFormData }) {
           </ul>
         </div>
       </div>
-      <div className="fixed inset-x-0 bottom-0 flex justify-center items-center flex-row gap-x-4 w-full">
-        <div className="flex justify-center items-start flex-row w-full max-w-[864px] gap-x-6 mt-2 mb-6 h-full">
-          <div className="flex justify-center items-center flex-row w-full p-2 mx-auto border border-solid border-alpha-blue rounded-lg bg-white shadow-lg text-black h-12">
-            <input
-              type="text"
+      <div className="fixed inset-x-0 bottom-0 flex justify-center items-center flex-row gap-x-10 w-full">
+        <div className="flex flex-row justify-center items-center gap-x-4 text-black mt-2 mb-6 h-full">
+          <button
+            className="bg-alpha-blue text-white px-6 py-3 rounded-xl disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={chatId === ""}
+            onClick={() => handleCompleteness(chatId)}
+          >
+            信息完整度{completeness === "" ? "" : `：${completeness}%`}
+          </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="icon icon-tabler icon-tabler-refresh w-6 h-6 cursor-pointer"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            onClick={() => handleCompleteness(chatId)}
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+            <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+          </svg>
+        </div>
+        <div className="flex justify-center items-center flex-row w-full max-w-[864px] gap-x-6 mt-2 mb-6 h-full">
+          <div className="flex justify-center items-center flex-row w-full p-2 mx-auto border border-solid border-alpha-blue rounded-lg bg-white shadow-lg text-black">
+            <textarea
               className="w-full p-1 focus:outline-none"
               placeholder={
                 loading
                   ? "请稍等……"
                   : isListening
-                  ? "请说话……"
-                  : "请输入您的回答"
+                    ? "请说话……"
+                    : "请输入您的回答"
               }
               ref={textInputRef}
               onKeyUp={handleKeyUp}
               onKeyDown={handleKeyDown}
+              value={inputValue}
+              onChange={(e) => {
+                handleChange(e);
+                handleInput();
+              }}
+              rows="1"
+              style={{ maxHeight: '10em' }} // 6 lines * line-height
               disabled={loading}
             />
             {isListening ? (
@@ -431,6 +502,16 @@ export default function AIChat({ dbFormData }) {
               </svg>
             </button>
           </div>
+        </div>
+        <div className="flex flex-row justify-center items-center mt-2 mb-6 h-full">
+          <Link href="/start-resumeserve">
+            <button
+              disabled={chatId === ""}
+              className="disabled:cursor-not-allowed disabled:bg-gray-400 bg-red-400 text-white px-6 py-3 rounded-xl"
+            >
+              结束会话
+            </button>
+          </Link>
         </div>
       </div>
     </div>

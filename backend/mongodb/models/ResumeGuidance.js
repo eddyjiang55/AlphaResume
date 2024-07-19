@@ -20,6 +20,14 @@ class ResumeGuidance {
         const collection = db.collection('resumeGuidances');
         return await collection.findOne({ position });
     }
+
+    // 删除所有记录
+    static async deleteAll() {
+        const db = await connect();
+        const collection = db.collection('resumeGuidances');
+        const result = await collection.deleteMany({});
+        return result;
+    }
 }
 
 module.exports = ResumeGuidance;

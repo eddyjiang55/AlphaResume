@@ -48,7 +48,7 @@ def get_pdf_from_mongodb(resumehist_id):
 
 # 从本地读取json模板
 template = {
-    "基础信息": {
+    "基本信息": {
         "姓": "",
         "名": "",
         "手机号码": "",
@@ -271,7 +271,7 @@ def transform_chat_json(md_data):
 
 # 此处需要修改
 md_data = get_pdf_from_mongodb(resume_history_id)
-print(md_data)
+print(md_data, flush=True)
 # 去掉所有除了中文，英文，数字和'-', ' ', '.', '\n'之外的字符
 md_data = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9\- \n]', '', md_data)
 # save md_data to a file
@@ -282,7 +282,7 @@ response = re.sub(r"```json", '', response)
 response = re.sub(r"```", '', response)
 
 
-def upload_standard_data_to_mongodb(json_data, improved_user_id):
+def upload_standard_data_to_mongodb(json_data, improved_user_id, resume_history_id):
     uri = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mongodb.net/?retryWrites=true&w=majority&appName=AIResume"
     client = MongoClient(uri)
 
@@ -298,14 +298,14 @@ def upload_standard_data_to_mongodb(json_data, improved_user_id):
     db = client[database_name]
 
     collection = db[collection_name]
+    
+    print(json_data, flush=True)
 
-    resume_id = "resume_2"
-
-    collection.insert_one({"_id": improved_user_id, "personal_data": json.loads(json_data)})
+    collection.update_one({"_id": improved_user_id}, {'$set':{ "resumeId": resume_history_id, "personal_data": json.loads(json_data)}})
 
     # 关闭MongoDB连接
     client.close()
 
 
-upload_standard_data_to_mongodb(response, improved_user_id)
-print(response)
+upload_standard_data_to_mongodb(response, improved_user_id, resume_history_id)
+print(response, flush=True)

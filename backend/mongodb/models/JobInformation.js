@@ -64,6 +64,14 @@ class JobInformation {
         }).toArray();
         return jobs;
     }
+
+    // 根据岗位名称查找职位信息
+    static async findByPosition(position) {
+        const db = await connect();
+        const collection = db.collection('jobInformation');
+        const jobInfo = await collection.findOne({ 岗位名称: position });
+        return jobInfo;
+    }
 }
 
 module.exports = JobInformation;

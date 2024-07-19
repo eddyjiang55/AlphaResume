@@ -39,7 +39,7 @@ collection_1 = db[COLLECTION_NAME_1]
 collection_2 = db[COLLECTION_NAME_2]
 
 priority = {
-    "基础信息": {
+    "基本信息": {
         "简历标题": "简历标题",
         "姓名": "姓名",
         "手机号码": "手机号码",
@@ -155,7 +155,7 @@ def get_chat_from_mongodb(chat_id, resume_id):
         # convert the audio to text
         api = audio_to_text.RequestApi(appid="80922260",
                      secret_key="84268ea312aee377ace0b8468633bd0a",
-                     upload_file_path=r"test1-1.wav")        # needs to be adjusted
+                     upload_file_path=audio_data)        # needs to be adjusted
         result = api.get_result()
         last_message['answer'] = result
 

@@ -7,8 +7,7 @@ import { formatDateToLocalTime } from "@/utils/timeRelated";
 
 const fetchRecordById = async (id) => {
   const response = await fetch(
-    process.env.NEXT_PUBLIC_API_URL +
-      `/api/improved-users/${id}/basicInformation`,
+    process.env.NEXT_PUBLIC_API_URL + `/api/improved-users/${id}/meta-data`,
     {
       method: "GET",
       headers: {
@@ -18,8 +17,11 @@ const fetchRecordById = async (id) => {
   );
   const rawData = await response.json();
   return {
-    title: rawData.data?.title || "",
-    updateTime: rawData.updateTime,
+    _id: rawData._id,
+    resumeHistoryId: rawData.resumeId,
+    page: rawData.page,
+    title: rawData.title,
+    updateTime: rawData.updatedAt,
   };
 };
 
@@ -111,14 +113,15 @@ function ResumeBox({ resumeId, userPhoneNumber, deletefromCards }) {
             上次修改：{formatDateToLocalTime(data.updateTime)}
           </div>
           <div className="flex flex-row justify-center items-center gap-x-12">
-            <Link href={`/resume/fill-info-step1?id=${resumeId}`}>
+            <Link href={`/resume/fill-info-step${data.page}?id=${resumeId}`}>
               <button className="py-2 px-6 text-white text-base 2xl:text-lg font-bold bg-alpha-blue rounded-full">
                 编辑
               </button>
             </Link>
             <button
-              className="py-2 px-6 text-white text-base 2xl:text-lg font-bold bg-alpha-blue rounded-full"
+              className="py-2 px-6 text-white text-base 2xl:text-lg font-bold bg-alpha-blue rounded-full disabled:bg-gray-400 disabled:cursor-not-allowed"
               onClick={handleDownloadPdf}
+              disabled={data.resumeHistoryId === ""}
             >
               查看结果
             </button>

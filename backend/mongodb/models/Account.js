@@ -25,21 +25,21 @@ class Account {
         return result.insertedId;
     }
 
-    static async addImprovedUser(accountId, improvedUserId) {
+    static async addImprovedUser(phoneNumber, improvedUserId) {
         const db = await connect();
         const collection = db.collection('accounts');
         const result = await collection.updateOne(
-            { _id: accountId }, // 直接使用UUID
-            { $push: { improvedUsers: improvedUserId } }
+            { phoneNumber },
+            { $addToSet: { improvedUsers: improvedUserId } }
         );
         return result;
     }
 
-    static async deleteImprovedUser(accountId, improvedUserId) {
+    static async deleteImprovedUser(phoneNumber, improvedUserId) {
         const db = await connect();
         const collection = db.collection('accounts');
         const result = await collection.updateOne(
-            { _id: accountId }, // 直接使用UUID
+            { phoneNumber },
             { $pull: { improvedUsers: improvedUserId } }
         );
         return result;

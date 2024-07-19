@@ -29,4 +29,15 @@ router.get('/resume-guidance/:position', async (req, res) => {
     }
 });
 
+
+// 删除 resumeGuidance 集合中的所有数据
+router.delete('/resume-guidance', async (req, res) => {
+    try {
+        const result = await ResumeGuidance.deleteAll();
+        res.status(200).json({ message: "All resume guidance records have been deleted", result });
+    } catch (error) {
+        console.error("Failed to delete all resume guidance records:", error);
+        res.status(500).json({ message: "Failed to delete all resume guidance records", error: error.toString() });
+    }
+});
 module.exports = router;

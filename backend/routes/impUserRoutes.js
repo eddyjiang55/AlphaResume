@@ -28,83 +28,16 @@ function formatDate(date) {
 
 let processResult = {};
 
-// 创建新的用户
+// 创建 ImprovedUser
 router.post('/improved-users', async (req, res) => {
     try {
-        // 从请求中获取Account的phoneNumber
         const { phoneNumber } = req.body;
-        if (!phoneNumber) {
-            return res.status(400).json({ message: 'Phone number is required to link account' });
-        }
-
-        const newUser = new ImprovedUser(
-            req.body.基本信息,
-            req.body.个人评价,
-            req.body.教育经历,
-            req.body.职业经历,
-            req.body.项目经历,
-            req.body.获奖与证书,
-            req.body.语言,
-            req.body.技能,
-            req.body.科研论文与知识产权
-        );
-        const _id = newUser._id;  // 获取新的ImprovedUser的ID
-
-        // 查找Account并添加ImprovedUser的ID
-        const account = await Account.findByPhoneNumber(phoneNumber);
-        if (account) {
-            await Account.addImprovedUser(account._id, _id);
-
-            // 创建空白的 ResumeHistory，格式化日期
-            const defaultTitle = "Default Title";
-            const createdAt = formatDate(new Date()); // 当前时间，格式化为 YYYY-MM-DD
-            const newResumeHistory = new ResumeHistory(
-                account._id,
-                createdAt,
-                defaultTitle,
-                "", // position 为空
-                "", // pdfData 为空
-                ""  // markdownData 为空
-            );
-            const resumeHistoryId = await newResumeHistory.save(); // 保存ResumeHistory并获取其ID
-
-            // 将 resumeHistoryId 关联到 ImprovedUser
-            newUser.resumeId = resumeHistoryId;
-
-            // 只需保存一次 ImprovedUser
-            await newUser.save();
-
-            // 调用 Python 文件更新完整度
-            const pythonProcess = spawn('python3', ['./pyScripts/update_complete_score.py', _id]);
-
-            pythonProcess.stdout.on('data', async (data) => {
-                console.log(`stdout: ${data}`);
-
-                // 解析 Python 文件的输出
-                const output = JSON.parse(data.toString());
-                const updatedCompleteness = output.completeness;
-
-                // 更新数据库中的完整度字段
-                await ImprovedUser.updateCompleteness(_id, updatedCompleteness);
-
-                // 返回更新后的完整度
-                res.status(201).json({ message: 'Improved user and resume history created successfully', _id: _id, resumeHistoryId: resumeHistoryId, completeness: updatedCompleteness });
-            });
-
-            pythonProcess.stderr.on('data', (data) => {
-                console.error(`stderr: ${data}`);
-            });
-
-            pythonProcess.on('close', (code) => {
-                console.log(`child process exited with code ${code}`);
-            });
-
-        } else {
-            res.status(404).json({ message: 'Account not found' });
-        }
+        const newUser = new ImprovedUser({}, new Date(), new Date(), "", 0);
+        const id = await newUser.save(phoneNumber);
+        res.status(201).json({ message: 'Improved user created successfully', _id: id });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to create improved user or update account', error: error.toString() });
+        res.status(500).json({ message: 'Failed to create improved user', error: error.toString() });
     }
 });
 
@@ -118,31 +51,24 @@ router.get('/improved-users/:_id', async (req, res) => {
             return res.status(404).json({ message: 'Resume record not found' });
         }
 
-        // 调用 Python 文件更新完整度
-        const pythonProcess = spawn('python3', ['./pyScripts/update_complete_score.py', resumeRecord._id]);
-        
-        pythonProcess.stdout.on('data', async (data) => {
-            console.log(`stdout: ${data}`);
-            
-            // 解析 Python 文件的输出
-            const output = JSON.parse(data.toString());
-            const updatedCompleteness = output.completeness;
+        // 返回用户信息
+        res.status(200).json(resumeRecord);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to retrieve user', error: error.toString() });
+    }
+});
 
-            // 更新数据库中的完整度字段
-            await ImprovedUser.update(resumeRecord._id, { completeness: updatedCompleteness });
-            
-            // 返回更新后的完整度
-            res.status(200).json({ ...resumeRecord, completeness: updatedCompleteness });
-        });
+router.get('/improved-users/:_id/meta-data', async (req, res) => {
+    try {
+        const resumeRecord = await ImprovedUser.findById(req.params._id);
+        if (!resumeRecord) {
+            return res.status(404).json({ message: 'Resume record not found' });
+        }
+        const title = resumeRecord.personal_data['基本信息']['title'];
 
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`stderr: ${data}`);
-        });
-
-        pythonProcess.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
-        });
-
+        // 返回用户信息
+        res.status(200).json({ _id: resumeRecord._id, resumeId: resumeRecord.resumeId, page: resumeRecord.page, title: title, updatedAt: resumeRecord.updatedAt });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Failed to retrieve user', error: error.toString() });
@@ -154,7 +80,10 @@ router.get('/improved-users/:_id', async (req, res) => {
 router.get('/improved-users/:_id/:type', async (req, res) => {
     try {
         const { _id, type } = req.params;
+        //console.log(`Received type: ${type}`);
         const chineseType = typeToChinese[type]; // 获得中文字段名
+        //console.log(`Mapped chineseType: ${chineseType}`);
+
         if (!chineseType) {
             return res.status(400).json({ message: "Invalid type specified" });
         }
@@ -180,92 +109,43 @@ router.get('/improved-users/:_id/:type', async (req, res) => {
 });
 
 
+// // 更新用户信息
+// router.patch('/improved-users/:_id', async (req, res) => {
+//     try {
+//         const updateResult = await ImprovedUser.update(req.params._id, req.body);
+//         if (updateResult.modifiedCount === 0) {
+//             return res.status(404).json({ message: 'No user found to update' });
+//         }
 
-// 更新用户信息
-router.patch('/improved-users/:_id', async (req, res) => {
-    try {
-        const updateResult = await ImprovedUser.update(req.params._id, req.body);
-        if (updateResult.modifiedCount === 0) {
-            return res.status(404).json({ message: 'No user found to update' });
-        }
+//         // 返回更新成功的响应
+//         res.status(200).json({ message: 'User updated successfully' });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Failed to update user', error: error.toString() });
+//     }
+// });
 
-        // 调用 Python 文件更新完整度
-        const pythonProcess = spawn('python3', ['./pyScripts/update_complete_score.py', req.params._id]);
-
-        pythonProcess.stdout.on('data', async (data) => {
-            console.log(`stdout: ${data}`);
-
-            // 解析 Python 文件的输出
-            const output = JSON.parse(data.toString());
-            const updatedCompleteness = output.completeness;
-
-            // 更新数据库中的完整度字段
-            await ImprovedUser.updateCompleteness(req.params._id, updatedCompleteness);
-
-            // 返回更新后的完整度
-            res.status(200).json({ message: 'User updated successfully', completeness: updatedCompleteness });
-        });
-
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`stderr: ${data}`);
-        });
-
-        pythonProcess.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Failed to update user', error: error.toString() });
-    }
-});
-
-// 删除用户，并从账户的 improvedUsers 列表中删除其 ID
+// 删除 ImprovedUser 及其在 Account 中的引用
 router.delete('/improved-users', async (req, res) => {
-    const { phoneNumber, improvedUserId } = req.body;
-    console.log(phoneNumber, improvedUserId);
-
-    if (!phoneNumber || !improvedUserId) {
-        return res.status(400).json({ message: 'Phone number and improvedUserId are required' });
-    }
-
     try {
-        // 查找对应的账户
-        const account = await Account.findByPhoneNumber(phoneNumber);
-        if (!account) {
-            return res.status(404).json({ message: 'Account not found' });
+        const { improvedUserId, phoneNumber } = req.body;
+        const result = await ImprovedUser.delete(improvedUserId, phoneNumber);
+        if (result) {
+            res.status(200).json({ message: 'Improved user deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Improved user not found or failed to delete' });
         }
-        console.log(account._id);
-        // 从账户的 improvedUsers 列表中删除 improvedUserId
-        const updateResult = await Account.deleteImprovedUser(account._id, improvedUserId);
-
-        if (updateResult.modifiedCount === 0) {
-            return res.status(404).json({ message: 'ImprovedUser ID not found in account' });
-        }
-        const improvedUser = await ImprovedUser.findById(improvedUserId);
-        const deleteResumeHistoryResult = await ResumeHistory.deleteById(improvedUser.resumeId);
-        if (deleteResumeHistoryResult.deletedCount === 0) {
-            return res.status(404).json({ message: 'ResumeHistory not found' });
-        }
-
-        // 删除 improvedUser
-        const deleteResult = await ImprovedUser.deleteById(improvedUserId);
-        if (deleteResult.deletedCount === 0) {
-            return res.status(404).json({ message: 'ImprovedUser not found' });
-        }
-
-        res.status(200).json({ message: 'ImprovedUser deleted successfully and removed from account' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to delete improved user or update account', error: error.toString() });
+        res.status(500).json({ message: 'Failed to delete improved user', error: error.toString() });
     }
 });
 
 
-// POST请求，保存数据到相应的集合
+
 // 更新个人信息数据
 router.post('/save-data', async (req, res) => {
-    const { id, type, data } = req.body;
+    const { id, type, data, page } = req.body;
     console.log('Request body:', req.body);
     try {
         // 根据type决定更新哪个部分
@@ -302,77 +182,87 @@ router.post('/save-data', async (req, res) => {
                 return res.status(400).json({ message: "Invalid type specified" });
         }
 
+        // 添加page的更新
+        if (page !== undefined) {
+            await ImprovedUser.updatePage(id, page);
+        }
+
         // 更新数据库记录
-        // console.log("before send to update")
-        // console.log(updatePath)
         const result = await ImprovedUser.update(id, updatePath);
         if (result.modifiedCount === 0) {
             return res.status(404).json({ message: "No record found to update." });
         }
 
-        // 调用 Python 脚本更新完整度
-        const pythonProcess = spawn('python3', ['./pyScripts/update_complete_score.py', id]);
-
-        pythonProcess.stdout.on('data', (data) => {
-            try {
-                const output = data.toString();
-                const jsonOutput = JSON.parse(output);
-                // console.log('Parsed JSON output:', jsonOutput);
-                res.status(200).json({ resumeId: id, message: "保存成功！", completeness: jsonOutput.completeness });
-            } catch (error) {
-                console.error('Failed to parse JSON:', error);
-                res.status(500).json({ resumeId: id, message: "保存失败！", error: error.toString() });
-            }
-        });
-
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`stderr: ${data}`);
-        });
-
-        pythonProcess.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
-        });
-
+        res.status(200).json({ resumeId: id, message: "保存成功！" });
     } catch (error) {
         res.status(500).json({ resumeId: id, message: "保存失败！", error: error.toString() });
     }
 });
 
 
+
+// 生成简历并保存到ResumeHistory
 router.post('/improved-users/generate-resume', async (req, res) => {
-    const { id } = req.body;
-    console.log('Generating resume for user:', id);
-    const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id],
-        {
+    const { id, phoneNumber, position } = req.body;
+
+    try {
+        const userRecord = await ImprovedUser.findById(id);
+        if (!userRecord) {
+            return res.status(404).json({ message: 'ImprovedUser not found' });
+        }
+
+        const account = await Account.findByPhoneNumber(phoneNumber);
+        if (!account) {
+            return res.status(404).json({ message: 'Account not found' });
+        }
+
+        const createdAt = formatDate(new Date());
+
+        const title = userRecord.personal_data['基本信息']['title'];
+
+        const newResumeHistory = new ResumeHistory(
+            account._id,
+            createdAt,
+            title,
+        );
+        const resumeHistoryId = await newResumeHistory.save();
+        await ImprovedUser.updateResumeId(id, resumeHistoryId);
+
+        const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id, resumeHistoryId, position], {
             env: {
                 ...process.env,
             }
-        }
-    );
-    console.log('Python process spawned:', pythonProcess.pid);
-    processResult[id] = { status: 'running', progress: 0 };
-    pythonProcess.stdout.on('data', (data) => {
-        const output = data.toString();
-        console.log(`stdout: ${output}`);
+        });
+        console.log('Python process spawned:', pythonProcess.pid);
+        processResult[id] = { status: 'running', progress: 0 };
 
-        // Check if the output contains a progress message
-        const progressMatch = output.match(/PROGRESS: (\d+)/);
-        if (progressMatch) {
-            const progressValue = parseInt(progressMatch[1], 10);
-            processResult[id].progress = progressValue;
-        }
-    });
+        pythonProcess.stdout.on('data', (data) => {
+            const output = data.toString();
+            console.log(`stdout: ${output}`);
 
-    pythonProcess.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-    });
+            // Check if the output contains a progress message
+            const progressMatch = output.match(/PROGRESS: (\d+)/);
+            if (progressMatch) {
+                const progressValue = parseInt(progressMatch[1], 10);
+                processResult[id].progress = progressValue;
+            }
 
-    pythonProcess.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-        processResult[id].status = 'done';
-    });
+        });
 
-    res.status(200).json({ message: "Resume generation started" });
+        pythonProcess.stderr.on('data', (data) => {
+            console.log(`stderr: ${data}`);
+        });
+
+        pythonProcess.on('close', async (code) => {
+            console.log(`child process exited with code ${code}`);
+            processResult[id].status = 'done';
+
+            res.status(200).json({ message: "Resume generation completed", resumeHistoryId });
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to generate resume', error: error.toString() });
+    }
 });
 
 router.post('/improved-users/resume-result', (req, res) => {
@@ -396,10 +286,18 @@ router.post('/improved-users/markdown', async (req, res) => {
         if (!record) {
             return res.status(404).send({ message: "User not found" });
         }
-        const markdown = record.improved_cv_md;
-        if (!markdown) {
-            return res.status(404).send({ message: "Markdown data not found for the user" });
+        console.log(record);
+        const resumeId = record.resumeId;
+        if (!resumeId) {
+            return res.status(404).send({ message: "resumeId not found for the user" });
         }
+        console.log(resumeId);
+        const resumeRecord = await ResumeHistory.findById(resumeId);
+        if (!resumeRecord) {
+            return res.status(404).send({ message: "Resume record not found" });
+        }
+        const markdown = resumeRecord.markdownData;
+
         res.type('text/markdown').status(200).send(markdown);
     } catch (error) {
         console.error('Failed to retrieve user data:', error);

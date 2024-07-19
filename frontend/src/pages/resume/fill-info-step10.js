@@ -1,6 +1,7 @@
 import { useState } from 'react'; // Import useState here
 import Link from 'next/link';
 import { useRouter } from 'next/router'; // 导入 useRouter 钩子
+import { useSelector } from 'react-redux';
 
 export async function getServerSideProps(context) {
   let dbFormData = { _id: context.query.id };
@@ -30,8 +31,10 @@ export async function getServerSideProps(context) {
 
 export default function Step10Page({ dbFormData }) {
   const router = useRouter(); // 使用 useRouter 钩子获取当前路由信息
-
+  const User = useSelector((state) => state.user);
   const [selectedImage, setSelectedImage] = useState('');
+  const [error, setError] = useState(false);
+  const [position, setPosition] = useState('');
   const images = [
     '/img/result-1.jpg',
     '/img/result-2.png',
@@ -41,20 +44,22 @@ export default function Step10Page({ dbFormData }) {
 
   const handleSubmit = async () => {
     // Save the selected image to the database
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users/generate-resume', {
+    if (position === '') {
+      setError(true);
+      return;
+    }
+    fetch(process.env.NEXT_PUBLIC_API_URL + '/api/improved-users/generate-resume', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         id: dbFormData._id,
+        phoneNumber: User.phoneNumber,
+        position: position,
       })
     });
-    if (response.status === 200) {
-      router.push('/resume/generated-resume?id=' + dbFormData._id);
-    } else {
-      alert('Failed to generate resume');
-    }
+    router.push('/resume/generated-resume?id=' + dbFormData._id);
     // Redirect to the next page
     // router.push('/generate-resume');
   }
@@ -64,8 +69,9 @@ export default function Step10Page({ dbFormData }) {
       <div className="flex flex-row justify-center items-start h-full">
         <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">意向岗位</h2>
-          <form className='w-full flex justify-center'>
-            <input className='w-[680px] mx-auto' type="text" />
+          <form className='w-full max-w-[90%] flex flex-col items-stretch justify-start mx-auto'>
+            <label>*意向岗位<br /><span className="text-sm">（如软件工程师，数据科学家等）</span></label>
+            <input className='' type="text" value={position} onChange={(e) => setPosition(e.target.value)} placeholder="请输入您的意向岗位" />
           </form>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">选择简历模板</h2>
           <div className="w-full max-w-[90%] grid grid-cols-2 gap-4 mx-auto">
@@ -80,8 +86,11 @@ export default function Step10Page({ dbFormData }) {
               </div>
             ))}
           </div>
-          <div className="mx-auto w-fit">
-            <button className='form-b' type="button" onClick={handleSubmit} disabled={selectedImage === ''}>生成简历</button>
+          <div className="w-full max-w-[75%] flex flex-row justify-center items-center gap-x-12 mx-auto">
+            <Link href={`/resume/fill-info-step9?id=${dbFormData._id}`}><button className="py-2.5 px-12 rounded-full text-white bg-alpha-blue" type="button" >
+              上一步
+            </button></Link>
+            <button className='py-2.5 px-12 rounded-full text-white bg-alpha-blue disabled:bg-gray-500 disabled:cursor-not-allowed' type="button" onClick={handleSubmit} disabled={selectedImage === ''}>生成简历</button>
           </div>
         </div>
         <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch gap-y-8 px-6 py-8 overflow-y-auto'>
@@ -89,6 +98,21 @@ export default function Step10Page({ dbFormData }) {
           {selectedImage && <img className='w-fit h-full mx-auto my-16' src={selectedImage} alt="Preview" />}
         </div>
       </div>
+      {
+        error && (<div>
+          <div
+            className='fixed inset-0 bg-black opacity-50 z-40'
+            onClick={() => setError(false)}
+          />
+          <div className='fixed left-[calc(50%-20px)] top-1/2 w-80 h-auto rounded-lg bg-white border border-alpha-blue flex flex-col justify-center items-stretch -translate-x-1/2 -translate-y-1/2 z-50'>
+            <p className='text-base font-bold text-wrap text-center py-4 px-4'>
+              本页存在必填项未填写，请检查并完成所有*标记项后重试。
+            </p>
+            <div className='w-full border border-alpha-blue' />
+            <button className='py-2 px-4 text-base' onClick={() => setError(false)}>了解</button>
+          </div>
+        </div>)
+      }
       <style jsx>{`
       .background {
         background-color: #EDF8FD;
