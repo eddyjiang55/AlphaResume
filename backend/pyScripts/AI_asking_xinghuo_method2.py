@@ -147,7 +147,6 @@ def extract_json(data_str):
             return json_data
         except json.JSONDecodeError as e:
             print("找到的字符串不是有效的 JSON。",e)
-            print(json_str)
             return None
     else:
         print("没有找到符合 JSON 格式的内容。")
@@ -240,8 +239,8 @@ json_update = re.sub(r"```", '', json_update)
 # 只保留str最外层的两个{}之内的内容，删除其他内容
 json_update = extract_json(json_update)
 new_query = process_asking(json_update)
-# final_question = concat_question(last_message, new_query)
-update_mongodb(chatId, new_query, resumeId, json_update)
+final_question = concat_question(last_message, new_query)
+update_mongodb(chatId, final_question, resumeId, json_update)
 close_mongodb()
 print(new_query)
 
