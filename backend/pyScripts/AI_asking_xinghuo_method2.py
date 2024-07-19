@@ -126,7 +126,7 @@ def update_json(original_json, last_chat):
         f"则不应擅自填充'无'，而应保持该字段为空。\n\n"
 
         f"你需要返回一个完整的JSON文件，不需要添加任何注释。\n"
-        f"返回的json的key和value都需要用双引号。\n"
+        f"这个json的key和value都需要使用双引号。 \n"
         f"以下是对话内容：\n{last_chat}\n"
         f"以下是JSON文件内容：\n{original_json}\n"
     )
