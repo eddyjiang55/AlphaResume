@@ -444,15 +444,15 @@ export default function AIChat({ dbFormData }) {
                   : "请输入您的回答"
               }
               ref={textInputRef}
+              onKeyUp={handleKeyUp}
+              onKeyDown={handleKeyDown}
               value={inputValue}
               onChange={(e) => {
                 handleChange(e);
                 handleInput();
               }}
               rows="1"
-              style={{ maxHeight: "10em" }}
-              onKeyUp={handleKeyUp}
-              onKeyDown={handleKeyDown}
+              style={{ maxHeight: "10em" }} // 6 lines * line-height
               disabled={loading}
             />
             {isListening ? (
