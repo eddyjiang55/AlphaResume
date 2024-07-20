@@ -22,6 +22,7 @@ export async function getServerSideProps(context) {
         `/api/improved-users/${context.query.id}/basicInformation`
     );
     const data = await res.json();
+    console.log(data);
     dbFormData = { _id: context.query.id, resumeTitle: data.data.title };
   }
   console.log(dbFormData);

@@ -5,11 +5,28 @@ const ImprovedUser = require('../mongodb/models/ImprovedUser.js');
 const { spawn } = require('child_process');
 const path = require('path');
 
-function getFormattedDate() {
-    const date = new Date();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${month}.${day}`;
+// function getFormattedDate() {
+//     const date = new Date();
+//     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+//     const day = date.getDate().toString().padStart(2, '0');
+//     return `${month}.${day}`;
+// }
+
+function formatDateString() {
+    // Ensure the input is a Date object
+    const dateObj = new Date();
+    if (isNaN(dateObj)) {
+        throw new Error('Invalid date');
+    }
+    
+    // Extract month and day
+    const month = dateObj.getMonth() + 1; // Months are zero-based
+    const day = dateObj.getDate();
+
+    // Format the date string
+    const formattedString = `${month}月${day}日聊天生成简历`;
+
+    return formattedString;
 }
 
 // 获取 Python 脚本的绝对路径
@@ -19,9 +36,11 @@ router.post('/resume-chat', async (req, res) => {
     try {
         const { userAccount, messages } = req.body;
         console.log(messages);
-        const currentDate = getFormattedDate();
+        // const currentDate = getFormattedDate();
+        const resumeTitle = formatDateString();
         const personal_data = {
             "基本信息": {
+                "title": resumeTitle,
                 "姓": "",
                 "名": "",
                 "手机号码": "",
@@ -126,8 +145,6 @@ router.post('/resume-chat', async (req, res) => {
         };
 
         const newUser = new ImprovedUser(personal_data, new Date(), new Date(), "", 0);
-
-
 
         const resume_id = await newUser.save(userAccount);
 
@@ -237,6 +254,7 @@ router.get('/resume-chat/:_id', async (req, res) => {
     try {
         const _id = req.params._id;
         const chat = await ResumeChat.findById(_id);
+        console.log(chat);
         if (chat) {
             res.status(200).json(chat);
         } else {

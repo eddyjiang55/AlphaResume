@@ -39,16 +39,25 @@ class ResumeChat {
         const db = await connect();
         const collection = db.collection('resumeChats');
         const document = await collection.findOne({ _id });
+        console.log("Add answer")
         console.log(messageId)
         console.log(newAnswer)
+        console.log(answer_type)
         console.log(document.messages)
         const messageIndex = document.messages.findIndex(message => message.id === messageId);
         console.log(messageIndex)
 
-        return await collection.updateOne(
+        const updateFields = {
+            [`messages.${messageIndex}.answer`]: newAnswer,
+            [`messages.${messageIndex}.answer_type`]: answer_type
+        };
+
+        const updateResult = await collection.updateOne(
             { _id },
-            { $set: { [`messages.${messageIndex}.answer`]: newAnswer, [`messages.${messageIndex}.answer_type`]: answer_type } }
+            { $set: updateFields }
         );
+
+        return updateResult;
     }
 
     static async findByUserAccount(userAccount) {
