@@ -280,7 +280,7 @@ export default function AIChat({ dbFormData }) {
       };
       setChatHistory((prevChatHistory) => [...prevChatHistory, newChat]);
       textInputRef.current.value = "";
-      // setInputValue('');
+      setInputValue('');
       if (chatId) {
         const response = await fetch(
           process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatId,
