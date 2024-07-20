@@ -79,7 +79,7 @@ export default function AIChat({ dbFormData }) {
   const [chatId, setChatId] = useState(dbFormData._id);
   const [resumeId, setResumeId] = useState(dbFormData.resumeId);
   const [completeness, setCompleteness] = useState("");
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const latestChatHistory = useRef(dbFormData.messages);
   const chatIdRef = useRef(dbFormData._id);
 
@@ -280,6 +280,7 @@ export default function AIChat({ dbFormData }) {
       };
       setChatHistory((prevChatHistory) => [...prevChatHistory, newChat]);
       textInputRef.current.value = "";
+      // setInputValue('');
       if (chatId) {
         const response = await fetch(
           process.env.NEXT_PUBLIC_API_URL + "/api/resume-chat/" + chatId,
@@ -355,7 +356,6 @@ export default function AIChat({ dbFormData }) {
     setLoading(false);
   };
 
-
   const handleKeyUp = (event) => {
     if (event.key === "Enter" && !event.ctrlKey) {
       event.preventDefault();
@@ -374,7 +374,7 @@ export default function AIChat({ dbFormData }) {
   };
 
   const handleInput = () => {
-    textInputRef.current.style.height = 'auto';
+    textInputRef.current.style.height = "auto";
     textInputRef.current.style.height = `${textInputRef.current.scrollHeight}px`;
   };
 
@@ -407,7 +407,7 @@ export default function AIChat({ dbFormData }) {
           </ul>
         </div>
       </div>
-      <div className="fixed inset-x-0 bottom-0 flex justify-center items-center flex-row gap-x-10 w-full">
+      <div className="fixed inset-x-0 bottom-0 flex justify-center items-end flex-row gap-x-10 w-full">
         <div className="flex flex-row justify-center items-center gap-x-4 text-black mt-2 mb-6 h-full">
           <button
             className="bg-alpha-blue text-white px-6 py-3 rounded-xl disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -432,7 +432,7 @@ export default function AIChat({ dbFormData }) {
             <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
           </svg>
         </div>
-        <div className="flex justify-center items-center flex-row w-full max-w-[864px] gap-x-6 mt-2 mb-6 h-full">
+        <div className="flex justify-center items-end flex-row w-full max-w-[864px] gap-x-6 mt-2 mb-6 h-full">
           <div className="flex justify-center items-center flex-row w-full p-2 mx-auto border border-solid border-alpha-blue rounded-lg bg-white shadow-lg text-black">
             <textarea
               className="w-full p-1 focus:outline-none"
@@ -452,7 +452,7 @@ export default function AIChat({ dbFormData }) {
                 handleInput();
               }}
               rows="1"
-              style={{ maxHeight: '10em' }} // 6 lines * line-height
+              style={{ maxHeight: "10em" }} // 6 lines * line-height
               disabled={loading}
             />
             {isListening ? (
