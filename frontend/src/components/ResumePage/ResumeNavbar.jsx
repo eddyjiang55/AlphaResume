@@ -26,7 +26,7 @@ const ResumeNavbar = () => {
               : ""
           }`}
         >
-          <p className="text-base">{step.name} </p>
+          <p className="text-base text-black text-center whitespace-nowrap">{step.name} </p>
         </div>
       ))}
     </div>

@@ -5,7 +5,7 @@ export default function AccountLayout({ children }) {
   return (
     <div>
       <Navbar />
-      <main className="bg-light-blue w-full h-[calc(100vh-8rem)] flex flex-col relative">
+      <main className="bg-light-blue w-full flex flex-col relative h-screen">
         <ResumeNavbar />
         {children}
       </main>

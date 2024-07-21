@@ -356,9 +356,9 @@ export default function Step1Page({ dbFormData }) {
             </form>
           </div>
         </div>
-        <div className="w-full flex flex-row justify-center items-center gap-x-20 p-4 mb-28">
-          <button className='form-b' onClick={handleSave}>保存</button>
-          <button className='form-b' type="button" onClick={handleSubmit}>下一步</button>
+        <div className="w-full flex flex-row justify-center items-center gap-x-20 p-4 my-8">
+          <button className='py-2.5 px-[100px] rounded-full text-white bg-alpha-blue hover:bg-[#B2DDEE] hover:text-black' onClick={handleSave}>保存</button>
+          <button className='py-2.5 px-[100px] rounded-full text-white bg-alpha-blue hover:bg-[#B2DDEE] hover:text-black' type="button" onClick={handleSubmit}>下一步</button>
         </div>
       </div>
       {

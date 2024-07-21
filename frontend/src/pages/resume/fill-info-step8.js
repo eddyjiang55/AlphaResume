@@ -253,10 +253,12 @@ export default function Step8Page({ dbFormData }) {
               增加技能
             </button>
           </div>
-          <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
-            <Link href={`/resume/fill-info-step7?id=${dbFormData._id}`}><button className="form-b" type="button" >
-              上一步
-            </button></Link>
+          <div className="w-full flex flex-row justify-center items-center gap-x-20 p-4 my-8">
+            <Link href={`/resume/fill-info-step7?id=${dbFormData._id}`}>
+              <button className="form-b" type="button" >
+                上一步
+              </button>
+            </Link>
             <button className="form-b" onClick={handleSave}>保存</button>
             <button className="form-b" type="button" onClick={handleSubmit}>
               下一步

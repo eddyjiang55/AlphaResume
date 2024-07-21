@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { step2Tips } from '@/lib/tips';
@@ -84,22 +83,24 @@ export default function Step2Page({ dbFormData }) {
   return (
     <>
       <div className="flex flex-row justify-center items-start h-full">
-        <div className="bg-white w-1/2 h-full flex flex-col justify-around items-stretch pt-8 pb-16 gap-y-4 overflow-y-auto">
-          <div className="flex flex-col flex-grow justify-start items-stretch gap-y-16 w-full max-w-[75%] mx-auto">
+        <div className="bg-white w-1/2 h-full flex flex-col justify-center items-center pt-8 pb-16 px-10 gap-y-4 overflow-y-auto">
+          <div className="flex flex-col flex-grow justify-start items-stretch gap-y-16 w-full max-w-[90%] mx-auto">
             <h2 className='text-alpha-blue font-bold text-4xl text-center mx-auto'>请书写您的个人评价</h2>
-            <form className='w-full max-w-[75%]  flex items-center justify-start mx-auto'>
+            <form className='w-full max-w-[75%] h-full flex items-center justify-start mx-auto'>
               <textarea className='w-full rounded-lg border border-black focus:border-2 p-4' rows={15} value={formData} onChange={
                 (e) => setFormData(e.target.value)
-              }></textarea>
+              } draggable={false}></textarea>
             </form>
           </div>
-          <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
-            <Link href={`/resume/fill-info-step1?id=${dbFormData._id}`}><button className='form-b' type="button" >上一步</button> </Link>
-            <button className='form-b' onClick={handleSave}>保存</button>
-            <button className='form-b' type="button" onClick={handleSubmit}>下一步</button>
+          <div className="w-full flex flex-row justify-center items-center gap-x-20 p-4 my-8">
+            <Link href={`/resume/fill-info-step1?id=${dbFormData._id}`}>
+              <button className='py-2.5 px-[50px] rounded-full text-white bg-alpha-blue hover:bg-[#B2DDEE] hover:text-black' type="button" >上一步</button>
+            </Link>
+            <button className='py-2.5 px-[50px] rounded-full text-white bg-alpha-blue hover:bg-[#B2DDEE] hover:text-black' onClick={handleSave}>保存</button>
+            <button className='py-2.5 px-[50px] rounded-full text-white bg-alpha-blue hover:bg-[#B2DDEE] hover:text-black' type="button" onClick={handleSubmit}>下一步</button>
           </div>
         </div>
-        <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-20 overflow-y-auto'>
+        <div className='w-1/2 bg-[#EDF8FD] h-full flex flex-col justify-start items-stretch pt-8 pb-16 gap-y-16 px-10 overflow-y-auto'>
           <h2 className="text-alpha-blue font-bold text-4xl text-center mx-auto">小贴士</h2>
           <div className='flex flex-col gap-y-4'>
             {step2Tips.map((topic, index) => (

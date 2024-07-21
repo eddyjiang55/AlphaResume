@@ -13,8 +13,10 @@ export const fetchPartData = async (id, partName) => {
 }
 
 export const processTimeStr = (timeStr, type) => {
-  if (type === "month") { if (timeStr.length < 4) { return timeStr } else { return `${timeStr.slice(0, 4)}-${timeStr.slice(4)}` } }
-  else if (type === "year") { return `${timeStr.slice(0, 4)}-${timeStr.slice(4, 2)}-${timeStr.slice(6)}`; }
+  if (type === "month") {
+    try { if (timeStr.length < 4) { return timeStr } else { return `${timeStr.slice(0, 4)}-${timeStr.slice(4)}` } } catch (error) { return ""; }
+  }
+  else if (type === "year") { try { return `${timeStr.slice(0, 4)}-${timeStr.slice(4, 2)}-${timeStr.slice(6)}`; } catch (error) { return ""; } }
 }
 
 export const extractDateRange = (dateString) => {

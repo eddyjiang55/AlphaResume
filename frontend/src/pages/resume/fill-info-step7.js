@@ -11,7 +11,7 @@ export async function getServerSideProps(context) {
   if (context.query.id) {
     // Fetch dbFormData from external API
     const preformattedData = await fetchPartData(context.query.id, 'researchPapersAndPatents');
-    // console.log(preformattedData.data);
+    console.log(preformattedData.data);
     let displayPaperData = [];
     let displayPatentData = [];
     if (preformattedData.data && preformattedData.data.科研论文) {
@@ -523,10 +523,12 @@ export default function Step7Page({ dbFormData }) {
               增加专利经历
             </button>
           </div>
-          <div className="w-full max-w-[75%] flex flex-row justify-between items-center mx-auto">
-            <Link href={`/resume/fill-info-step6?id=${dbFormData._id}`}><button className="form-b" type="button" >
-              上一步
-            </button></Link>
+          <div className="w-full flex flex-row justify-center items-center gap-x-20 p-4 my-8">
+            <Link href={`/resume/fill-info-step6?id=${dbFormData._id}`}>
+              <button className="form-b" type="button" >
+                上一步
+              </button>
+            </Link>
             <button className="form-b" onClick={handleSave}>保存</button>
             <button className="form-b" type="button" onClick={handleSubmit}>
               下一步
