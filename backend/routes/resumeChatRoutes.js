@@ -152,7 +152,7 @@ router.post('/resume-chat', async (req, res) => {
         const _id = await resumeChat.save();
 
         // 调用 Python 文件
-        const pythonProcess = spawn('python3', [pythonScriptPath, _id, resume_id, 0]);
+        const pythonProcess = spawn('python', [pythonScriptPath, _id, resume_id, 0]);
 
         let stderrOutput = '';
 
@@ -201,7 +201,7 @@ router.put('/resume-chat/:_id', async (req, res) => {
         const sectionId = chatRecord.sectionId;
 
         // 调用 Python 文件
-        const pythonProcess = spawn('python3', [pythonScriptPath, _id, resumeId, sectionId]);
+        const pythonProcess = spawn('python', [pythonScriptPath, _id, resumeId, sectionId]);
 
         let stderrOutput = '';
 

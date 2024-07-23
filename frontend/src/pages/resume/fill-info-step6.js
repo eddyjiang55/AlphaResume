@@ -14,7 +14,7 @@ export async function getServerSideProps(context) {
     const preformattedData = await fetchPartData(context.query.id, 'awardsAndCertificates');
     let displayAwardData = [];
     let displayCertificateData = [];
-    // console.log(preformattedData.data);
+    console.log(preformattedData.data);
     if (preformattedData.data && preformattedData.data.获奖) {
       displayAwardData = preformattedData.data.获奖.map((data) => {
         return {

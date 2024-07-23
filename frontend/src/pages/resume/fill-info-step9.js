@@ -197,6 +197,7 @@ export default function Step10Page({ dbFormData }) {
 
                   <label>*熟练度</label>
                   <select
+                    placeholder='请选择熟练度'
                     value={languageFormData[activeIndex].proficiency}
                     onChange={(e) => {
                       const newLanguageFormData = [...languageFormData];
