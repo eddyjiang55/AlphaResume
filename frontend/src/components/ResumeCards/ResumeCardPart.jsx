@@ -10,6 +10,8 @@ const RecordsList = ({ resumeIdList, userPhoneNumber }) => {
 
   useEffect(() => {
     console.log("resumeIdList changed");
+    // reverse the order of the resumeIdList
+    resumeIdList.reverse();
     setCards(resumeIdList);
   }, [resumeIdList]);
 

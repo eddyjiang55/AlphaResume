@@ -20,8 +20,10 @@ export const processTimeStr = (timeStr, type) => {
 }
 
 export const extractDateRange = (dateString) => {
+  const filterNonDigitChars = (str) => str.replace(/\D/g, '');
+
   try {
-    const [start, end] = dateString.split('-');
+    const [start, end] = dateString.split('//').map(filterNonDigitChars);
     return [processTimeStr(start, "month"), processTimeStr(end, "month")];
   } catch (error) {
     return ["", ""];

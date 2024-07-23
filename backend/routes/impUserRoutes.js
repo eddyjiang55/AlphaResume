@@ -228,7 +228,7 @@ router.post('/improved-users/generate-resume', async (req, res) => {
         const resumeHistoryId = await newResumeHistory.save();
         await ImprovedUser.updateResumeId(id, resumeHistoryId);
 
-        const pythonProcess = spawn('python3', ['./pyScripts/generate_cv.py', id, resumeHistoryId, position], {
+        const pythonProcess = spawn('python', ['./pyScripts/generate_cv.py', id, resumeHistoryId, position], {
             env: {
                 ...process.env,
             }

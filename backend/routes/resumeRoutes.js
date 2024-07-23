@@ -16,6 +16,24 @@ const upload = multer({ storage: storage });
 
 let processResult = {};
 
+function formatDateString() {
+    // Ensure the input is a Date object
+    const dateObj = new Date();
+    console.log(dateObj);
+    if (isNaN(dateObj)) {
+        throw new Error('Invalid date');
+    }
+
+    // Extract month and day
+    const month = dateObj.getMonth() + 1; // Months are zero-based
+    const day = dateObj.getDate();
+
+    // Format the date string
+    const formattedString = `${month}月${day}日扫描简历`;
+
+    return formattedString;
+}
+
 
 // 上传简历并保存记录
 router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
@@ -33,7 +51,7 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
 
         const pdfData = req.file.buffer.toString('base64'); // 确保正确编码为Base64
         console.log(`PDF data encoded to Base64, length: ${pdfData.length}`);
-        
+
         const markdownData = await convertToMarkdown(req.file.buffer); // 假设这个函数同步执行并返回Markdown数据
 
         // 将简历数据保存到数据库
@@ -48,9 +66,10 @@ router.post('/resume-history', upload.single('pdfFile'), async (req, res) => {
 
         const resume_history_id = await newResume.save(); // 保存并获取ID
         console.log(`Resume history saved with ID: ${resume_history_id}`);
+        const formattedDateString = formatDateString();
 
         // 调用Python脚本进行进一步处理
-        const pythonProcess = spawn('python3', ['./pyScripts/pdf_reader.py', resume_history_id, improved_user_id]);
+        const pythonProcess = spawn('python', ['./pyScripts/pdf_reader.py', resume_history_id, improved_user_id, formattedDateString]);
         processResult[improved_user_id] = { status: 'running' };
 
         pythonProcess.stdout.on('data', (data) => {

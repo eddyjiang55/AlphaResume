@@ -19,9 +19,8 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 resume_history_id = sys.argv[1]
 # get resume_id from command line
 improved_user_id = sys.argv[2]
-
-
-
+resume_title = sys.argv[3]
+print(resume_title, flush=True)
 
 
 def get_pdf_from_mongodb(resumehist_id):
@@ -49,6 +48,7 @@ def get_pdf_from_mongodb(resumehist_id):
 # 从本地读取json模板
 template = {
     "基本信息": {
+        "title": resume_title,
         "姓": "",
         "名": "",
         "手机号码": "",
@@ -261,16 +261,16 @@ def transform_chat_json(md_data):
         repetition_penalty=1.0
     )
     if response.status_code == HTTPStatus.OK:
-        print(response.usage)  # The usage information
+        print(response.usage, flush=True)  # The usage information
         return response.output['text']  # The output text
     else:
-        print(response.code)  # The error code.
-        print(response.message)  # The error message.
-
+        print(response.code, flush=True)  # The error code.
+        print(response.message, flush=True)  # The error message.
 
 
 # 此处需要修改
 md_data = get_pdf_from_mongodb(resume_history_id)
+print("Get md_data from mongodb", flush=True)
 print(md_data, flush=True)
 # 去掉所有除了中文，英文，数字和'-', ' ', '.', '\n'之外的字符
 md_data = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9\- \n]', '', md_data)
@@ -280,7 +280,8 @@ with open("md_data.md", "w", encoding="utf-8") as f:
 response = transform_chat_json(md_data)
 response = re.sub(r"```json", '', response)
 response = re.sub(r"```", '', response)
-
+print("result from model", flush=True)
+print(response, flush=True)
 
 def upload_standard_data_to_mongodb(json_data, improved_user_id, resume_history_id):
     uri = "mongodb+srv://leoyuruiqing:WziECEdgjZT08Xyj@airesume.niop3nd.mongodb.net/?retryWrites=true&w=majority&appName=AIResume"
@@ -289,19 +290,20 @@ def upload_standard_data_to_mongodb(json_data, improved_user_id, resume_history_
     # Send a ping to confirm a successful connection
     try:
         client.admin.command('ping')
-        print("Pinged your deployment. You successfully connected to MongoDB!")
+        print("Pinged your deployment. You successfully connected to MongoDB!", flush=True)
     except Exception as e:
-        print(e)
+        print(e, flush=True)
 
     database_name = "airesumedb"
     collection_name = "improvedUsers"
     db = client[database_name]
 
     collection = db[collection_name]
-    
+
     print(json_data, flush=True)
 
-    collection.update_one({"_id": improved_user_id}, {'$set':{ "resumeId": resume_history_id, "personal_data": json.loads(json_data)}})
+    collection.update_one({"_id": improved_user_id}, {'$set': {
+                          "resumeId": resume_history_id, "personal_data": json.loads(json_data)}})
 
     # 关闭MongoDB连接
     client.close()

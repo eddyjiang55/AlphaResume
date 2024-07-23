@@ -15,6 +15,8 @@ export async function getServerSideProps(context) {
     if (preformattedData.data) {
       const displayData = preformattedData.data.map((data) => {
         const [formattedStart, formattedEnd] = extractDateRange(data.起止时间);
+        // console.log(formattedStart);
+        // console.log(formattedEnd);
         let tillPresent = false;
         if (formattedEnd === "至今") {
           tillPresent = true;
@@ -36,6 +38,7 @@ export async function getServerSideProps(context) {
         };
       });
       dbFormData = { data: displayData, _id: preformattedData._id };
+      console.log(dbFormData.data);
     } else {
       dbFormData = { data: null, _id: preformattedData._id };
     }
@@ -110,7 +113,7 @@ export default function Step3Page({ dbFormData }) {
         学校名称: data.school,
         城市: data.city,
         国家: data.country,
-        起止时间: data.startDate + "-" + data.endDate,
+        起止时间: `${data.startDate} // ${data.endDate}`,
         院系: data.department,
         专业: data.major,
         GPA: data.gpa,
@@ -163,7 +166,7 @@ export default function Step3Page({ dbFormData }) {
         学校名称: data.school,
         城市: data.city,
         国家: data.country,
-        起止时间: data.startDate + "-" + data.endDate,
+        起止时间: `${data.startDate} // ${data.endDate}`,
         院系: data.department,
         专业: data.major,
         GPA: data.gpa,
@@ -235,8 +238,7 @@ export default function Step3Page({ dbFormData }) {
             </div>
               <form className="w-full max-w-[960px] flex flex-col items-stretch justify-start mx-auto">
                 <label>*学历</label>
-                <input
-                  type="text"
+                <select
                   placeholder="请输入学历水平"
                   value={formData[activeIndex].degree}
                   onChange={(e) => {
@@ -244,7 +246,13 @@ export default function Step3Page({ dbFormData }) {
                     newFormData[activeIndex].degree = e.target.value;
                     setFormData(newFormData);
                   }}
-                />
+                >
+                  <option value="">请选择学历</option>
+                  <option value="大专">大专</option>
+                  <option value="本科">本科</option>
+                  <option value="硕士研究生">硕士研究生</option>
+                  <option value="博士研究生">博士研究生</option>
+                </select>
 
                 <label>*学校名称</label>
                 <input
@@ -591,7 +599,8 @@ export default function Step3Page({ dbFormData }) {
         input[type="text"],
         textarea[type="text"],
         input[type="tel"],
-        input[type="email"] {
+        input[type="email"],
+        select {
           padding: 10px;
           margin-top: 5px;
           border: 1px solid #ccc;

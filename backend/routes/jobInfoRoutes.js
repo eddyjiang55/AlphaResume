@@ -104,7 +104,7 @@ router.get('/job-information/keyword/:keyword', async (req, res) => {
 router.post('/job-information/match', async (req, res) => {
     try {
         const { jobString } = req.body;
-        const pythonProcess = spawn('python3', [path.join(__dirname, '../calculate_similarity.py'), jobString]);
+        const pythonProcess = spawn('python', [path.join(__dirname, '../calculate_similarity.py'), jobString]);
 
         pythonProcess.stdout.on('data', (data) => {
             const result = JSON.parse(data.toString());

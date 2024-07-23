@@ -142,7 +142,7 @@ export default function GeneratedResumePage({ dbFormData }) {
 
   return (
     <>
-      <div className="grid grid-cols-12 py-4 gap-x-1 h-full max-h-[calc(100vh-8rem-100px)] overflow-y-hidden">
+      <div className="grid grid-cols-12 py-4 gap-x-1 h-full overflow-y-hidden">
         <div
           id="edit zone"
           className="col-span-5 px-2 flex flex-col justify-center items-center max-h-full"
@@ -174,9 +174,9 @@ export default function GeneratedResumePage({ dbFormData }) {
           className="col-span-5 px-2 flex-1 flex flex-col justify-center items-center h-full overflow-auto"
         >
           <h2 className="text-alpha-blue font-bold text-4xl mb-8">导出效果</h2>
-          <div id="preview" className="h-full overflow-auto">
+          <div id="preview" className="h-full overflow-auto w-full">
             {loading ? (
-              <div className="h-full flex flex-col justify-center mx-8">
+              <div className="h-full flex flex-col justify-center w-4/5 mx-auto">
                 <div className="flex justify-between mb-1">
                   <span className="text-lg font-medium text-alpha-blue dark:text-white">
                     Resume Generating...
